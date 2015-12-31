@@ -1,0 +1,286 @@
+<div class="navbar-border" ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Statistics for <a ng-href="/projects/{{projectId}}/summary">project {{projectId}}</a></h3>
+        </div>
+        <div class="col-md-3">
+            <span class="projectStats-date-selection-label">From:</span>
+
+            <p class="input-group">
+                <input type="text" class="form-control" uib-datepicker-popup="{{datePickerDateFormat}}"
+                       ng-model="fromDate" is-open="datePickerFromOpen" max-date="{{datePickerMaxSelectableDate}}"
+                       ng-required="true" ng-change="updateFromDate()" close-text="Close"/>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="openDatePickerFrom($event)" style="height: 34px;"><i
+                    class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+            </p>
+        </div>
+        <div class="col-md-3">
+            <span class="projectStats-date-selection-label">Until:</span>
+
+            <p class="input-group">
+                <input type="text" class="form-control" uib-datepicker-popup="{{datePickerDateFormat}}"
+                       ng-model="untilDate" is-open="datePickerUntilOpen" max-date="{{datePickerMaxSelectableDate}}"
+                       ng-required="true" ng-change="updateUntilDate()" close-text="Close"/>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="openDatePickerUntil($event)" style="height: 34px;">
+                <i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+            </p>
+        </div>
+    </div>
+
+    <div class="row projectStats-row-spacing">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Compilations {{totalCompilationsDay}} and Runs {{totalRunsDay}}
+            <span class="glyphicon glyphicon-question-sign pull-right" aria-hidden="true"
+                  tooltip-placement="left" uib-tooltip="Shows the number of compilations and runs per day.">
+            </span>
+                    </h3>
+                </div>
+                <div class="panel-body">
+
+                    <div>
+                        <div ng-show="isLoadingCompilationRunGraphData">
+                            <h4><span class="glyphicon glyphicon-refresh projectStats-load-icon-animate"></span>
+                                Loading...
+                            </h4>
+                        </div>
+
+                        <div ng-if="!isLoadingCompilationRunGraphData">
+                            <canvas id="line23" class="chart chart-line" chart-data="compileRunGraph.data"
+                                    chart-labels="compileRunGraph.labels" chart-legend="true"
+                                    chart-series="compileRunGraph.series">
+                            </canvas>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 60px;">
+                        <button class="btn btn-default center-block" ng-click="hideShowCompilationRunTable()">
+                            {{compilationRunBtnLabel}}
+                        </button>
+
+                        <div ng-show="compilationRunTableVisible">
+
+                            <div ng-show="isLoadingCompilationRunDetails">
+                                <h4><span class="glyphicon glyphicon-refresh projectStats-load-icon-animate"></span>
+                                    Loading...
+                                </h4>
+                            </div>
+
+                            <div ng-show="!isLoadingCompilationRunDetails">
+
+                                <h4>Compilations ({{totalCompilations}})</h4>
+
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Last compilation</th>
+                                        <th># of compilations</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="user in filteredCompilations">
+                                        <td><a ng-href="/users/{{user._id }}">{{user._id}}</a></td>
+                                        <td>{{user.lastDate | date:'medium'}}</td>
+                                        <td>{{user.countProjectAccess }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="text-center">
+                                    <uib-pagination
+                                            ng-model="currentPageCompilations"
+                                            total-items="compilationStats.length"
+                                            max-size="maxSizePage"
+                                            items-per-page="numPerPage"
+                                            ng-change="pageCompilationChanged()"
+                                            boundary-links="true">
+                                    </uib-pagination>
+                                </div>
+
+
+                                <h4>Runs ({{totalRuns}})</h4>
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Last run</th>
+                                        <th># of runs</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="user in filteredRuns">
+                                        <td><a ng-href="/users/{{user._id }}">{{user._id}}</a></td>
+                                        <td>{{user.lastDate | date:'medium'}}</td>
+                                        <td>{{user.countProjectAccess }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="text-center">
+                                    <uib-pagination
+                                            ng-model="currentPageRuns"
+                                            total-items="runStats.length"
+                                            max-size="maxSizePage"
+                                            items-per-page="numPerPage"
+                                            ng-change="pageRunsChanged()"
+                                            boundary-links="true">
+                                    </uib-pagination>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row projectStats-row-spacing">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Project accesses {{totalAccessPerDay}}
+            <span class="glyphicon glyphicon-question-sign pull-right" aria-hidden="true"
+                  tooltip-placement="left"
+                  uib-tooltip="Shows the number of project accesses per day. Each access, including multiple by the same user, is counted.">
+            </span>
+                    </h3>
+                </div>
+                <div class="panel-body">
+
+                    <div ng-show="isLoadingUserAccessGraphData">
+                        <h4><span class="glyphicon glyphicon-refresh projectStats-load-icon-animate"></span>
+                            Loading...
+                        </h4>
+                    </div>
+
+                    <div ng-if="!isLoadingUserAccessGraphData">
+                        <div>
+                            <canvas id="dataGraphUserAccessId" class="chart chart-line"
+                                    chart-data="dataGraphUserAccess.data"
+                                    chart-labels="dataGraphUserAccess.labels" chart-legend="true"
+                                    chart-series="dataGraphUserAccess.series">
+                            </canvas>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 60px;">
+                        <button class="btn btn-default center-block" ng-click=hideShowProjectAccessDetails()>
+                            {{projectAccessBtnLabel}}
+                        </button>
+                        <div ng-show="projectAccessTableVisible">
+
+                            <div ng-show="isLoadingProjectAccessDetails">
+                                <h4><span class="glyphicon glyphicon-refresh projectStats-load-icon-animate"></span>
+                                    Loading...
+                                </h4>
+                            </div>
+
+                            <div ng-show="!isLoadingProjectAccessDetails">
+
+                                <h4>Project accesses ({{totalAccesses}})</h4>
+
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Last access</th>
+                                        <th># of accesses</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="user in filteredProjAccesses">
+                                        <td><a ng-href="/users/{{user._id }}">{{user._id}}</a></td>
+                                        <td>{{user.lastDate | date:'medium'}}</td>
+                                        <td>{{user.countProjectAccess }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="text-center">
+                                    <uib-pagination
+                                            ng-model="currentPageProjectAccess"
+                                            total-items="accessStats.length"
+                                            max-size="maxSizePage"
+                                            items-per-page="numPerPage"
+                                            ng-change="pageProjectAccessChanged()"
+                                            boundary-links="true">
+                                    </uib-pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row projectStats-row-spacing">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Submissions</h3>
+                </div>
+                <div class="panel-body">
+                    <div>
+                        <p> Submission statistics can be viewed in the user details below (no graph available). </p>
+                        <button class="btn btn-default center-block" ng-click=hideShowSubmissionsDetails()>
+                            {{submissionBtnLabel}}
+                        </button>
+
+                        <div ng-show="submissionTableVisible">
+
+                            <div ng-show="isLoadingSubmissionsDetails">
+                                <h4><span class="glyphicon glyphicon-refresh projectStats-load-icon-animate"></span>
+                                    Loading...
+                                </h4>
+                            </div>
+
+                            <div ng-show="!isLoadingSubmissionsDetails">
+                                <h4>Submissions details ({{totalSubmissions}})</h4>
+
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Last submission</th>
+                                        <th># of submissions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="user in filteredSubmissions">
+                                        <td><a ng-href="/users/{{user._id }}">{{user._id}}</a></td>
+                                        <td>{{user.lastDate | date:'medium'}}</td>
+                                        <td>{{user.countProjectAccess }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="text-center">
+                                    <uib-pagination
+                                            ng-model="currentPageSubmissions"
+                                            total-items="submissionStats.length"
+                                            max-size="maxSizePage"
+                                            items-per-page="numPerPage"
+                                            ng-change="pageSubmissionsChanged()"
+                                            boundary-links="true">
+                                    </uib-pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

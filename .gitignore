@@ -1,0 +1,18 @@
+# NodeJS dependencies
+node_modules
+
+# Bower dependencies
+app/bower_components
+
+# tmp folders created by Grunt
+.tmp
+.sass-cache
+
+# the folder created when running "grunt build"
+dist
+
+# Ignore the profile pictures of users
+app/images/users/profiles
+
+# Ignore everything in folder test/coverage which has generated coverage reports
+test/coverage

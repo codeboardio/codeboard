@@ -1,0 +1,27 @@
+{
+  "language": "C",
+  "files": [
+    {
+      "filename": "Root/application.c",
+      "content": "#include <stdio.h>\n#include \"./p1/b.h\"\n int main() {  printf(\"Hello, C World! \"); \n\tfoo(); return 0; }"
+    },
+    {
+      "filename": "Root/p1/b.h",
+      "content": "#ifndef B_MODULE\n #define B_MODULE\n int foo();\n #endif"
+    },
+    {
+      "filename": "Root/p1/b.c",
+      "content": "#include \"b.h\"\n#include \"../p2/c.h\"\n int foo () {bar(); return 1;}"
+    },
+    {
+      "filename": "Root/p2/c.h",
+      "content": "#ifndef C_MODULE\n #define C_MODULE\n int bar();\n #endif"
+    },
+    {
+      "filename": "Root/p2/c.c",
+      "content": "#include <stdio.h>\n#include \"c.h\"\n int bar () {printf(\"Hello C\"); return 2;}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

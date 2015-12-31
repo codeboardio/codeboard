@@ -1,0 +1,15 @@
+{
+  "language": "Python",
+  "files": [
+    {
+      "filename": "Root/b.py",
+      "content": "def foo():\n\tprint \"Goodbye, foo!\""
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainFileForRunning\":\"application.py\"\n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

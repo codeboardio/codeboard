@@ -1,0 +1,11 @@
+{
+  "language": "Haskell",
+  "files": [
+    {
+      "filename": "Root/application.hs",
+      "content": "main = do putStrLn \"Hello Haskell World!\""
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

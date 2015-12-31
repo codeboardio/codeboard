@@ -1,0 +1,45 @@
+{
+  "name": "codeboard",
+  "description": "Codeboard, the web-based IDE for the classroom. Core of the codeboard.io project.",
+  "version": "0.1.0",
+  "authors": [
+    {"name": "H.-Christian Estler", "email": "christian@codeboard.io"},
+    {"name": "Martin Nordio", "email": "martin@codeboard.io"}
+  ],
+  "homepage": "https://codeboard.io",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/codeboardio/codeboard.git"
+  },
+  "dependencies": {
+    "angular": "1.3.18",
+    "json3": "3.2.6",
+    "es5-shim": "2.1.0",
+    "jquery": "1.11.0",
+    "angular-bootstrap": "0.14.3",
+    "ng-file-upload-shim": "1.6.1",
+    "ng-file-upload": "1.6.1",
+    "bootstrap": "3.3.2",
+    "angular-resource": "1.3.18",
+    "angular-cookies": "1.3.18",
+    "angular-sanitize": "1.3.18",
+    "angular-route": "1.3.18",
+    "angular-animate": "1.3.18",
+    "ace-builds": "1.2.0",
+    "angular-ui-ace": "0.2.3",
+    "jsSHA": "1.5.0",
+    "angular-ui-select": "0.11.2",
+    "selectize": "0.8.5",
+    "ng-grid": "2.0.13",
+    "kendo-ui": "2015.1.318+Official",
+    "Chart.js": "1.0.2",
+    "angular-chart.js": "0.8.4",
+    "angular-websocket": "1.0.13",
+    "angular-scroll-glue": "2.0.6"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.3.18",
+    "angular-scenario": "1.3.18"
+  },
+  "license": "MIT"
+}

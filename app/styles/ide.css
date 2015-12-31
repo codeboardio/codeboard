@@ -1,0 +1,188 @@
+
+.ideHeader {
+  width: 100%;
+  /* height: 54px; /* set the header to the same height as the navbar */
+  /*border: 1px solid #a9a9a9;*/
+}
+
+#ideTreeViewProjectName {
+  /* height: inherit; */
+  /*border-top: 1px solid #a9a9a9;*/
+  /*border-left: 1px solid #a9a9a9;*/
+  /*border-right: 1px solid #a9a9a9;*/
+  border-bottom: 1px solid #9f9f9f;
+  /* width: 219px; /* must be the same as the tree-view element */
+  padding-top: 10px;
+  padding-left: 5px;
+  color: #777777;
+  font-size: 16px;
+  /* float: left; */
+  height: 29px;
+  background-color: #e7e7e7;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#ideTabArea {
+  overflow-y: auto; /* if we have too many tabs, a scroll bar appears */
+  padding-left: 2px; /* the first tab has 2 pixels space compared to where the editor starts */
+  height: 38px;
+  /* border-bottom: 1px solid #a9a9a9; */
+  margin-top: 2px;
+}
+
+.dropdown {
+  /* want a pointer for all the menus */
+  /* we don't get it by default because we don't provide a href in the <a> element */
+  cursor: pointer !important;
+}
+
+.ideFooter {
+  position: absolute;
+  height: 204px;
+  width: 100%;
+  bottom: 0;
+  background-color: #e7e7e7;
+}
+
+.ideOutput {
+  overflow: auto;
+  color: #555555;
+  background-color: #ffffff;
+  white-space: pre;
+  padding: 10px;
+  position: absolute;
+  top: 3px;
+  bottom: 25px;
+  left: 3px;
+  right: 3px;
+}
+
+.ideOutputText {
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.42857143;
+}
+
+.ideOutputBorder {
+  border: 1px solid #9f9f9f;
+  border-radius: 3px;
+}
+
+.ideFooterStatusBar {
+  height: 18px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 1px;
+  border-top: 1px solid #e7e7e7;
+  font-size: 11px;
+  color: #777;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.ideTree {
+  /*position: absolute; */
+  /* width: 220px; */
+  height: 100%;
+  overflow: auto;
+}
+
+.ideEditorArea {
+  /* padding-left: 220px; */
+  /* height:100%; */
+  overflow: auto;
+}
+
+.ideEditor {
+  border-top: 1px solid #9f9f9f;
+}
+
+#ideAceNotVisible {
+  background-color: #e7e7e7;
+  /* height: 100%; */
+}
+
+#ideMsgNoFilesOpen {
+  text-align: center;
+  padding-top: 100px;
+  color: #a9a9a9;
+}
+
+#ideMsgNotSignedIn {
+  max-width: 300px;
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 25px;
+}
+
+.ideSplitterOverflowVisible {
+  overflow: visible !important;
+}
+
+.ideSplitterFullHeight {
+  height: 100%;
+}
+
+.ideTabs {
+  /* margin-top: 2px;*/
+  margin-bottom: 0;
+  padding-left: 0px;
+  /* background-color: #e8e8e8; */
+}
+
+.ideTabs li {
+  list-style-type: none;
+  border: 1px solid #d3d3d3;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  padding: 10px 15px;
+  background-color: #fff;
+  cursor: pointer;
+  color: #333;
+  opacity: .65;
+}
+
+.ideTabActive {
+  opacity: 1 !important;
+  border-color: #9f9f9f !important;
+}
+
+.ideTabs img {
+  margin: 0 0 0 4px;
+}
+
+#ideNavBar {
+  border-radius: 0;
+  margin-bottom: 0;
+  background-color: #f5f5f5;
+}
+
+.navbar-brand {
+  padding-left: 15px;
+  padding-top: 5px;
+}
+
+.ace_gutter {
+  /* overwrite the ace gutter bg-color to match the bootstrap gray */
+  background-color: #e7e7e7 !important;
+}
+
+#ace_editor {
+  /* border-top: 1px solid darkgray; */
+  /* height: 100%; */
+  width: 100%;
+  /*padding-bottom: 40px; /* padding for the tab bar */
+  position: absolute;
+  top: 39px;
+  bottom: 0px;
+}
+
+#ideRightPartOfMiddlePart {
+  background-color: #e7e7e7;
+}
+
+/* Make sure the kendo-splitter is not visible in the treeview where it splits the project-name and the LibraryCtrl */
+#ideTreeviewPartOfMiddlePart .k-splitbar {
+  background-color: #ffffff;
+}

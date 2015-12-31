@@ -1,0 +1,11 @@
+{
+  "language": "Python",
+  "files": [
+    {
+      "filename": "Root/application.py",
+      "content": "print \"Goodbye, World!\"  "
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

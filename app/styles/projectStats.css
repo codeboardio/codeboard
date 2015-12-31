@@ -1,0 +1,44 @@
+
+/** Spacing between the bootstrap rows on the stats page */
+.projectStats-row-spacing {
+    margin-top: 20px
+}
+
+/** Formatting for label "From:" and "Until:" */
+.projectStats-date-selection-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #666666;
+}
+
+/** Class that defines a spinning animation (use for load icon) */
+.projectStats-load-icon-animate {
+    -animation: projectStatsSpin .8s infinite linear;
+    -webkit-animation: projectStatsSpin .8s infinite linear;
+    -moz-animation: projectStatsSpin .8s infinite linear;
+}
+
+/** Keyframes define the specific animation behavior */
+@keyframes projectStatsSpin {
+    from { transform: scale(1) rotate(0deg); }
+    to   { transform: scale(1) rotate(360deg); }
+}
+
+@-moz-keyframes projectStatsSpin {
+    from { -moz-transform: rotate(0deg); }
+    to   { -moz-transform: rotate(360deg); }
+}
+
+@-webkit-keyframes projectStatsSpin {
+    from { -webkit-transform: rotate(0deg); }
+    to   { -webkit-transform: rotate(360deg); }
+}
+
+/**
+ * We hijack the dynamically inject div with class .chart-container.
+ * That allows us to fix the bug where a chart grows on every resizing.
+ * Might not be needed in the future if the library gets fixed.
+ */
+.chart-container {
+    height: 350px;
+}

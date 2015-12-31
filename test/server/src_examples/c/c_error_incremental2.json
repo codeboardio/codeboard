@@ -1,0 +1,15 @@
+{
+  "language": "C",
+  "files": [
+    {
+      "filename": "Root/b.c",
+      "content": "#include \"b.h\"\n#include \"c.h\"\n int foo () {bar(); return 1;}"
+    },
+    {
+      "filename": "Root/c.c",
+      "content": "#include <stdio.h>\n#include \"c.h\"\n int bar () {printf(\"Hello C\");return 2;}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

@@ -1,0 +1,27 @@
+{
+  "language": "Haskell",
+  "files": [
+    {
+      "filename": "Root/application.hs",
+      "content": "import P1(ff)\nimport P1.B(foo)\nimport P1.C(bar)\n\nmain = do\n  putStrLn \"Hello Haskell World!\"\n  foo\n  bar\n\n"
+    },
+    {
+      "filename": "Root/P1.hs",
+      "content": "module P1 (ff) where ff = do putStrLn \"Hello P1\""
+    },
+    {
+      "filename": "Root/P1/B.hs",
+      "content": "module P1.B (foo) where foo = do putStrLn \"Hello P1.B\""
+    },
+    {
+      "filename": "Root/P1/C.hs",
+      "content": "module P1.C (bar) where bar = do putStrLn \"Hello P1.C\""
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainFileForCompilation\":\"application.hs\",\n\t\"GHCArgumentMainIs\":\"main\"\n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

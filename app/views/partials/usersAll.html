@@ -1,0 +1,32 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+<div>
+  <div class="container">
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <h2>{{users.length}} users</h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr ng-repeat="user in users">
+                <td><a ng-href="/users/{{user.username}}">{{user.username}}</a></td>
+                <td>{{user.createdAt | date}}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+

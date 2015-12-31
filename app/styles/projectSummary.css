@@ -1,0 +1,17 @@
+.projectSummary-listing {
+  list-style: none;
+  padding-top: 20px;
+}
+
+.projectSummary-listing-metadata {
+  float: right;
+  margin-top: 20px;
+  color: #5e5e5e;
+  font-size: 12px;
+}
+
+.projectSummary-listing-description {
+  white-space: pre-line;
+  max-width: 650px;
+  padding-top: 20px;
+}

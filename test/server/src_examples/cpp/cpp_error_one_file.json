@@ -1,0 +1,11 @@
+{
+  "language": "C++",
+  "files": [
+    {
+      "filename": "Root/application.cpp",
+      "content": "#include <iostream>\n int main() {  std::cout << \"Hello C++ world!\" << std::endl; foo(); \n\treturn 0; }"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

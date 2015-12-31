@@ -1,0 +1,8 @@
+{
+    "_comment": "Configuration for this Haskell-HSpec project.",
+    "MainFileForCompilation": "./Root/Src/Main.hs",
+    "GHCArgumentMainIs": "Root.Src.Main.main",
+    "DirectoryForSourceFiles": "./Root/Src",
+    "DirectoryForTestFiles": "./Root/Test",
+    "DirectoryForTestSubmissionFiles": "./Root/TestSubmission"
+}

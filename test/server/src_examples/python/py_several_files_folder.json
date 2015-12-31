@@ -1,0 +1,27 @@
+{
+  "language": "Python",
+  "files": [
+    {
+      "filename": "Root/application.py",
+      "content": "from p1.b import foo\nfrom p1.c import bar\nfoo()\nbar()\nprint \"Goodbye, World!\""
+    },
+    {
+      "filename": "Root/p1/__init__.py",
+      "content": " "
+    },
+    {
+      "filename": "Root/p1/b.py",
+      "content": "def foo():\n\tprint \"Goodbye, P1.foo!\""
+    },
+    {
+      "filename": "Root/p1/c.py",
+      "content": "def bar():\n\tprint \"Goodbye, P1.bar!\""
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainFileForRunning\":\"application.py\"\n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

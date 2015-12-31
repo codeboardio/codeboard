@@ -1,0 +1,153 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <base href="/">
+    <title>Codeboard · the IDE for the classroom</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+
+    <!-- Keep bootstrap out of vendor.css path to make icons show correctly -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+
+    <!-- build:css(app) styles/vendor.css -->
+    <!-- the css for the Angular UI select -->
+    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.min.css">
+    <link rel="stylesheet" href="bower_components/selectize/dist/css/selectize.default.css">
+    <!-- the css for the Angular UI ngGrid -->
+    <link rel="stylesheet" href="bower_components/ng-grid/ng-grid.min.css">
+    <!-- endbuild -->
+
+    <!-- the css for the treeview (should not be modified during build because of path to img) -->
+    <link rel="stylesheet" type="text/css" href="components/angularTreeview/css/angular.treeview.css">
+
+
+    <!-- css for KendoUI -->
+    <link rel="stylesheet" type="text/css" href="bower_components/kendo-ui/styles/kendo.common.min.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/kendo-ui/styles/kendo.bootstrap.min.css">
+
+    <!-- build:css({.tmp,app}) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/ide.css">
+    <link rel="stylesheet" href="styles/userManagement.css">
+    <link rel="stylesheet" href="styles/projectListing.css">
+    <link rel="stylesheet" href="styles/projectSummary.css">
+    <link rel="stylesheet" href="styles/projectStats.css">
+    <link rel="stylesheet" href="styles/userSettings.css">
+    <link rel="stylesheet" href="styles/docs.css">
+    <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
+    <!-- endbuild -->
+
+  </head>
+  <body ng-app="codeboardApp">
+
+  <!--<div class="alert alert-warning alert-dismissible" role="alert" style="margin-bottom: 0px">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Important:</strong> on Wed 2015-12-16, from approximately 11 PM until 11.30 PM (UTC), Codeboard will undergo planned maintenance and might not be available.
+  </div>-->
+
+  <!-- [if lt IE 7]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <div ng-view style="height: 100%;"></div>
+
+
+  <!--[if lt IE 9]>
+  <script src="bower_components/es5-shim/es5-shim.js"></script>
+  <script src="bower_components/json3/lib/json3.min.js"></script>
+  <![endif]-->
+
+
+  <!-- build:js(app) scripts/vendor.js -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/ng-file-upload-shim/angular-file-upload-shim.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/ng-file-upload/angular-file-upload.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="bower_components/angular-resource/angular-resource.js"></script>
+  <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+  <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.js"></script>
+  <script src="bower_components/jsSHA/src/sha.js"></script>
+  <script src="bower_components/angular-websocket/angular-websocket.js"></script>
+
+  <!--Angular Charts -->
+  <script src="bower_components/Chart.js/Chart.min.js"></script>
+  <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
+
+
+  <!-- Angular TreeView -->
+  <script src="components/angularTreeview/angular.treeview.js"></script>
+  <!-- Angular UI-->
+  <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <!-- endbuild -->
+
+  <!-- Angular UI select -->
+  <script src="bower_components/angular-ui-select/dist/select.min.js"></script>
+  <!-- Angular UI ngGrid -->
+  <script src="bower_components/ng-grid/ng-grid-2.0.13.min.js"></script>
+
+
+
+  <!-- Ace editor -->
+  <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
+  <script src="bower_components/angular-ui-ace/ui-ace.min.js"></script>
+
+  <script src="components/ngGrid/ngGridHeight.js"></script>
+
+  <!-- Testing Kendo-UI -->
+  <script src="bower_components/kendo-ui/js/kendo.core.min.js"></script>
+  <script src="bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
+  <script src="bower_components/kendo-ui/js/kendo.angular.min.js"></script>
+
+  <!-- Angular Scroll-Glue (make output automatically scroll to bottom when adding text) -->
+  <script src="bower_components/angular-scroll-glue/src/scrollglue.js"></script>
+
+
+  <!-- build:js({.tmp,app}) scripts/scripts.js -->
+  <script src="scripts/app.js"></script>
+  <script src="scripts/controllers/main.js"></script>
+  <script src="scripts/controllers/navbarCtrl.js"></script>
+  <script src="scripts/controllers/signupCtrl.js"></script>
+  <script src="scripts/controllers/signinCtrl.js"></script>
+  <script src="scripts/controllers/passwordResetCtrl.js"></script>
+  <script src="scripts/controllers/ide.js"></script>
+  <script src="scripts/controllers/ide/ideNodeActionCtrl.js"></script>
+  <script src="scripts/controllers/usersAllCtrl.js"></script>
+  <script src="scripts/controllers/userProjectsCtrl.js"></script>
+  <script src="scripts/controllers/projectsAllCtrl.js"></script>
+  <script src="scripts/controllers/projectSettingsCtrl.js"></script>
+  <script src="scripts/controllers/projectSummaryCtrl.js"></script>
+  <script src="scripts/controllers/projectNewCtrl.js"></script>
+  <script src="scripts/controllers/projectStatsCtrl.js"></script>
+  <script src="scripts/controllers/projectSubmissionsCtrl.js"></script>
+  <script src="scripts/controllers/projectUserProjectsCtrl.js"></script>
+  <script src="scripts/controllers/supportCtrl.js"></script>
+  <script src="scripts/services/projectFactory.js"></script>
+  <script src="scripts/controllers/userSettingsCtrl.js"></script>
+  <script src="scripts/services/uploadService.js"></script>
+  <script src="scripts/services/ideMsgService.js"></script>
+  <script src="scripts/services/ideSnippetsSrv.js"></script>
+  <script src="scripts/services/userSrv.js"></script>
+  <script src="scripts/services/websocketSrv.js"></script>
+  <script src="scripts/services/statsSrv.js"></script>
+  <script src="scripts/directives/ngEnter.js"></script>
+  <script src="scripts/directives/ngSelectOnFocus.js"></script>
+  <script src="scripts/resources/projectRes.js"></script>
+  <script src="scripts/resources/sessionRes.js"></script>
+  <script src="scripts/resources/userRes.js"></script>
+  <script src="scripts/resources/userprojectRes.js"></script>
+  <!-- endbuild -->
+  </body>
+</html>

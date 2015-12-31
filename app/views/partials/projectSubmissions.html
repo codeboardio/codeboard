@@ -1,0 +1,58 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Submissions for <a ng-href="/projects/{{projectId}}/summary">project {{projectId}}</a></h3>
+    </div>
+  </div>
+
+  <div class="row" ng-show="submissionData.length > 0">
+    <div class="col-md-4 pull-right">
+      <input type="text" placeholder="Filter by username" ng-model="usernameFilter" uib-typeahead="elem.username as elem.username for elem in submissionData | filter:{username:$viewValue} | limitTo:8" class="form-control">
+    </div>
+  </div>
+
+  <div class="row" ng-show="submissionData.length == 0 || filteredData == 0" style="padding-top: 40px;">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="jumbotron">
+        <h3>No submissions found.</h3>
+        <p ng-show="usernameFilter == undefined || usernameFilter.length == 0">It looks like this project has no submissions.</p>
+        <p ng-show="usernameFilter !== undefined && usernameFilter.length > 0">It looks like user '{{usernameFilter}}' has no submissions.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <ul style="list-style-type: none;">
+        <li ng-repeat="elem in filteredData = (submissionData | filter:{username: usernameFilter} | orderBy: 'username')" style="padding: 15px;">
+          <h4>
+            <a ng-href="/users/{{elem.username}}" ng-if="elem.username !== '#anonymous'">{{elem.username}}</a>
+            <span ng-if="elem.username === '#anonymous'">{{elem.username}}</span>
+            ({{elem.submissions.length}})
+          </h4>
+          <table class="table table-condensed table-hover">
+            <tr>
+              <th title="Date when the submission was created">Created</th>
+              <th title="Result or grade that was given">Result</th>
+              <th title="Number of test cases the submission passed">Tests passed</th>
+              <th title="Number of test cases the submission failed">Tests failed</th>
+              <th title="Result forwarded via LTI to other platform">LTI</th>
+              <th></th>
+            </tr>
+            <tr ng-repeat="sub in elem.submissions | orderBy:'createdAt':true">
+              <td>{{sub.createdAt | date: 'medium'}}</td>
+              <td>{{sub.testResult === -1 ? '-' : sub.testResult}}</td>
+              <td>{{sub.numTestsPassed === -1 ? '-' : sub.numTestsPassed}}</td>
+              <td>{{sub.numTestsFailed === -1 ? '-' : sub.numTestsFailed}}</td>
+              <td>{{sub.isLtiSubmission ? 'yes' : 'no'}}</td>
+              <td><a class="btn btn-default btn-xs"  ng-href="/projects/{{projectId}}/submissions/{{sub.submissionId}}">Open in IDE</a></td>
+            </tr>
+          </table>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div> <!-- end of container -->

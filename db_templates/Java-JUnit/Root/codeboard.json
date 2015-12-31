@@ -1,0 +1,9 @@
+{
+    "_comment": "Configuration for this Java-JUnit project.",
+    "MainClassForRunning": "Main",
+    "ClassPath": "/usr/share/java/*",
+    "DirectoryForClassFiles": "./Root/bin",
+    "DirectoryForSourceFiles": "./Root/src",
+    "DirectoryForTestFiles": "./Root/test",
+    "DirectoryForTestSubmissionFiles": "./Root/test_submission"
+}

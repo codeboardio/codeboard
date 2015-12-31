@@ -1,0 +1,15 @@
+{
+  "language": "C++",
+  "files": [
+    {
+      "filename": "Root/b.cpp",
+      "content": "#include \"b.h\"\n#include \"c.h\"\n int foo () {bar(); return 1;}"
+    },
+    {
+      "filename": "Root/c.cpp",
+      "content": "#include <iostream>\n#include \"c.h\"\n int bar () {std::cout << \"Hello C++ world!\" << std::endl;return 2;}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

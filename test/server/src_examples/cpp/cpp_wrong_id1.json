@@ -1,0 +1,11 @@
+{
+  "language": "C++",
+  "files": [
+    {
+      "filename": "Root/b.h",
+      "content": "#ifndef B_MODULE\n #define B_MODULE\n int foo();\n #endif"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

@@ -1,0 +1,15 @@
+{
+  "language": "Haskell",
+  "files": [
+    {
+      "filename": "Root/application.hs",
+      "content": "main = do putStrLn \"Hello Haskell World!\""
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainFileForCompilation\":\"application.hs\",\n\t\"GHCArgumentMainIs\":\"main\"\n ERROR"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

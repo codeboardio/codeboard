@@ -1,0 +1,61 @@
+<div class="navbar-border" ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+  <div class="row">
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">New project</h3>
+        </div>
+        <div class="panel-body">
+
+          <form role="form" name="form" ng-submit="save(form)" style="margin-bottom: 30px">
+            <div class="form-group">
+              <label for="projectname">Project name</label>
+              <input type="text" class="form-control" id="projectname" ng-model="data.projectname" required>
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" rows="3" ng-model="data.description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="language">Language</label>
+              <select class="form-control" id="language" ng-model="data.language" required>
+                <option>C</option>
+                <option>C++</option>
+                <option>Haskell</option>
+                <option>Haskell-HSpec</option>
+                <option>Java</option>
+                <option>Java-JUnit</option>
+                <option>Python</option>
+                <option>Python-UnitTest</option>
+              </select>
+
+            </div>
+            <div class="form-group">
+              <label>Access control</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="data.isPrivate"> Private project (only accessible by owners and users)
+                </label>
+                <!--<p class="help-block">Only owners and users can see and access the project.</p>-->
+              </div>
+            </div>
+
+            <button type="submit" id="projectNew_createButton" class="btn btn-success">Create</button>
+            <a type="button" class="btn btn-default" href="/">Cancel</a>
+          </form>
+
+          <div ng-show="server.saveSuccess" class="alert alert-success" role="alert">
+            <strong>Project created!</strong> Redirecting to it's summary page.
+          </div>
+          <div ng-show="server.saveFailure" class="alert alert-danger" role="alert">
+            <strong>Project not created!</strong> Problem while saving your changes. Check your data and try again.
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

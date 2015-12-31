@@ -1,0 +1,23 @@
+{
+  "language": "C",
+  "files": [
+    {
+      "filename": "Root/b.h",
+      "content": "#ifndef B_MODULE\n #define B_MODULE\n int foo();\n #endif"
+    },
+    {
+      "filename": "Root/b.c",
+      "content": "#include \"b.h\"\n#include \"c.h\"\n int foo () {bar(); return 1;}"
+    },
+    {
+      "filename": "Root/c.h",
+      "content": "#ifndef C_MODULE\n #define C_MODULE\n int bar();\n #endif"
+    },
+    {
+      "filename": "Root/c.c",
+      "content": "#include <stdio.h>\n#include \"c.h\"\n int bar () {printf(\"Hello C\");return 2;}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

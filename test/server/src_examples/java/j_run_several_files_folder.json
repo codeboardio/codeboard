@@ -1,0 +1,31 @@
+{
+  "language": "Java",
+  "files": [
+    {
+      "filename": "Root/Application.java",
+      "content": "import p1.*; import p2.*; public class Application { public static void main(String[] args) {B b = new B(); D d = new D(); E e = new E();   System.out.println(\"Hello Java Test-3 \"); }}"
+    },
+    {
+      "filename": "Root/p1/B.java",
+      "content": "package p1; public class B { public B() {C c = new C(); System.out.println(\"Hello B\"); }}"
+    },
+    {
+      "filename": "Root/p1/C.java",
+      "content": "package p1; public class C { public C() {System.out.println(\"Hello C\"); }}"
+    },
+    {
+      "filename": "Root/p2/D.java",
+      "content": "package p2; public class D { public D() {System.out.println(\"Hello D\"); }}"
+    },
+    {
+      "filename": "Root/p2/E.java",
+      "content": "package p2; public class E { public E() {System.out.println(\"Hello E\"); }}"
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainFileForCompilation\": \"Application.java\",\n\t\"MainClassForRunning\":\"Application\"\n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

@@ -1,0 +1,11 @@
+{
+  "language": "C",
+  "files": [
+    {
+      "filename": "Root/application.c",
+      "content": "#include <stdio.h>\n int main() {  printf(\"Hello, C World! \"); foo(); \n\treturn 0; }"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

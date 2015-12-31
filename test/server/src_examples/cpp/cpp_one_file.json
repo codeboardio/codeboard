@@ -1,0 +1,11 @@
+{
+  "language": "C++",
+  "files": [
+    {
+      "filename": "Root/application.cpp",
+      "content": "/*Keep the main routine in the file application.c;\n otherwise Codeboard does not work*/\n\n#include <iostream>  \nint main() { \n\tstd::cout << \"Hello C++ world!\" << std::endl;  \n\treturn 0; \n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

@@ -1,0 +1,433 @@
+
+<!-- the entire view is controlled by the IdeCtrl, as specified in the routes -->
+<div class="ideSplitterFullHeight">
+
+  <!-- Start of Kendo splitter layout -->
+  <div class="ideSplitterFullHeight">
+
+    <!-- the outermost splitter that splits into header, middle, and footer -->
+    <div kendo-splitter k-orientation="'vertical'" k-on-resize="splitterResizeEvent()" k-panes='[{resizable: false, collapsible: false, size: "51px"}, {collapsible: false}, {collapsible: true, size: "180px" }]' style="height: 100%; border: none; box-shadow: none; webkit-box-shadow: none;  background-color: #e8e8e8;">
+
+      <div id="ideHeaderPartId" class="ideSplitterOverflowVisible">
+        <div class="ideHeader">
+          <nav class="navbar navbar-default navbar-static-top" role="navigation" id="ideNavBar">
+            <div class="container-fluid">
+              <!-- Brand and toggle get grouped for better mobile display -->
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <!--<a class="navbar-brand" href="/">-->
+                <img style="padding-top: 5px;"  src="/images/logo/codeboard_logo_50.png"/><!--</a>-->
+              </div>
+
+              <!-- Collect the nav links, forms, and other content for toggling -->
+              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                  <li class="dropdown">
+                    <a id="projectButton" data-toggle="dropdown" role="button">Project<b class="caret"></b></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
+                      <li><a ng-click="navBarClick('add_folder')">Add folder</a></li>
+                      <li><a ng-click="navBarClick('rename_node')">Rename file/folder</a></li>
+                      <li class="divider"></li>
+                      <li><a ng-click="navBarClick('remove_node')">Delete file/folder</a></li>
+
+                      <li ng-show="currentRoleIsOwner()" class="divider"></li>
+                      <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
+
+                      <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
+                      <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
+
+                      <li ng-show="currentRoleIsOwner()" class="divider"></li>
+                      <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
+
+                      <li class="divider"></li>
+                      <li><a href="/">Exit project</a></li>
+                    </ul>
+                  </li>
+                  <li class="dropdown">
+                    <a class="dropdown" data-toggle="dropdown" role="button">Edit<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a ng-click="ace.editor.getSession().getUndoManager().undo(false)">Undo</a></li>
+                      <li><a ng-click="ace.editor.getSession().getUndoManager().redo(false)">Redo</a></li>
+                    </ul>
+                  </li>
+                  <li class="dropdown">
+                    <a class="dropdown" data-toggle="dropdown" role="button">View<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
+
+                      <li ng-show="currentRoleIsOwner()" >
+                        <a ng-click="navBarClick('show_output_as_text')">
+                          <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="dropdown">
+                    <a class="dropdown" data-toggle="dropdown">Actions<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li ng-class="{disabled: disabledActions.compile}" ng-show="isCompilationNeeded()"><a ng-click="navBarClick('compile')">Compile</a></li>
+                      <li ng-class="{disabled: disabledActions.compile}" ng-hide="isCompilationNeeded() || hiddenActions.compileDynamic"><a ng-click="navBarClick('compileDynamic')">Run</a></li>
+                      <li ng-class="{disabled: disabledActions.compile}"><a ng-click="navBarClick('compile_clean')" ng-show="isEiffelLanguageCompatible()">Compile (clean)</a></li>
+                      <li class="divider" ng-show="isCompilationNeeded()"></li>
+                      <li ng-class="{disabled: disabledActions.run}" ng-show="isCompilationNeeded() && !(hiddenActions.run)"><a ng-click="navBarClick('run')">Run</a></li>
+                      <li ng-hide="hiddenActions.stop"><a ng-click="navBarClick('stop')">Stop</a></li>
+                      <li ng-class="{disabled: disabledActions.test}" ng-show="isTestSupported()"><a ng-click="navBarClick('test')">Test</a></li>
+                      <li ng-class="{disabled: disabledActions.tool}" ng-show="isToolSupported()"><a ng-click="navBarClick('tool')">Analyze</a></li>
+                      <li ng-show="uiSettings.showSubmissionBtn" class="divider"></li>
+                      <li ng-show="uiSettings.showSubmissionBtn" ng-class="{disabled: disabledActions.submit}"><a ng-click="navBarClick('submit')">Submit solution</a></li>
+                    </ul>
+                  </li>
+                </ul>
+
+                <form class="navbar-form navbar-left">
+                  <!--<button id="compileButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="{{isCompilationNeeded()? 'Compile this project' : 'Run this project'}}">
+                    <span class="{{isCompilationNeeded() ? 'glyphicon glyphicon-cog' : 'glyphicon glyphicon-play-circle'}}"></span> {{isCompilationNeeded() ? "Compile" : "Run"}}
+                  </button>-->
+                  <button id="compileButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
+                    <span class="glyphicon glyphicon-cog"></span> Compile
+                  </button>
+                  <button id="compileRunBtn" class="btn btn-default btn-sm" ng-hide="isCompilationNeeded() || hiddenActions.compileDynamic" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
+                    <span class="glyphicon glyphicon-play-circle"></span> Run
+                  </button>
+                  <button id="runButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded() && !(hiddenActions.run)" ng-disabled="disabledActions.run" ng-click="navBarClick('run')" title="Run the last compiled program">
+                    <span class="glyphicon glyphicon-play-circle"></span> Run
+                  </button>
+                  <button id="stopBtn" class="btn btn-default btn-sm" ng-hide="hiddenActions.stop" ng-click="navBarClick('stop')" title="Stop this program">
+                    <span class="glyphicon glyphicon-remove-circle"></span> Stop
+                  </button>
+                  <button id="ideTestButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.test" ng-click="navBarClick('test')" ng-show="isTestSupported()" title="Run the tests of this project">
+                    <span class="glyphicon glyphicon-check"></span> Test
+                  </button>
+                  <button id="ideToolButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
+                    <span class="glyphicon glyphicon-check"></span> Analyze
+                  </button>
+                  <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-success btn-sm" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" style="margin-left: 45px;" title="Submit this project">
+                    <span class="glyphicon glyphicon-send"></span> Submit
+                  </button>
+                </form>
+              </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+          </nav>
+        </div>
+      </div>
+
+      <div id="ideMiddlePartId" class="ideSplitterOverflowVisible">
+        <!-- the inner split part; left is the tree view, right is the editor -->
+        <div kendo-splitter k-orientation="'horizontal'" k-panes='[{ collapsible: true, size: "220px" }, {collapsible: false}]' class="ideSplitterOverflowVisible ideSplitterFullHeight">
+            <div id="ideTreeviewPartOfMiddlePart" class="ideSplitterOverflowVisible">
+              <!-- everything related to the tree view -->
+
+              <div kendo-splitter k-orientation="'vertical'" k-panes="[{resizable: false, size: '29px'},{},{resizable: false, collapsible: false, size: '55px'}]" class="ideSplitterOverflowVisible ideSplitterFullHeight">
+
+                <!-- the project name -->
+                <div id="ideTreeViewProjectName">
+                  {{projectName}}
+                </div>
+
+                <!-- the tree view -->
+                <div ng-controller="TreeCtrl" ng-init="init()" class="ideTree">
+                  <div
+                    data-angular-treeview="true"
+                    data-tree-id="mytree"
+                    data-tree-model="projectNodes"
+                    data-node-id="uniqueId"
+                    data-node-label="filename_annotated"
+                    data-node-is-folder="isFolder"
+                    data-node-children="children"
+                    data-node-click="nodeClick">
+                  </div>
+                </div>
+
+                <!-- the select box that lists library interface files -->
+                <div ng-controller="LibraryCtrl" class="ideSplitterOverflowVisible">
+                  <div ng-init="fetchStaticFiles()" style="max-width: 320px; padding: 4px;" ng-show="isEiffelLanguageCompatible()">
+                    <ui-select reset-search-input="true" ng-change="showFile()" ng-model="file.selected" theme="selectize" ng-disabled="disabled" append-to-body="'true'" style="width: 80%">
+                      <ui-select-match placeholder="Browse library" style="width: 80%;">{{$select.selected.classname}}</ui-select-match>
+                      <ui-select-choices repeat="file in files | filter: $select.search">
+                        <small ng-bind-html="file.classname | highlight: $select.search"></small>
+                      </ui-select-choices>
+                    </ui-select>
+                  </div>
+                </div>
+                <!-- end of the select box that lists library interface files -->
+              </div> <!-- end of splitter that splits everything related to the tree view (projectname, treeview, library select box -->
+
+            </div> <!-- end of left-part split-->
+            <div id="ideRightPartOfMiddlePart"> <!-- begin of right-part of the middle part, that is the editor and tabs -->
+              <!-- everything related to the editor -->
+                <div ng-controller="TabCtrl" id="ideTabArea"> <!-- the tabs -->
+                  <ul class="ideTabs">
+                    <li ng-repeat="tab in tabs" ng-class="{ideTabActive: tab.isActive}" ng-click="selectClick(tab.arrayIndex)" style="float: left;">
+                      <span title="{{tab.title}}">{{tab.name}}</span>
+                      <img src="images/close_light.png" onmouseover="this.src='images/close_dark.png'" onmouseout="this.src='images/close_light.png'" ng-click="closeClick(tab.arrayIndex)">
+                    </li>
+                  </ul>
+                </div>
+                <div class="ideEditorArea">
+                  <div ng-hide="ace.isVisible" id="ideAceNotVisible">
+                    <div id="ideMsgNoFilesOpen">No files are open.<br>Click on a file from the project tree.</div>
+                    <div id="ideMsgNotSignedIn" class="alert alert-warning" ng-hide="signinSettings.userIsAuthenticated()">
+                      <strong>You're not signed in.</strong><br><a ng-href="{{signinSettings.signinPathWithRedirect()}}">Sign in now </a> to save your progress or load your previously saved version.
+                    </div>
+                  </div>
+                  <!-- the ace editor -->
+                  <!-- note: don't use ng-model as it updates too slowly. Access the session value directly instead. -->
+
+                  <div class="ideEditor" ng-show="ace.isVisible" id="ace_editor" ui-ace="{
+                    showGutter: true,
+                    useWrapMode: false,
+                    theme: 'eclipse',
+                    onLoad: aceLoaded}">
+                  </div>
+                </div>
+                <!-- end of everything related to the editor -->
+            </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
+        </div><!-- closing the high-level splitter in the middle part-->
+      </div><!-- End of the middle part, where left is the tree view etc., right is the editor etc. -->
+      <div class="ideFooter"> <!-- the lower part of splitter area, where the terminal lives -->
+        <div ng-show="renderHtmlOutput" ng-bind-html="htmlOutput" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
+        <div ng-hide="renderHtmlOutput" ng-bind="output" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
+        <div style="position: absolute; bottom: 2px; width: 100%"><!-- the area for the user input and send button -->
+          <div style="position: absolute; right: 73px; left: 3px;">
+            <input type="text" id="idFooterUserInput" ng-model="userInputData" ng-enter="sendUserInputClick(userInputData, 'idFooterUserInput')" ng-select-on-focus class="ideOutputText ideOutputBorder" style="width: 100%; height: 18px; padding-left: 10px;" placeholder="Input to your program (press Enter to send)"/>
+          </div>
+          <div style="float:right; margin-right: 3px;">
+            <button ng-click="sendUserInputClick(userInputData, 'idFooterUserInput')" class="btn btn-default btn-xs">
+              <span class="glyphicon glyphicon-console"></span> Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- closing the outermost splitter that splits into header, middle, and footer -->
+
+    <!-- the status bar on the bottom of the page, showing username, role, info etc.-->
+    <div style="height: 3px; background-color: #f5f5f5;"></div>
+    <div ng-controller="IdeFooterStatusBarCtrl" class="ideFooterStatusBar">
+      <span ng-bind-html="getUsername()"></span>
+      <span style="margin-left: 20px;">Role: {{getRole()}}</span>
+      <span style="margin-left: 20px;" ng-show="isUsingLti()">Info: Submissions are forwarded to external platform</span>
+      <span class="pull-right"><a style="margin-left: 20px;" href="/">open.codeboard.io</a></span>
+    </div>
+  </div>
+
+  <!-- End of Kendo splitter layout -->
+
+
+  <!-- the modal window used to add a file or folder -->
+  <div ng-controller="IdeNodeActionCtrl">
+    <script type="text/ng-template" id="ideNewNodeModal.html">
+      <div class="modal-header">
+        <h3>{{labels.heading}}</h3>
+      </div>
+      <form class="form" name="ideAddNodeForm" ng-submit="submit(data)">
+        <div class="modal-body">
+
+          <div class="form-group">
+            <p>{{labels.label}}</p>
+            <input type="text" name="dataNodeName" ng-model="data.nodeName" ng-pattern="isValid" autofocus style="width: 100%;" required/>
+            <p class="help-block" ng-show="ideAddNodeForm.dataNodeName.$error.pattern">
+              {{getFormDataErrorMsg()}}
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="okAddFileNameButton" class="btn btn-primary" ng-disabled="ideAddNodeForm.dataNodeName.$error.pattern">{{labels.btnOk}}</button>
+          <button class="btn btn-warning" ng-click="cancel()">{{labels.btnCancel}}</button>
+        </div>
+      </form>
+    </script>
+  </div>
+  <!-- end of modal window -->
+
+  <!-- the modal window for loading a user's version of the project -->
+  <div>
+    <script type="text/ng-template" id="ideLoadUserProjectModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Welcome back {{getUsername()}}</h3>
+      </div>
+      <div class="modal-body">
+        <p class="lead">
+          You have a saved version of this project.<br>
+          Would you like to load your saved version?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">Yes, load my version</button>
+        <button class="btn btn-default" ng-click="cancel()">No, load original version</button>
+      </div>
+    </script>
+  </div>
+  <!-- end of the modal window -->
+
+  <!-- the modal window for asking anonymous users if they really want to submit -->
+  <div>
+    <script type="text/ng-template" id="ideConfirmAnonymousSubmissionModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Anonymous submission</h3>
+      </div>
+      <div class="modal-body">
+        <p class="lead">
+          <br>
+          You're currently not logged in.<br>
+          Would you like to make an anonymous submission?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">Yes, submit anonymously</button>
+        <button class="btn btn-default" ng-click="cancel()">No, cancel submission</button>
+      </div>
+    </script>
+  </div>
+  <!-- end of the modal window -->
+
+  <!-- the modal window for showing the "Share project" information -->
+  <div>
+    <script type="text/ng-template" id="ideShareProjectModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Share project</h3>
+      </div>
+      <div class="modal-body">
+        <p class="lead" style="margin-bottom: 10px;">
+          Url to share this project with others:
+        </p>
+        <form>
+          <input type="text" ng-model="form.inputText" readonly class="lead" style="width:100%; margin-bottom: 2px; color: #337ab7;"><br>
+          <input type="checkbox" ng-model="form.inputCheckbox" ng-change="checkboxChanged()" style="font-weight: 300; line-height: 1.4"> Automatically reopen the files currently displayed in the editor.
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="closeModal()">Close</button>
+      </div>
+    </script>
+  </div>
+  <!-- end of the modal window -->
+
+  <!-- the modal window used to change the settings of the editor -->
+  <div>
+      <script type="text/ng-template" id="ideEditorSettingsModal.html">
+          <div class="modal-header">
+              <h3>Editor settings</h3>
+            <p style="font-size: 10px;color: #a9a9a9">Editor settings are not persisted and therefore lost when reloading/closing the project.</p>
+
+          </div>
+          <div class="modal-body">
+              <!-- Bug: autofocus only set the first time around. See: https://github.com/angular-ui/bootstrap/pull/2945-->
+            <form>
+              <div class="form-group">
+                <label>Theme</label>
+                <select class="form-control" ng-model="editorSettings.theme" required>
+                  <option>ambiance</option>
+                  <option>chaos</option>
+                  <option>chrome</option>
+                  <option>clouds</option>
+                  <option>clouds_midnight</option>
+                  <option>cobalt</option>
+                  <option>crimson_editor</option>
+                  <option>theme-dawn</option>
+                  <option>dreamweaver</option>
+                  <option>eclipse</option>
+                  <option>github</option>
+                  <option>idle_fingers</option>
+                  <option>katzenmilch</option>
+                  <option>kr_theme</option>
+                  <option>kuroir</option>
+                  <option>merbivore</option>
+                  <option>merbivore_soft</option>
+                  <option>mono_industrial</option>
+                  <option>monokai</option>
+                  <option>pastel_on_dark</option>
+                  <option>solarized_dark</option>
+                  <option>solarized_light</option>
+                  <option>terminal</option>
+                  <option>textmate</option>
+                  <option>tomorrow</option>
+                  <option>tomorrow_night</option>
+                  <option>tomorrow_night_blue</option>
+                  <option>tomorrow_night_bright</option>
+                  <option>tomorrow_night_eighties</option>
+                  <option>twilight</option>
+                  <option>vibrant_ink</option>
+                  <option>xcode</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Font size</label>
+                <select class="form-control" ng-model="editorSettings.fontSize" required>
+                  <option>8px</option>
+                  <option>9px</option>
+                  <option>10px</option>
+                  <option>11px</option>
+                  <option>12px</option>
+                  <option>13px</option>
+                  <option>14px</option>
+                  <option>15px</option>
+                  <option>16px</option>
+                  <option>17px</option>
+                  <option>18px</option>
+                  <option>20px</option>
+                  <option>22px</option>
+                  <option>24px</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Keyboard handler</label>
+                <select class="form-control" ng-model="editorSettings.handler" required>
+                  <option>ace</option>
+                  <option>vim</option>
+                  <option>emacs</option>
+                  <!--option>textarea</option>
+                  <option>sublime</option>-->
+                </select>
+              </div>
+
+              <!--<div class="form-group">
+                <label>Tab size</label>
+                <select class="form-control" ng-model="editorSettings.tabSize" required>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                </select>
+              </div>-->
+
+              <div class="form-group">
+                <label>Invisible characters</label>
+                <select class="form-control" ng-model="editorSettings.invisibles" required>
+                  <option>Show</option>
+                  <option>Hide</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Gutter</label>
+                <select class="form-control" ng-model="editorSettings.gutter" required>
+                  <option>Show</option>
+                  <option>Hide</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">Apply settings</button>
+            <button class="btn btn-primary" ng-click="preview()">Preview</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+
+          </div>
+      </script>
+  </div>
+  <!-- end of modal window -->
+
+</div>

@@ -1,0 +1,143 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+  <div class="row">
+
+    <div class="col-md-8 col-md-offset-2">
+
+      <uib-tabset>
+        <uib-tab heading="Public profile">
+          <div class="userSettingsBorder">
+            <form class="form" name="form" ng-submit="save(data)">
+              <div class="form-group">
+                <label>Profile picture</label>
+
+                <div class="col-md-12">
+                  <div class="col-md-6">
+                    <img ng-src="{{data.imageUrl}}" style="margin-bottom: 15px; width: 150px;">
+                  </div>
+                  <div class="col-md-6">
+                    <div class="btn btn-default" ng-file-select="onFileSelect($files)">Upload new picture</div>
+                    <div ng-file-drop="onFileSelect($files)"
+                         ng-file-drag-over-class="optional-css-class-name-or-function"
+                         ng-file-drop-available="dropSupported=true"
+                         ng-show="dropSupported"
+                         style=" width: 150px; padding: 20px 0px; border-style: dashed; border-width: 4px; border-color: #d3d3d3; margin: 10px 0px">
+                      Or drop a picture here
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!--<div class="form-group" ng-class="{ 'has-success': form.email.$valid && submitted,
+                                              'has-error': form.email.$invalid && submitted }">
+                <label>Email* (used by codeboard.io)</label>
+                <input type="email" name="email" ng-model="data.email" class="form-control" required/>
+
+                <p class="help-block" ng-show="form.email.$error.email && submitted">
+                  Please check if this is a valid email.
+                </p>
+              </div>-->
+
+              <div class="form-group" ng-class="{ 'has-success': form.emailPublic.$valid && submitted,
+                                                    'has-error': form.emailPublic.$invalid && submitted }">
+                <label>Email (publicly displayed on your profile)</label>
+                <input type="email" name="emailPublic" ng-model="data.emailPublic" class="form-control"/>
+
+                <p class="help-block" ng-show="form.emailPublic.$error.email && submitted">
+                  Please provide a valid email address.
+                </p>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-success': form.name.$valid && submitted,
+                                                    'has-error': form.name.$invalid && submitted }">
+                <label>Full name</label>
+                <input type="text" name="name" ng-model="data.name" class="form-control"/>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-success': form.url.$valid && submitted,
+                                                    'has-error': form.url.$invalid && submitted }">
+                <label>Web</label>
+                <input type="url" name="url" ng-model="data.url" class="form-control"/>
+
+                <p class="help-block" ng-show="form.url.$error.url && submitted">
+                  Please provide a valid URL.
+                </p>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-success': form.institution.$valid && submitted,
+                                                    'has-error': form.institution.$invalid && submitted }">
+                <label>Institution</label>
+                <input type="text" name="institution" ng-model="data.institution" class="form-control"/>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-success': form.location.$valid && submitted,
+                                                    'has-error': form.location.$invalid && submitted }">
+                <label>Located in</label>
+                <input type="text" name="location" ng-model="data.location" class="form-control"/>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </form>
+
+            <div ng-show="server.saveSuccess" class="alert alert-success" role="alert" style="margin-top: 20px;">
+              <strong>Changes saved!</strong> Your changes have been saved successfully.
+            </div>
+            <div ng-show="server.saveFailure" class="alert alert-danger" role="alert" style="margin-top: 20px;">
+              <strong>Changes not saved!</strong> Problem while saving your changes. Please try again.
+            </div>
+          </div>
+        </uib-tab>
+
+        <uib-tab heading="Password">
+          <div class="userSettingsBorder" ng-controller="UserSettingsPasswordCtrl">
+            <form class="form" name="changePasswordForm" ng-submit="updatePassword(formModel)">
+              <div class="form-group" ng-class="{'has-success': changePasswordForm.$valid && passwordSubmitted,
+                                                'has-error': (changePasswordForm.$invalid || invalidCurrentPassword) && passwordSubmitted }">
+                <label>Current password*</label>
+                <input type="password" name="currentPassword" ng-model="formModel.currentPassword" class="form-control"
+                       required/>
+              </div>
+
+              <div class="form-group" ng-class="{ 'has-success': changePasswordForm.newPassword.$valid && changePasswordForm.newPasswordConfirm.$valid && formModel.newPassword === formModel.newPasswordConfirm && passwordSubmitted,
+                                                'has-error': (changePasswordForm.newPassword.$invalid || changePasswordForm.newPasswordConfirm.$invalid || formModel.newPassword !== formModel.newPasswordConfirm) && passwordSubmitted}">
+                <label>New password*</label>
+                <input type="password" name="newPassword" ng-model="formModel.newPassword" ng-minlength="4"
+                       class="form-control" required/>
+                <label>Confirm new password*</label>
+                <input type="password" name="newPasswordConfirm" ng-model="formModel.newPasswordConfirm"
+                       ng-minlength="4" class="form-control" required/>
+
+                <p class="help-block"
+                   ng-show="(changePasswordForm.newPassword.$error.minlength || changePasswordForm.newPasswordConfirm.$error.minlength) && passwordSubmitted">
+                  Password must be at least 4 characters.
+                </p>
+
+                <p class="help-block"
+                   ng-show="!(formModel.newPassword === formModel.newPasswordConfirm) && passwordSubmitted">
+                  The new passwords do not match. Please enter them again.
+                </p>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Change password</button>
+            </form>
+
+            <div ng-show="pserver.saveSuccess" class="alert alert-success" role="alert" style="margin-top: 20px;">
+              <strong>Changes saved!</strong> Your password has been updated.
+            </div>
+            <div ng-show="pserver.saveFailure && invalidCurrentPassword" class="alert alert-danger" role="alert"
+                 style="margin-top: 20px;">
+              <strong>Changes not saved!</strong> Your current password was incorrect. Please try again.
+            </div>
+            <div ng-show="pserver.saveFailure && !invalidCurrentPassword" class="alert alert-danger" role="alert"
+                 style="margin-top: 20px;">
+              <strong>Changes not saved!</strong> Problem while saving your new password. Please try again.
+            </div>
+
+          </div>
+        </uib-tab>
+      </uib-tabset>
+
+    </div>
+  </div>
+</div>

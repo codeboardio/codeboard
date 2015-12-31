@@ -1,0 +1,15 @@
+{
+  "language": "Haskell",
+  "files": [
+    {
+      "filename": "Root/B.hs",
+      "content": "module B (foo) where foo = do putStrLn \"Hello B\""
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainFileForCompilation\":\"application.hs\",\n\t\"GHCArgumentMainIs\":\"main\"\n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

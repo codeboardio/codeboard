@@ -1,0 +1,43 @@
+.docContent {
+  margin-bottom: 50px;
+}
+
+
+.docContent img {
+  display:block;
+  margin: 50px auto 0;
+  border: 1px solid;
+  border-color: #cccccc;
+}
+
+
+.docContent figcaption {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+
+.docContent .docSection {
+  padding-bottom: 25px;
+}
+
+
+.docContent table {
+  font-size: 12px;
+}
+
+
+.docContent pre {
+  text-align: center;
+}
+
+
+.docContent .tip {
+  font-style: italic;
+  background-color: #d9edf7;
+  font-size: 12px;
+}
+
+.docContent .video {
+  text-align: center;
+}

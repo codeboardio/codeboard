@@ -1,0 +1,11 @@
+{
+  "language": "C",
+  "files": [
+    {
+      "filename": "Root/application.c",
+      "content": "/*Keep the main routine in the file application.c;\n otherwise Codeboard does not work*/\n\n#include <stdio.h> \nint main() { \n\tprintf(\"Hello, C World! \"); \n\treturn 0; \n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

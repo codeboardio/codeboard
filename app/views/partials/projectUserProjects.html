@@ -1,0 +1,43 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Versions saved by users for <a ng-href="/projects/{{projectId}}/summary">project {{projectId}}</a></h3>
+    </div>
+  </div>
+
+  <div class="row" ng-show="userProjects.length > 0">
+    <div class="col-md-4 pull-right">
+      <input type="text" placeholder="Filter by username" ng-model="usernameFilter" uib-typeahead="elem.username as elem.username for elem in userProjects | filter:{username:$viewValue} | limitTo:8" class="form-control">
+    </div>
+  </div>
+
+  <div class="row" ng-show="userProjects.length == 0 || filteredData == 0" style="padding-top: 40px;">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="jumbotron">
+        <h3>No user versions found.</h3>
+        <p ng-show="usernameFilter == undefined || usernameFilter.length == 0">It looks like no users have saved versions of this project.</p>
+        <p ng-show="usernameFilter !== undefined && usernameFilter.length > 0">It looks like user '{{usernameFilter}}' has not saved a version of this project.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="padding-top: 40px;" ng-show="filteredData.length > 0">
+    <div class="col-md-10 col-md-offset-1">
+      <table class="table table-condensed table-hover" >
+        <tr>
+          <th>User</th>
+          <th>Last save</th>
+          <th></th>
+        </tr>
+        <tr ng-repeat="elem in filteredData = (userProjects | filter:{username: usernameFilter})" style="padding: 15px;">
+          <td><a ng-href="/users/{{elem.username}}" >{{elem.username}}</a></td>
+          <td>{{elem.updatedAt | date: 'medium'}}</td>
+          <td><a class="btn btn-default btn-xs"  ng-href="/projects/{{projectId}}/userprojects/{{elem.userprojectId}}">Open in IDE</a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div> <!-- end of container -->

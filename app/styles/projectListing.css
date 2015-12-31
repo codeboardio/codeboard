@@ -1,0 +1,22 @@
+.project-listing {
+    list-style: none;
+    border-bottom: 1px solid #eee;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.project-listing-planguage {
+    float: right;
+    margin-top: 20px;
+    font-weight: bold;
+    color: #5e5e5e;
+}
+
+.project-listing-metadata {
+    color: #5e5e5e;
+    font-size: 12px;
+}
+
+.project-listing-description {
+    max-width: 650px;
+}

@@ -1,0 +1,19 @@
+
+<header class="container" ng-controller="NavbarCtrl">
+  <div class="row">
+    <div class="col-md-3">
+      <a href="/" style="text-decoration: none;" class="pull-left"><h2 class="dark-font-color" style="margin: 0">Codeboard.io</h2></a></div>
+    <div class="col-md-9">
+      <ul class="nav nav-pills pull-right">
+        <li><a href="/projects">Explore</a></li>
+        <li ng-show="username">
+          <a ng-href="/users/{{username}}">{{username}}</a>
+        </li>
+        <li><a ng-hide="isAuth" href="/signin">Sign in</a></li>
+        <li><a ng-hide="isAuth" href="/signup">Sign up</a></li>
+        <li><a ng-show="isAuth" href="" ng-click="signOut()">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+<hr style="margin: 0px;">

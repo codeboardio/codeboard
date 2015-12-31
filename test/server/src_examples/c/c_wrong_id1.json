@@ -1,0 +1,11 @@
+{
+  "language": "C",
+  "files": [
+    {
+      "filename": "Root/b.c",
+      "content": "#include \"b.h\"\n#include \"c.h\"\n int foo () {bar(); return 1;}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

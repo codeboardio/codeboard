@@ -1,0 +1,64 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+<main>
+  <div class="container-fluid blackboard">
+    <div class="container">
+      <div class="row" style="padding: 5em 0em;">
+
+
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-12">
+              <img src="/images/logo/codeboard_logo_256.png" class="img-responsive" alt="Responsive image"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <ul class="list-unstyled nice-font" style="padding-top: 2em;">
+                <li>A web-based IDE to teach programming in the classroom.</li>
+                <li>Easily create and share exercises with students.</li>
+                <li>Analyze and inspect students' submissions with a single click.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <a href="/signup" class="btn btn-link pull-right" role="button" style="padding-right: 0px;">No account? Sign up here.</a>
+
+          <form role="form" name="loginFormNg" ng-submit="login(loginForm)" style="padding-top: 40px">
+
+            <div class="form-group">
+              <input type="text" name="username" ng-model="loginForm.username" class="form-control"
+                     placeholder="Username or Email" required autofocus>
+            </div>
+            <div class="form-group">
+              <input type="password" name="password" ng-model="loginForm.password" class="form-control"
+                     placeholder="Password" required>
+            </div>
+
+            <div class="form-group">
+              <p class="text-danger" ng-show="authFailed">Invalid username, email or password.</p>
+              <button id="signInButton" type="submit" class="btn btn-primary" style="width: 100%">Sign in</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container" style="margin-top: 20px;">
+    <div class="row">
+
+      <div class="col-md-12">
+        <p class="text-center">
+          This is an Open-Codeboard installation. Learn more at <a href="http://open.codeboard.io">open.codeboard.io</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</main>

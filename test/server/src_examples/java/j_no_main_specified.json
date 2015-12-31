@@ -1,0 +1,19 @@
+{
+  "language": "Java",
+  "files": [
+    {
+      "filename": "Root/B.java",
+      "content": "public class B { public B() {C c = new C(); System.out.println(\"Hello B\"); }}"
+    },
+    {
+      "filename": "Root/C.java",
+      "content": "public class C { public C() {System.out.println(\"Hello C\"); }}"
+    },
+    {
+      "filename": "Root/codeboard.json",
+      "content": "{\n\t\"MainClassForRunning\":\"Application\"\n}"
+    }
+  ],
+  "action": "compile",
+  "stream": false
+}

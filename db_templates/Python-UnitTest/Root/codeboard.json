@@ -1,0 +1,7 @@
+{
+  "_comment": "Configuration for this Python-UnitTest project.",
+  "MainFileForRunning": "./Root/src/main.py",
+  "DirectoryForSourceFiles": "./Root/src",
+  "DirectoryForTestFiles": "./Root/test",
+  "DirectoryForTestSubmissionFiles": "./Root/testSubmission"
+}
