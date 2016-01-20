@@ -7,6 +7,7 @@ Codeboard is a web-based IDE to teach programming in the classroom. This is the 
 Codeboard requires NodeJS, MySQL, MongoDB, and graphicsmagick (for resizing user profile pictures).
 
 * Nodejs: tested with version 0.12.9
+* MongoDB: tested with version 2.6.4
 * Codeboard has been tested on an Ubuntu 14.04 system.
 
 
