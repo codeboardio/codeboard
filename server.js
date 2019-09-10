@@ -7,7 +7,7 @@ var express = require('express'),
   util = require('util'),
   expressValidator = require('express-validator'),
   session = require('express-session'),
-  mongoStore = require('connect-mongo')(session),
+    // mongoStore = require('connect-mongo')(session), // todo add to package.json :: "mongoose": "3.8.8",
   passport = require('passport'),
   compression = require('compression'),
   busboy = require('connect-busboy'),
@@ -71,7 +71,7 @@ app.set('view engine', 'html');
 
 
 // set configuration for settings
-if (env !== 'test') {
+if (env !== 'test' && 'a' === 'b') { // todo mongo db für settings einrichten
   // by default we persist sessions using the Mongo database
   app.use(session(
     {
