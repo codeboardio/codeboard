@@ -16,3 +16,6 @@ app/images/users/profiles
 
 # Ignore everything in folder test/coverage which has generated coverage reports
 test/coverage
+
+# Ignore .idea
+.idea
