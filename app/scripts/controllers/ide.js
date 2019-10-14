@@ -261,7 +261,6 @@ app.controller('IdeCtrl',
         // clear the output
         setOutput('', lRenderOutputAsHTML);
 
-
         var onWSOpenCallback = function () {
 
           $http.get(aStartUrl)
@@ -283,18 +282,27 @@ app.controller('IdeCtrl',
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
 
-          var outputLength = addToOutput(aNewlyReceivedData, lRenderOutputAsHTML);
+          // todo Rückgabewert ist Blob!? daher war Ausgabe falsch
+          var reader = new FileReader();
+          reader.onload = function() {
 
-          // account for the number of messages
-          numOfMessages += 1;
-          //if(numOfMessages > maxNumOfMessages) {
-          if(outputLength > maxNumOfMessageCharacters) {
-            addToOutput("\n\nYour program output has more than " + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" +
-              'For this reason, Codeboard has terminated your program.\n\n', lRenderOutputAsHTML);
+            // original (janick)
+            var outputLength = addToOutput(reader.result, lRenderOutputAsHTML);
 
-            WebsocketSrv.close(true);
-          }
-        }
+            // account for the number of messages
+            numOfMessages += 1;
+            //if(numOfMessages > maxNumOfMessages) {
+            if(outputLength > maxNumOfMessageCharacters) {
+              addToOutput("\n\nYour program output has more than " + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" +
+                  'For this reason, Codeboard has terminated your program.\n\n', lRenderOutputAsHTML);
+
+              WebsocketSrv.close(true);
+            }
+
+          };
+          reader.readAsText(aNewlyReceivedData);
+
+        };
 
         // Function to handle the event of the WS closing
         var onWSCloseCallback = function() {
@@ -408,7 +416,7 @@ app.controller('IdeCtrl',
         saveCurrentlyDisplayedContent();
 
         // remove previous compilation results
-        setOutput('Waiting for results...', false);
+        setOutput('Waiting for (previous) results...', false);
 
         // disable all actions till the compile request is completed
         setEnabledActions(0,0,0,0,0);
@@ -1179,6 +1187,7 @@ app.controller('IdeCtrl',
       /** Handles a "compileReqeusted" event */
       $scope.$on(IdeMsgService.msgCompileRequest().msg, function () {
         $log.debug('Compile request received');
+
         compileProject(false);
         // set the focus on the editor so user can start typing right away
         $scope.ace.editor.focus();
