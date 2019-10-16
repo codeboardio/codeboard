@@ -7,7 +7,8 @@ var express = require('express'),
   util = require('util'),
   expressValidator = require('express-validator'),
   session = require('express-session'),
-    // mongoStore = require('connect-mongo')(session), // todo add to package.json :: "connect-mongo": "git://github.com/haches/connect-mongo",
+  MongoStore = require('connect-mongo')(session),
+  mongoose = require('mongoose'),
   passport = require('passport'),
   compression = require('compression'),
   busboy = require('connect-busboy'),
@@ -62,8 +63,11 @@ if(env == 'production') {
 
 
 app.use(busboy());
-app.use(bodyParser({limit: '10mb'}));
-app.use(expressValidator());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+// app.use(expressValidator());
 
 
 app.engine('html', require('ejs').renderFile);
@@ -71,7 +75,15 @@ app.set('view engine', 'html');
 
 
 // set configuration for settings
-if (env !== 'test' && 'a' === 'b') { // todo mongo db für settings einrichten
+if (env !== 'test') {
+
+  console.log(config.mongo.uri);
+  console.log(process.env.NODE_ENV);
+
+  mongoose.connect(config.mongo.uri, config.mongo.options).then(() => {
+    // console.log("Connected to Mongo DB");
+  });
+
   // by default we persist sessions using the Mongo database
   app.use(session(
     {
@@ -80,7 +92,11 @@ if (env !== 'test' && 'a' === 'b') { // todo mongo db für settings einrichten
       cookie: {maxAge: 30 * 24 * 60 * 60 * 1000}, // session expires after 30 days (unit is ms)
       resave: true,
       saveUninitialized: true,
-      store: new mongoStore({db: config.sessionSettings.mongoStoreDbName, clear_interval: 6 * 3600}) // clear interval removes expired sessions every 6h (unit is sec)
+      store: new MongoStore({
+        db: config.sessionSettings.mongoStoreDbName,
+        mongooseConnection: mongoose.connection,
+        clear_interval: 6 * 3600 // clear interval removes expired sessions every 6h (unit is sec)
+      })
     }
   ));
 } else {
@@ -88,7 +104,9 @@ if (env !== 'test' && 'a' === 'b') { // todo mongo db für settings einrichten
   app.use(session(
     {
       name: config.sessionSettings.name,
-      secret: config.sessionSettings.secret
+      secret: config.sessionSettings.secret,
+      resave: true,
+      saveUninitialized: true
     }
   ));
 }

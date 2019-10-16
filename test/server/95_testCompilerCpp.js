@@ -9,7 +9,8 @@ app.use(bodyParser());
 
 var projectUrl = '/api/projects/5';
 
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 describe('Test Mantra with C++ compilation', function () {
 
