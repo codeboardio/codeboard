@@ -18,4 +18,4 @@ app/images/users/profiles
 test/coverage
 
 # Ignore .idea
-.idea
+/.idea/
