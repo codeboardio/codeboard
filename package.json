@@ -13,7 +13,8 @@
     }
   ],
   "scripts": {
-    "start": "grunt serve",
+    "start": "node server.js",
+    "startDev": "grunt serve",
     "build": "grunt build",
     "testClient": "grunt test:client",
     "testServer": "grunt test:server"

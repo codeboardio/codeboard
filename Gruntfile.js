@@ -127,6 +127,7 @@ module.exports = function (grunt) {
             '.tmp',
             '<%= yeoman.dist %>/*',
             '!<%= yeoman.dist %>/.git*',
+            '!<%= yeoman.dist %>/README.md*',
             '!<%= yeoman.dist %>/Procfile' // wird verwendet für Heroku
           ]
         }]
@@ -315,6 +316,12 @@ module.exports = function (grunt) {
             'package.json',
             'server.js',
             'lib/**/*'
+          ]
+        }, {
+          expand: true,
+          dest: '<%= yeoman.dist %>/lib/config',
+          src: [
+            'db_templates/**/*'
           ]
         }]
       },

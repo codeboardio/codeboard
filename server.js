@@ -177,6 +177,10 @@ if (env == 'development') {
 
 
 if(env == 'production') {
+
+  var templateProjects = require('./lib/config/dbTemplateProjects.js');
+  templateProjects.addAllTemplateProjects();
+
   // start the server
   server.listen(config.port, function () {
     console.log('Codeboard server listening on port %d in %s mode', config.port, app.get('env'));
