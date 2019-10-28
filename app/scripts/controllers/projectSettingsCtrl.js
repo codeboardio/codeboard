@@ -35,6 +35,8 @@ angular.module('codeboardApp')
         angular.copy(projectData, $scope.originalData);
         $scope.data = projectData;
 
+        $scope.data.ltiUri = location.protocol + '//' + location.hostname + "/lti/projects/" + $scope.data.id;
+
         // if the controller is used for creating a new project, then 'projectData' is an empty project
         // and we need to create the ownerSet and userSet manually
         if (!$scope.data.ownerSet)
