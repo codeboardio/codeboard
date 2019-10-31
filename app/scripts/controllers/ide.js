@@ -282,25 +282,17 @@ app.controller('IdeCtrl',
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
 
-          // todo Rückgabewert ist Blob!? daher war Ausgabe falsch
-          var reader = new FileReader();
-          reader.onload = function() {
+          var outputLength = addToOutput(aNewlyReceivedData, lRenderOutputAsHTML);
 
-            // original (janick)
-            var outputLength = addToOutput(reader.result, lRenderOutputAsHTML);
+          // account for the number of messages
+          numOfMessages += 1;
+          //if(numOfMessages > maxNumOfMessages) {
+          if(outputLength > maxNumOfMessageCharacters) {
+            addToOutput("\n\nYour program output has more than " + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" +
+                'For this reason, Codeboard has terminated your program.\n\n', lRenderOutputAsHTML);
 
-            // account for the number of messages
-            numOfMessages += 1;
-            //if(numOfMessages > maxNumOfMessages) {
-            if(outputLength > maxNumOfMessageCharacters) {
-              addToOutput("\n\nYour program output has more than " + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" +
-                  'For this reason, Codeboard has terminated your program.\n\n', lRenderOutputAsHTML);
-
-              WebsocketSrv.close(true);
-            }
-
-          };
-          reader.readAsText(aNewlyReceivedData);
+            WebsocketSrv.close(true);
+          }
 
         };
 
@@ -737,7 +729,8 @@ app.controller('IdeCtrl',
         $scope.disabledActions.run = !(run == 1);
         $scope.disabledActions.test = !(test == 1);
         $scope.disabledActions.tool = !(tool == 1);
-        $scope.disabledActions.submit = !(submit == 1);
+        // $scope.disabledActions.submit = !(submit == 1);
+        $scope.disabledActions.submit = 0;
 
         // trigger a digest because when the WebSocket closes, the buttons sometimes don't get enabled
         if(!$scope.$$phase) {
@@ -867,6 +860,10 @@ app.controller('IdeCtrl',
               var req = IdeMsgService.msgSubmitRequest();
               $rootScope.$broadcast(req.msg);
             }
+            break;
+          case ('submitio'):
+            var req = IdeMsgService.msgSubmitRequest();
+            $rootScope.$broadcast(req.msg);
             break;
         }
       };

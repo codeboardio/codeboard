@@ -35,7 +35,11 @@ angular.module('codeboardApp')
 
       // when a new message is received over the WS
       ws.onMessage(function(msg) {
-        onWSDataCallback(msg.data);
+          var reader = new FileReader();
+          reader.addEventListener("loadend", function() {
+              onWSDataCallback(reader.result);
+          });
+          reader.readAsText(msg.data);
       });
 
       // when the WS is closed
