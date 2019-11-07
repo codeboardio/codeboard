@@ -1384,6 +1384,16 @@ app.controller('IdeCtrl',
        */
       $scope.isTestSupported = function() {
 
+        // todo hier umstellen, das Test angezeigt wird wenn io-test
+
+        // NOTE:  Was ist besser? Hier irgendwie Config auslesen, um herauszufinden, ob und welcher Test?
+        //        Oder Datenbank-Model um Feld 'isTestSupported' erweitern (0 = false, 1 = unit-test, 2 = io, 3 = manuel)
+
+        // vorerst einfacher immer true zurück
+        return true;
+
+
+
         var _testingProjects = ['Haskell-HSpec', 'Java-JUnit', 'Python-UnitTest'];
         var _testIsSupported = false;
 

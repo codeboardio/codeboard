@@ -77,7 +77,7 @@
                       <li class="divider" ng-show="isCompilationNeeded()"></li>
                       <li ng-class="{disabled: disabledActions.run}" ng-show="isCompilationNeeded() && !(hiddenActions.run)"><a ng-click="navBarClick('run')">Run</a></li>
                       <li ng-hide="hiddenActions.stop"><a ng-click="navBarClick('stop')">Stop</a></li>
-                      <li ng-class="{disabled: disabledActions.test}" ng-show="isTestSupported()"><a ng-click="navBarClick('test')">Test</a></li>
+                      <li ng-class="{disabled: disabledActions.run}" ng-show="isTestSupported()"><a ng-click="navBarClick('test')">Test</a></li>
                       <li ng-class="{disabled: disabledActions.tool}" ng-show="isToolSupported()"><a ng-click="navBarClick('tool')">Analyze</a></li>
                       <li ng-show="uiSettings.showSubmissionBtn" class="divider"></li>
                       <li ng-show="uiSettings.showSubmissionBtn" ng-class="{disabled: disabledActions.submit}"><a ng-click="navBarClick('submit')">Submit solution</a></li>
@@ -109,6 +109,10 @@
                   </button>
                   <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-success btn-sm" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" style="margin-left: 45px;" title="Submit this project">
                     <span class="glyphicon glyphicon-send"></span> Submit
+                  </button>
+
+                  <button class="btn btn-success btn-sm" ng-click="navBarClick('submitio')" style="margin-left: 45px;" title="Submit this project">
+                    <span class="glyphicon glyphicon-send"></span> Submit IO
                   </button>
                 </form>
               </div><!-- /.navbar-collapse -->

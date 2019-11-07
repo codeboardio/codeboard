@@ -826,6 +826,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       var payload = getPayloadForCompilation(true);
       payload.action = 'test';
 
+      payload.id = lastCompilationId;
+
       // create the promise that is returned
       var deferred = $q.defer();
 
