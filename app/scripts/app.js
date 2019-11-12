@@ -8,6 +8,7 @@ var app = angular.module('codeboardApp', [
   'ngAnimate',
   'ui.ace',
   'angularTreeview',
+  'angularScreenfull',
   'ui.bootstrap',
   'angularFileUpload',
   'ui.select',

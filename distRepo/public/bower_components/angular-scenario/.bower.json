@@ -1,0 +1,19 @@
+{
+  "name": "angular-scenario",
+  "version": "1.3.18",
+  "main": "./angular-scenario.js",
+  "ignore": [],
+  "dependencies": {
+    "angular": "1.3.18"
+  },
+  "homepage": "https://github.com/angular/bower-angular-scenario",
+  "_release": "1.3.18",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.3.18",
+    "commit": "c9b2c02be247523d92c4f298bd0bb39ad1f29524"
+  },
+  "_source": "https://github.com/angular/bower-angular-scenario.git",
+  "_target": "1.3.18",
+  "_originalSource": "angular-scenario"
+}

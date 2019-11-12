@@ -14,3 +14,8 @@
     -webkit-transform: scaleX(-1);
     -ms-transform: scaleX(-1);
 }
+
+.fullscreen {
+    width: 100%;
+    height: 100%;
+}

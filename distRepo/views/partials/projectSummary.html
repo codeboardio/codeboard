@@ -1,0 +1,73 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+          <ul style="padding: 0;">
+            <li class="projectSummary-listing">
+              <div class="projectSummary-listing-metadata">Created: {{prj.createdAt | date}}</div>
+              <h3><a ng-href="/projects/{{prj.id}}/summary">{{prj.projectname}}</a></h3>
+
+              <p class="projectSummary-listing-description">{{prj.description}}</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row" style="padding-top: 20px">
+        <div class="col-md-10 col-md-offset-1">
+          <label>Language</label>
+          <p>{{prj.language}}</p>
+        </div>
+      </div>
+
+      <div class="row" ng-show="prj.isPrivate" style="padding-top: 20px">
+        <div class="col-md-10 col-md-offset-1">
+          <label>Access control</label>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-disabled="true" ng-checked="prj.isPrivate"> Private project
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="padding-top: 20px">
+        <div class="col-md-10 col-md-offset-1">
+          <label>Owners</label>
+          <p>
+            <span ng-repeat="owner in prj.ownerSet"><a href="/users/{{owner.username}}">{{owner.username}}</a> </span>
+          </p>
+        </div>
+      </div>
+
+      <div class="row" style="padding-top: 20px">
+        <div class="col-md-10 col-md-offset-1">
+          <label>Share</label>
+          <p>
+            <a href="/projects/{{prj.id}}">https://codeboard.io/projects/{{prj.id}}</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="row" style="padding-top: 20px">
+        <div class="col-md-10 col-md-offset-1">
+          <a class="btn btn-default" href="/projects/{{prj.id}}" role="button">Open in IDE</a>
+          <div class="btn-group pull-right" role="group" ng-show="isCurrentUserProjectOwner()">
+            <a href="/projects/{{prj.id}}/settings" role="button" class="btn btn-default" title="Edit project settings"><span class="glyphicon glyphicon-wrench"></span></a>
+            <a href="/projects/{{prj.id}}/stats" role="button" class="btn btn-default" title="Show project statistics"><span class="glyphicon glyphicon-stats"></span></a>
+            <a href="/projects/{{prj.id}}/userprojects" role="button" class="btn btn-default" title="Show user versions of project"><span class="glyphicon glyphicon-user"></span></a>
+            <a href="/projects/{{prj.id}}/submissions" role="button" class="btn btn-default" title="Show project submissions"><span class="glyphicon glyphicon-education"></span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div> <!-- end of container -->

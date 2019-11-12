@@ -1,6 +1,6 @@
 
 <!-- the entire view is controlled by the IdeCtrl, as specified in the routes -->
-<div class="ideSplitterFullHeight">
+<div class="ideSplitterFullHeight" ngsf-fullscreen="fullscreenCtrl">
 
   <!-- Start of Kendo splitter layout -->
   <div class="ideSplitterFullHeight">
@@ -102,25 +102,32 @@
                   </button>
                 </form>
 
-
                 <div class="navbar-form navbar-right">
 
-                  <div class="dropdown">
-                    <a class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
-                      <span class="glyphicon glyphicon-cog"></span>
-                    </a>
+                  <ul class="nav navbar-nav">
+                    <li>
+                      <button class="btn btn-default btn-sm" ng-click="fullscreenCtrl.toggleFullscreen()" style="margin-right: 5px" show-if-fullscreen-enabled>
+                        <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
+                        <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
+                      </button>
+                    <li>
+                      <div class="dropdown">
+                      <a class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                        <span class="glyphicon glyphicon-cog"></span>
+                      </a>
 
-                    <ul class="dropdown-menu">
-                      <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
+                      <ul class="dropdown-menu">
+                        <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
 
-                      <li ng-show="currentRoleIsOwner()" >
-                        <a ng-click="navBarClick('show_output_as_text')">
-                          <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-
+                        <li ng-show="currentRoleIsOwner()" >
+                          <a ng-click="navBarClick('show_output_as_text')">
+                            <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                    </li>
+                  </ul>
                 </div>
 
               </div><!-- /.navbar-collapse -->

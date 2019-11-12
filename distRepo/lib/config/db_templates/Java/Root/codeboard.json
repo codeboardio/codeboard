@@ -1,0 +1,5 @@
+{
+    "_comment": "Specify the main file used for compiling your application. Specify the main class used for running your application.",
+    "MainFileForCompilation": "Main.java",
+    "MainClassForRunning": "Main"
+}

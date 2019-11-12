@@ -1,0 +1,156 @@
+<div class="navbar-border" ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+  <div class="row">
+
+    <div class="col-md-8 col-md-offset-2">
+
+      <h3>Settings for <a ng-href="/projects/{{projectId}}/summary">project {{projectId}}</a></h3>
+
+      <div class="panel panel-default" style="margin-top: 30px;">
+        <div class="panel-heading">
+          <h3 class="panel-title">Configure settings</h3>
+        </div>
+        <div class="panel-body">
+
+          <form role="form" name="form" ng-submit="save(form)" style="margin-bottom: 30px">
+            <div class="form-group">
+              <label for="projectname">Project name</label>
+              <input type="text" class="form-control" id="projectname" ng-model="data.projectname" required>
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" rows="3" ng-model="data.description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="language">Language</label>
+              <select class="form-control" id="language" ng-model="data.language">
+                <option>Java</option>
+                <option>Java-JUnit</option>
+                <option>Python</option>
+              </select>
+
+            </div>
+            <div class="form-group">
+              <label>Access control</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="data.isPrivate"> Private project (only accessible by owners and users)
+                </label>
+                <!--<p class="help-block">Only owners and users can see and access the project.</p>-->
+              </div>
+            </div>
+
+
+            <div class="form-group">
+              <label>Project owners</label>
+              <!--<p class="help-block">Owners can fully modify the project.</p>-->
+              <div class="panel panel-default">
+                <div class="panel-body">
+
+                  <span ng-repeat="owner in data.ownerSet" class="label label-default" style="margin: 3px ; font-size: 14px; display: inline-block">
+                    <a href="users/{{owner.username}}" style="color: white">{{owner.username}}</a>
+                    <span class="glyphicon glyphicon-remove" ng-click="removeMember(data.ownerSet, owner.username)" style="cursor: pointer"></span>
+                  </span>
+
+                </div>
+                <div class="panel-footer">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Username of owner (separate multiple by comma)" ng-model="input.newOwner" ng-enter="addOwners(input.newOwner)">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" ng-click="addOwners(input.newOwner)">Add</button>
+                    </span>
+                  </div><!-- /input-group -->
+                </div><!-- panel-footer -->
+              </div>
+            </div>
+
+
+            <div class="form-group">
+              <label>Project users</label>
+              <label ng-show="!data.isPrivate" style="color: firebrick">(not used because project is public)</label>
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <span ng-show="data.isPrivate" ng-repeat="user in data.userSet" class="label label-default" style="margin: 3px ; font-size: 14px; display: inline-block">
+                    <a href="/{{user.username}}" style="color: white">{{user.username}}</a>
+                    <span class="glyphicon glyphicon-remove" ng-click="removeMember(data.userSet, user.username)" style="cursor: pointer"></span>
+                  </span>
+                </div>
+                <div class="panel-footer">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Username of user (separate multiple by comma)" ng-model="input.newUser" ng-enter="addUsers(input.newUser)" ng-disabled="!data.isPrivate">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" ng-click="addUsers(input.newUser)" ng-disabled="!data.isPrivate">Add</button>
+                    </span>
+                  </div><!-- /input-group -->
+                </div><!-- panel-footer -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Submission</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="isSubmissionAllowed" ng-model="data.isSubmissionAllowed"> Allow users to submit their code (e.g. for grading or evaluating users' implementations).
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>LTI settings</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="isLitAllowed" ng-model="data.isLtiAllowed"> Allow LTI access (LTI users can access the project regardless of access control settings)
+                </label>
+              </div>
+              <div class="panel panel-default" ng-show="data.isLtiAllowed">
+                <div class="panel-body">
+                  <label for="projectname">LTI consumer key</label>
+                  <input type="text" class="form-control" id="ltiKey" ng-model="data.ltiKey">
+                  <label for="description">LTI consumer secret</label>
+                  <input type="text" class="form-control" id="ltiSecret" ng-model="data.ltiSecret">
+                  <label style="margin-top: 20px;">Url for LTI access</label>
+                  <p>
+                    <a href="{{data.ltiUri}}">{{data.ltiUri}}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-default" ng-click="discardChanges()">Discard changes</button>
+            <button type="button" class="btn btn-danger pull-right" ng-click="openDeletionModal()">Delete project</button>
+          </form>
+
+          <div ng-show="server.saveSuccess" class="alert alert-success" role="alert">
+            <strong>Changes saved!</strong> Your changes have been saved successfully.
+          </div>
+          <div ng-show="server.saveFailure" class="alert alert-danger" role="alert">
+            <strong>Changes not saved!</strong> Problem while saving your changes. Check your data and try again.
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- the following is for the deletion modal -->
+  <div>
+    <script type="text/ng-template" id="DeletionModalContent.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Delete project</h3>
+      </div>
+      <div class="modal-body">
+        <p class="lead">
+          Do you really want to delete this project?<br>
+          Deletion can not be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" ng-click="ok()">Delete project</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+  </div>
+</div>
+
+
