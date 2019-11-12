@@ -27,7 +27,7 @@
               <!-- Collect the nav links, forms, and other content for toggling -->
               <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                  <li class="dropdown">
+                  <li ng-show="currentRoleIsOwner()" class="dropdown">
                     <a id="projectButton" data-toggle="dropdown" role="button">Project<b class="caret"></b></a>
                     <ul class="dropdown-menu" role="menu">
                       <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
@@ -49,43 +49,29 @@
                       <li><a href="/">Exit project</a></li>
                     </ul>
                   </li>
-                  <li class="dropdown">
-                    <a class="dropdown" data-toggle="dropdown" role="button">Edit<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li><a ng-click="ace.editor.getSession().getUndoManager().undo(false)">Undo</a></li>
-                      <li><a ng-click="ace.editor.getSession().getUndoManager().redo(false)">Redo</a></li>
-                    </ul>
-                  </li>
-                  <li class="dropdown">
-                    <a class="dropdown" data-toggle="dropdown" role="button">View<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
-
-                      <li ng-show="currentRoleIsOwner()" >
-                        <a ng-click="navBarClick('show_output_as_text')">
-                          <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="dropdown">
-                    <a class="dropdown" data-toggle="dropdown">Actions<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li ng-class="{disabled: disabledActions.compile}" ng-show="isCompilationNeeded()"><a ng-click="navBarClick('compile')">Compile</a></li>
-                      <li ng-class="{disabled: disabledActions.compile}" ng-hide="isCompilationNeeded() || hiddenActions.compileDynamic"><a ng-click="navBarClick('compileDynamic')">Run</a></li>
-                      <li ng-class="{disabled: disabledActions.compile}"><a ng-click="navBarClick('compile_clean')" ng-show="isEiffelLanguageCompatible()">Compile (clean)</a></li>
-                      <li class="divider" ng-show="isCompilationNeeded()"></li>
-                      <li ng-class="{disabled: disabledActions.run}" ng-show="isCompilationNeeded() && !(hiddenActions.run)"><a ng-click="navBarClick('run')">Run</a></li>
-                      <li ng-hide="hiddenActions.stop"><a ng-click="navBarClick('stop')">Stop</a></li>
-                      <li ng-class="{disabled: disabledActions.run}" ng-show="isTestSupported()"><a ng-click="navBarClick('test')">Test</a></li>
-                      <li ng-class="{disabled: disabledActions.tool}" ng-show="isToolSupported()"><a ng-click="navBarClick('tool')">Analyze</a></li>
-                      <li ng-show="uiSettings.showSubmissionBtn" class="divider"></li>
-                      <li ng-show="uiSettings.showSubmissionBtn" ng-class="{disabled: disabledActions.submit}"><a ng-click="navBarClick('submit')">Submit solution</a></li>
-                    </ul>
-                  </li>
                 </ul>
 
+
+                <div class="navbar-form navbar-left">
+
+                  <a class="btn btn-default btn-sm" ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')" title="Undo">
+                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                  </a>
+
+                  <a class="btn btn-default btn-sm" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
+                    <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                  </a>
+
+                  <a class="btn btn-default btn-sm" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
+                    <span class="glyphicon glyphicon-share-alt"></span>
+                  </a>
+                </div>
+
+
+
+
                 <form class="navbar-form navbar-left">
+
                   <!--<button id="compileButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="{{isCompilationNeeded()? 'Compile this project' : 'Run this project'}}">
                     <span class="{{isCompilationNeeded() ? 'glyphicon glyphicon-cog' : 'glyphicon glyphicon-play-circle'}}"></span> {{isCompilationNeeded() ? "Compile" : "Run"}}
                   </button>-->
@@ -115,6 +101,28 @@
                     <span class="glyphicon glyphicon-send"></span> Submit IO
                   </button>
                 </form>
+
+
+                <div class="navbar-form navbar-right">
+
+                  <div class="dropdown">
+                    <a class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                      <span class="glyphicon glyphicon-cog"></span>
+                    </a>
+
+                    <ul class="dropdown-menu">
+                      <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
+
+                      <li ng-show="currentRoleIsOwner()" >
+                        <a ng-click="navBarClick('show_output_as_text')">
+                          <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+
+                </div>
+
               </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
           </nav>
