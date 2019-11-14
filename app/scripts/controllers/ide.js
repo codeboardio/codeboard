@@ -1659,7 +1659,25 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
 app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'ProjectFactory', 'IdeMsgService',
   function ($scope, $rootScope, $log, $uibModal, ProjectFactory, IdeMsgService) {
 
-  $scope.tabs = [];
+  $scope.tabs = []; // todo am anfang alle (oder alle im ROOT) tabs öffnen
+/*
+  ProjectFactory.getProject().files.forEach(function(file) {
+      file.children.forEach(function(file) {
+
+          console.log(file);
+          return;
+
+          $scope.tabs.push(
+              {
+                  name: file.filename,
+                  title: file.path + '/' + file.filename,
+                  nodeIndex: file.nodeId,
+                  arrayIndex: $scope.tabs.length,
+                  isActive: false
+              });
+      });
+  });
+*/
 
   /**
    * Function to set a particular tab as active and set all other tabs inactive.

@@ -1,6 +1,6 @@
 body {
     border-left: 5px solid #0064a6;
-    overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 
@@ -8,6 +8,11 @@ body {
   width: 100%;
   /* height: 54px; /* set the header to the same height as the navbar */
   /*border: 1px solid #a9a9a9;*/
+}
+
+.ideHeader .navbar-form {
+  margin-top: 13px;
+  margin-bottom: 13px;
 }
 
 #ideTreeViewProjectName {
@@ -28,12 +33,29 @@ body {
   white-space: nowrap;
 }
 
+.ideHeader .projectTitle {
+  font-size: 1.2em;
+  font-weight: 900;
+  color: #5697c2;
+  margin: 10px 0;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.ideHeader .projectTitle span {
+
+}
+
+
 #ideTabArea {
   overflow-y: auto; /* if we have too many tabs, a scroll bar appears */
-  padding-left: 2px; /* the first tab has 2 pixels space compared to where the editor starts */
-  height: 38px;
-  /* border-bottom: 1px solid #a9a9a9; */
-  margin-top: 2px;
+  padding: 0;
+  height: 30px;
+  margin-top: 20px;
+
 }
 
 .dropdown {
@@ -52,8 +74,8 @@ body {
 
 .ideOutput {
   overflow: auto;
-  color: #555555;
-  background-color: #ffffff;
+  background-color: #222;
+  color: #aaa;
   white-space: pre;
   padding: 10px;
   position: absolute;
@@ -61,6 +83,7 @@ body {
   bottom: 25px;
   left: 3px;
   right: 3px;
+
 }
 
 .ideOutputText {
@@ -70,8 +93,7 @@ body {
 }
 
 .ideOutputBorder {
-  border: 1px solid #9f9f9f;
-  border-radius: 3px;
+  border: 0;
 }
 
 .ideFooterStatusBar {
@@ -132,25 +154,39 @@ body {
 .ideTabs {
   /* margin-top: 2px;*/
   margin-bottom: 0;
-  padding-left: 0px;
+  margin-left: 40px;
+  padding: 0;
   /* background-color: #e8e8e8; */
 }
 
 .ideTabs li {
   list-style-type: none;
-  border: 1px solid #d3d3d3;
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  padding: 10px 15px;
+  border: 0;
+  padding: 6px 8px;
+  margin-right: 4px;
   background-color: #fff;
   cursor: pointer;
-  color: #333;
   opacity: .65;
+  font-size: 0.75em;
+  font-weight: bold;
+  color: #bbb;
+  height: 17px;
+  line-height: 15px;
 }
 
-.ideTabActive {
+.ideTabs li.ideTabActive {
   opacity: 1 !important;
   border-color: #9f9f9f !important;
+  color: #777;
+}
+
+.ideTabs li .remove {
+    font-size: 7px;
+    padding-left: 5px;
+    color: #ccc;
+}
+.ideTabs li:hover .remove {
+    color: #d9534f;
 }
 
 .ideTabs img {
@@ -171,17 +207,20 @@ body {
 .ace_gutter {
   /* overwrite the ace gutter bg-color to match the bootstrap gray */
   background-color: #e7e7e7 !important;
+  width: 40px !important; /* static width */
+  border-right: 0 !important;;
 }
 
 #ace_editor {
-  /* border-top: 1px solid darkgray; */
+  border-top: 0 !important;
   /* height: 100%; */
   width: 100%;
   /*padding-bottom: 40px; /* padding for the tab bar */
   position: absolute;
-  top: 39px;
+  top: 49px;
   bottom: 0px;
 }
+
 
 #ideRightPartOfMiddlePart {
   background-color: #e7e7e7;
@@ -190,4 +229,77 @@ body {
 /* Make sure the kendo-splitter is not visible in the treeview where it splits the project-name and the LibraryCtrl */
 #ideTreeviewPartOfMiddlePart .k-splitbar {
   background-color: #ffffff;
+}
+
+
+
+.btn-default,
+.btn-success {
+  border-radius: 0;
+  border: 0;
+  font-weight: 400;
+  padding: 4px 6px;
+  background-color: #ddd;
+  color: #00000075;
+  border-bottom: #aaa 2px solid;
+  line-height: initial;
+}
+
+.btn.active,
+.btn.focus,
+.btn:active,
+.btn:focus,
+.btn:hover,
+.open>.dropdown-toggle.btn{
+  background-color: #ccc;
+  border-bottom: #888 2px solid;
+  color: rgba(0, 0, 0, 0.91);
+}
+
+.btn .glyphicon {
+  padding: 0 4px;
+}
+
+.btn-success,
+.btn-success.disabled,
+.btn-success.disabled.active,
+.btn-success.disabled.focus,
+.btn-success.disabled:active,
+.btn-success.disabled:focus,
+.btn-success.disabled:hover,
+.btn-success[disabled],
+.btn-success[disabled].active,
+.btn-success[disabled].focus,
+.btn-success[disabled]:active,
+.btn-success[disabled]:focus,
+.btn-success[disabled]:hover,
+fieldset[disabled] .btn-success,
+fieldset[disabled] .btn-success.active,
+fieldset[disabled] .btn-success.focus,
+fieldset[disabled] .btn-success:active,
+fieldset[disabled] .btn-success:focus,
+fieldset[disabled] .btn-success:hover {
+  background: #0064a6;
+  border-bottom: 2px solid #00558e;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-success.active,
+.btn-success.focus,
+.btn-success:active,
+.btn-success:focus,
+.btn-success:hover,
+.open>.dropdown-toggle.btn-success {
+  background: #00558e;
+  border-bottom: 2px solid #004472;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.btn-group-sm>.btn,
+.btn-sm {
+  font-size: 11px;
+}
+
+*[class^='col'] {
+  box-sizing: border-box !important; /* override kendo */
 }
