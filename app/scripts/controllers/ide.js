@@ -420,6 +420,8 @@ app.controller('IdeCtrl',
         promise.then(
           function (data) { // note: we only get the data because the resolution to 'then' indicates that the call was successful; thus no header information
 
+            console.log(data);
+
             //
             ideState.stopUrl = data.stopUrl;
 
@@ -456,6 +458,8 @@ app.controller('IdeCtrl',
         ProjectFactory
           .runProject()
           .then(function (data) { // note: we only get the data because the resolution to 'then' indicates that the call was successful; thus no header information
+
+            console.log(data);
 
             // set the Url on how to stop the current run-action
             ideState.stopUrl = data.stopUrl;
@@ -774,96 +778,95 @@ app.controller('IdeCtrl',
 
         $log.debug('NavBarClick with id: ' + aClickId);
 
+        var req;
+
         switch (aClickId) {
           case ('add_file'):
-            var req = IdeMsgService.msgNewNodeRequest('file');
+            req = IdeMsgService.msgNewNodeRequest('file');
             $rootScope.$broadcast(req.msg, req.data);
             break;
           case ('add_folder'):
-            var req = IdeMsgService.msgNewNodeRequest('folder');
+            req = IdeMsgService.msgNewNodeRequest('folder');
             $rootScope.$broadcast(req.msg, req.data);
             break;
           case ('rename_node'):
-            var req = IdeMsgService.msgRenameNodeRequest();
+            req = IdeMsgService.msgRenameNodeRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('remove_node'):
-            var req = IdeMsgService.msgRemoveNodeRequest();
+            req = IdeMsgService.msgRemoveNodeRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('save_project'):
-            var req = IdeMsgService.msgSaveProjectRequest();
+            req = IdeMsgService.msgSaveProjectRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('hide_file'):
-            var req = IdeMsgService.msgHideNodeRequest();
+            req = IdeMsgService.msgHideNodeRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('show_share_project'):
-            var req = IdeMsgService.msgShowShareProjectModalRequest();
+            req = IdeMsgService.msgShowShareProjectModalRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('show_editor_settings'):
-            var req = IdeMsgService.msgShowEditorSettingsRequest($scope.aceEditorSettings);
+            req = IdeMsgService.msgShowEditorSettingsRequest($scope.aceEditorSettings);
             $rootScope.$broadcast(req.msg, req.data);
             break;
           case ('show_output_as_text'):
-            var req = IdeMsgService.msgShowOutputAsText();
+            req = IdeMsgService.msgShowOutputAsText();
             $rootScope.$broadcast(req.msg);
             break;
           case ('compile'):
             if(!($scope.disabledActions.compile)) {
-              var req = IdeMsgService.msgCompileRequest();
+              req = IdeMsgService.msgCompileRequest();
               $rootScope.$broadcast(req.msg);
             }
             break;
           case ('compileDynamic'):
             if(!($scope.disabledActions.compile)) {
-              var req = IdeMsgService.msgCompileRequest();
+              req = IdeMsgService.msgCompileRequest();
               $rootScope.$broadcast(req.msg);
-
               ideState.actionAllowsForStopping = true;
             }
             break;
           case ('compile_clean'):
             if(!($scope.disabledActions.compile)) {
-              var req = IdeMsgService.msgCompileCleanRequest();
+              req = IdeMsgService.msgCompileCleanRequest();
               $rootScope.$broadcast(req.msg);
             }
             break;
           case ('run'):
             if(!($scope.disabledActions.run)) {
-              var req = IdeMsgService.msgRunRequest();
+              req = IdeMsgService.msgRunRequest();
               $rootScope.$broadcast(req.msg);
-
               ideState.actionAllowsForStopping = true;
             }
             break;
           case ('stop'):
-            var req = IdeMsgService.msgStopRequest();
+            req = IdeMsgService.msgStopRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('test'):
             if(!($scope.disabledActions.test)) {
-              var req = IdeMsgService.msgTestRequest();
+
+              // req = IdeMsgService.msgTestRequest(); -> original via console
+              req = IdeMsgService.msgTestRequestOpenModal();
               $rootScope.$broadcast(req.msg);
+
             }
             break;
           case ('tool'):
             if(!($scope.disabledActions.tool)) {
-              var req = IdeMsgService.msgToolRequest();
+              req = IdeMsgService.msgToolRequest();
               $rootScope.$broadcast(req.msg);
             }
             break;
           case ('submit'):
             if(!($scope.disabledActions.submit)) {
-              var req = IdeMsgService.msgSubmitRequest();
+              req = IdeMsgService.msgSubmitRequest();
               $rootScope.$broadcast(req.msg);
             }
-            break;
-          case ('submitio'):
-            var req = IdeMsgService.msgSubmitRequest();
-            $rootScope.$broadcast(req.msg);
             break;
         }
       };
@@ -1461,6 +1464,76 @@ app.controller('IdeCtrl',
         }
       };
 
+      /** Handles the event that the Modal for "Test Project" should show be shown. (Janick Michot) */
+      $scope.$on(IdeMsgService.msgTestRequestOpenModal().msg, function (aEvent, aMsgData) {
+
+        /** The controller for the modal */
+        var testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
+
+          $scope.testsFailed = 0;
+          $scope.testsSucceed = 0;
+          $scope.ioTests = [];
+
+          let testProject = function() {
+            var promise = ProjectFactory.testProject()
+                .then(function (data) {
+                  $scope.ioTests = data.appropriateTests;
+
+                  console.log(data.appropriateTests);
+
+                }).catch(function (err) {
+                  console.log(err);
+                });
+          };
+
+          testProject();
+
+          // NOTE: Entweder Test nacheinander Senden (wie bei repl.it) oder gesamtes Ergebnis zuücknehmen
+          // nachfolgend Code um hier config auszulesen
+          let readIoTests = function() {
+
+            let ioTests = [];
+
+            /* get codeboard config file */
+            let configFile = ProjectFactory.getProject().files.find(function(folder) {
+                return folder.filename === 'Root';
+              }).children.find(function(file) {
+                return file.filename === 'codeboard.json';
+              });
+
+            if(configFile) {
+              let configJson = JSON.parse(configFile.content);
+              if(typeof configJson.testMethod !== 'undefined' && configJson.testMethod === 'ioTests' && typeof configJson.ioTests !== 'undefined' && configJson.ioTests.length > 0 ) {
+                ioTests = configJson.ioTests;
+              }
+            }
+
+            return ioTests;
+          };
+
+
+
+          $scope.allTestsPassed = function() {
+            // todo
+            return true;
+          }
+
+
+
+
+          $scope.closeModal = function () {
+            $uibModalInstance.close();
+          };
+        }];
+
+        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
+        $uibModal.open({
+          templateUrl: 'ideTestProjectModal.html',
+          controller: testProjectModalInstanceCtrl
+        });
+
+      });
+
 
       /** Below list all one-time invocations for functions which should run whenever the controller is loaded from scratch.*/
 
@@ -1659,25 +1732,7 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
 app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'ProjectFactory', 'IdeMsgService',
   function ($scope, $rootScope, $log, $uibModal, ProjectFactory, IdeMsgService) {
 
-  $scope.tabs = []; // todo am anfang alle (oder alle im ROOT) tabs öffnen
-/*
-  ProjectFactory.getProject().files.forEach(function(file) {
-      file.children.forEach(function(file) {
-
-          console.log(file);
-          return;
-
-          $scope.tabs.push(
-              {
-                  name: file.filename,
-                  title: file.path + '/' + file.filename,
-                  nodeIndex: file.nodeId,
-                  arrayIndex: $scope.tabs.length,
-                  isActive: false
-              });
-      });
-  });
-*/
+  $scope.tabs = [];
 
   /**
    * Function to set a particular tab as active and set all other tabs inactive.

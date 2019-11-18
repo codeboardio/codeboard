@@ -82,7 +82,7 @@ angular.module('codeboardApp')
       return {
         msg: 'ide.renameNodeNameAvailable',
         data: {nodeId: aNodeId, nodeName: aNewNodeName}
-      }
+      };
     };
 
 
@@ -105,7 +105,7 @@ angular.module('codeboardApp')
       return {
         msg: 'ide.removeNodeConfirmation',
         data: {uniqueId: aUniqueId}
-      }
+      };
     };
 
 
@@ -127,7 +127,7 @@ angular.module('codeboardApp')
     this.msgHideNodeRequest = function () {
       return {
         msg: 'ide.hideNodeRequest'
-      }
+      };
     };
 
 
@@ -138,7 +138,7 @@ angular.module('codeboardApp')
     this.msgCompileRequest = function () {
       return {
         msg: 'ide.compileRequest'
-      }
+      };
     };
 
 
@@ -149,7 +149,7 @@ angular.module('codeboardApp')
     this.msgCompileCleanRequest = function () {
       return {
         msg: 'ide.compileCleanRequest'
-      }
+      };
     };
 
 
@@ -160,7 +160,7 @@ angular.module('codeboardApp')
     this.msgRunRequest = function () {
       return {
         msg: 'ide.runRequest'
-      }
+      };
     };
 
 
@@ -171,7 +171,7 @@ angular.module('codeboardApp')
     this.msgStopRequest = function () {
       return {
         msg: 'ide.stopRequest'
-      }
+      };
     };
 
 
@@ -183,7 +183,7 @@ angular.module('codeboardApp')
     this.msgStoppableActionAvailable = function () {
       return {
         msg: 'ide.stoppableActionAvailable'
-      }
+      };
     };
 
 
@@ -195,7 +195,7 @@ angular.module('codeboardApp')
     this.msgStoppableActionGone = function () {
       return {
         msg: 'ide.stoppableActionGone'
-      }
+      };
     };
 
 
@@ -206,7 +206,7 @@ angular.module('codeboardApp')
     this.msgTestRequest = function () {
       return {
         msg: 'ide.testRequest'
-      }
+      };
     };
 
 
@@ -217,7 +217,7 @@ angular.module('codeboardApp')
     this.msgToolRequest = function () {
       return {
         msg: 'ide.toolRequest'
-      }
+      };
     };
 
 
@@ -228,7 +228,7 @@ angular.module('codeboardApp')
     this.msgSubmitRequest = function () {
       return {
         msg: 'ide.SubmitRequest'
-      }
+      };
     };
 
 
@@ -241,7 +241,7 @@ angular.module('codeboardApp')
       return {
         msg: 'ide.displayEditorRequest',
         data: {displayEditor: aDisplayEditor}
-      }
+      };
     };
 
 
@@ -253,7 +253,7 @@ angular.module('codeboardApp')
     this.msgShowOutputAsText = function () {
       return {
         msg: 'ide.showOutputAsText'
-      }
+      };
     };
 
 
@@ -264,7 +264,7 @@ angular.module('codeboardApp')
     this.msgReloadTreeFromProjectFactory = function () {
       return {
         msg: 'ide.reloadTreeFromProjectFactory'
-      }
+      };
     };
 
     /**
@@ -275,7 +275,7 @@ angular.module('codeboardApp')
       return {
         msg: 'ide.showEditorSettingsRequest',
         data: {settings: currentSettings}
-      }
+      };
     };
 
     /**
@@ -286,7 +286,7 @@ angular.module('codeboardApp')
       return {
         msg: 'ide.editorSettingsChanged',
         data: {settings: currentSettings}
-      }
+      };
     };
 
 
@@ -297,7 +297,7 @@ angular.module('codeboardApp')
     this.msgEditorResizeRequest = function () {
       return {
         msg: 'ide.editorResizeRequest'
-      }
+      };
     };
 
 
@@ -308,7 +308,7 @@ angular.module('codeboardApp')
     this.msgProcessViewQueryStringRequest = function () {
       return {
         msg: 'ide.processViewQueryStringRequest'
-      }
+      };
     };
 
 
@@ -319,7 +319,18 @@ angular.module('codeboardApp')
     this.msgShowShareProjectModalRequest = function () {
       return {
         msg: 'ide.showShareProjectModalRequest'
-      }
+      };
+    };
+
+    /**
+     * Returns msg object used to signal that the modal for sharing the project should be shown.
+     * @return {{msg: string}}
+     * @author Janick Michot
+     */
+    this.msgTestRequestOpenModal = function () {
+      return {
+        msg: 'ide.testRequestOpenModal'
+      };
     };
 
   });

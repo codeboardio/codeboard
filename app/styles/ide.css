@@ -303,3 +303,74 @@ fieldset[disabled] .btn-success:hover {
 *[class^='col'] {
   box-sizing: border-box !important; /* override kendo */
 }
+
+
+
+/* ioTests */
+
+.modal-dialog{
+  overflow-y: initial !important
+}
+.modal-body{
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+#ioTestsAccordion .panel {
+  margin: 0;
+  border-radius: 0;
+  border: 1px solid #fff;
+}
+
+#ioTestsAccordion .panel .panel-heading {
+  border-radius: 0;
+  font-weight: 900;
+  background: #ecc5c5;
+}
+#ioTestsAccordion .panel .panel-heading.pass {
+  background: #dceede;
+}
+
+#ioTestsAccordion .panel .panel-heading a {
+  color: #ab5c5c !important;
+}
+#ioTestsAccordion .panel .panel-heading.pass a {
+  color: #77af87 !important;
+}
+
+#ioTestsAccordion .panel .panel-body {
+  border-top: 0;
+  background: #fafafa;
+}
+
+#ioTestsAccordion .inputOutputArea {
+  width: 100%;
+  min-height: 80px;
+  background: #fff;
+  border: 0;
+  padding: 8px;
+  color: #aaa;
+}
+
+#ioTestsAccordion .inputOutputArea.actualOutput {
+  background: #f7e9e9;
+  color: #d28484;
+}
+#ioTestsAccordion .inputOutputArea.expectedOutput {
+  background: #e7f3e8;
+  color: #7ebf84;
+}
+
+#ioTestsAccordion .areaLabel {
+  color: #aaa;
+  font-weight: 100;
+}
+
+.list-group-item,
+.list-group-item:hover{
+  z-index: auto !important;
+}
+
+.modal{
+  overflow: visible !important;
+}

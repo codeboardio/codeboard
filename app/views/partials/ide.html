@@ -43,7 +43,7 @@
                   <div class="col-xs-7 col-md-5 col-md-pull-2">
                     <div class="navbar-form navbar-left" style="padding-left: 0">
 
-                       <div class="dropdown" style="display: inline-block">
+                       <div class="dropdown" ng-show="currentRoleIsOwner()" style="display: inline-block">
 
                          <a id="projectButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
                            <span class="glyphicon glyphicon-option-horizontal"></span>
@@ -111,11 +111,6 @@
                         <span class="glyphicon glyphicon-send"></span> Submit
                       </button>
 
-                      <!-- todo löschen
-                      <button class="btn btn-success btn-sm" ng-click="navBarClick('submitio')" style="margin-left: 45px;" title="Submit this project">
-                        <span class="glyphicon glyphicon-send"></span> Submit IO
-                      </button>
-                      -->
                     </form>
                   </div>
 
@@ -471,6 +466,67 @@
           </div>
       </script>
   </div>
+
+
+  <!-- the modal window for showing the "Share project" information -->
+  <div>
+    <script type="text/ng-template" id="ideTestProjectModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Testing your solution</h3>
+      </div>
+      <div class="modal-body">
+
+        <!-- Accordion with ioTests -->
+        <div class="panel-group" id="ioTestsAccordion">
+          <div class="panel panel-default" ng-repeat="ioTest in ioTests">
+            <div class="panel-heading" ng-class="{pass: ioTest.pass}">
+              <a href="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
+                <span class="title" title="{{ioTest.name}}">{{ioTest.name}}</span>
+                <span ng-show="ioTest.pass" class="pull-right flag glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                <span ng-show="!ioTest.pass" class="pull-right flag glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+               </a>
+            </div>
+
+            <div id="ioTest{{$index}}" class="panel-collapse collapse">
+              <div class="panel-body">
+                <p ng-show="!ioTest.pass" class="failureReason text-danger"><b>Failure reason:</b> {{ioTest.note}}</p>
+                <p ng-show="ioTest.pass" class="successNote text-success"><b>Success Note:</b> {{ioTest.note}}</p>
+
+                <div class="form-group">
+                  <label class="areaLabel">Teachers Input</label>
+                  <textarea class="inputOutputArea teachersInput">{{ioTest.input}}</textarea>
+                </div>
+
+                <div class="row">
+                  <div class="col-xs-12 col-md-6">
+                    <div class="form-group">
+                      <label class="areaLabel">Teacher expected to see:</label>
+                      <textarea class="inputOutputArea expectedOutput">{{ioTest.output}}</textarea>
+                    </div>
+                  </div>
+                  <div class="col-xs-12 col-md-6">
+                    <div class="form-group">
+                      <label class="areaLabel">Your Output:</label>
+                      <textarea class="inputOutputArea actualOutput">{{ioTest.actualOutput}}</textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="closeModal()">Continue</button>
+        <button ng-show="!allTestsPassed()"class="btn btn-default" ng-click="">Need Help?</button>
+        <button ng-show="allTestsPassed()" class="btn btn-default btn-success" >Submit</button>
+      </div>
+    </script>
+  </div>
+  <!-- end of the modal window -->
+
+
   <!-- end of modal window -->
 
 </div>

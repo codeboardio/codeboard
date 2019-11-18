@@ -474,8 +474,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     var setProjectFromJSONdata = function (projectDataFromServer, ltiData, staticFiles) {
 
       // default values for the two optional parameters
-      var _ltiData = {}
-        , _staticFiles = [];
+      var _ltiData = {}, _staticFiles = [];
 
       // set the lastCompilationId to be empty
       // Otherwise we might switch to a different project
@@ -825,8 +824,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
       var payload = getPayloadForCompilation(true);
       payload.action = 'test';
-
-      payload.id = lastCompilationId;
 
       // create the promise that is returned
       var deferred = $q.defer();
