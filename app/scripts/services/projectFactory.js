@@ -819,11 +819,37 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       return deferred.promise;
     };
 
+    /**
+     * Retrieves all test for this project in an array
+     * @author Janick Michot
+     */
+    var getTests = function() {
 
-    var testProject = function() {
+      let payload = getPayloadForCompilation(true);
+      payload.action = 'getTests';
 
-      var payload = getPayloadForCompilation(true);
+      // create the promise that is returned
+      var deferred = $q.defer();
+
+      // make call to the server
+      ProjectRes.save( { projectId: $routeParams.projectId }, payload,
+          function success(data) {
+            deferred.resolve(data);
+          },
+          function error(response) {
+            deferred.reject(response);
+          }
+        );
+
+      return deferred.promise;
+    }
+
+
+    var testProject = function(testData) {
+
+      var payload = getPayloadForCompilation(false);
       payload.action = 'test';
+      payload.testData = testData; // add our test object to the payload (Janick Michot)
 
       // create the promise that is returned
       var deferred = $q.defer();
@@ -966,6 +992,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       saveProjectToServer: saveProjectToServer,
       compileProject: compileProject,
       runProject: runProject,
+      getTests: getTests,
       testProject: testProject,
       toolAction: toolAction,
       submitProject: submitProject,

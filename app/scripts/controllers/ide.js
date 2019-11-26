@@ -372,18 +372,20 @@ app.controller('IdeCtrl',
         $scope.renderHtmlOutput = false;
 
         if(renderAsHtml && !($scope.uiSettings.showOutputAsText)) {
-
-          // get the current output and add the new output
           var lConcatOutput = $scope.htmlOutput + aOutputToAdd;
-          $scope.htmlOutput = $sce.trustAsHtml(lConcatOutput);
-          $scope.renderHtmlOutput = true;
+          $scope.$apply(function () {
+            $scope.htmlOutput = $sce.trustAsHtml(lConcatOutput);
+            $scope.renderHtmlOutput = true;
+          });
         }
         else {
-          $scope.output += aOutputToAdd;
-          $scope.renderHtmlOutput = false;
+          $scope.$apply(function () {
+            $scope.output += aOutputToAdd;
+            $scope.renderHtmlOutput = false;
+          });
         }
 
-        // if there is an htmlOutput, we need to unwarp it before we can count it's length.
+        // if there is an htmlOutput, we need to unwrap it before we can count it's length.
         return $scope.output.length + ($scope.htmlOutput.$$unwrapTrustedValue ? $scope.htmlOutput.$$unwrapTrustedValue().length : 0);
       };
 
@@ -668,7 +670,7 @@ app.controller('IdeCtrl',
         compile: false,
         run: true,
         stop: true,
-        test: true,
+        test: false,
         tool: false,
         submit: true
       };
@@ -1464,62 +1466,101 @@ app.controller('IdeCtrl',
         }
       };
 
-      /** Handles the event that the Modal for "Test Project" should show be shown. (Janick Michot) */
+      /**
+       * Handles the event that the Modal for "Test Project" should show be shown.
+       *
+       * @author Janick Michot
+       */
       $scope.$on(IdeMsgService.msgTestRequestOpenModal().msg, function (aEvent, aMsgData) {
 
         /** The controller for the modal */
         var testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
 
-          $scope.testsFailed = 0;
-          $scope.testsSucceed = 0;
-          $scope.ioTests = [];
+          $scope.compilationResult = { 'inProgress': true };
+          $scope.tests = [];
 
-          let testProject = function() {
-            var promise = ProjectFactory.testProject()
-                .then(function (data) {
-                  $scope.ioTests = data.appropriateTests;
+          // get all tests related to this project
+          ProjectFactory.getTests()
+            .then(function(data) {
+              if(data.fail) {
+                Promise.reject("Fehlgeschlagen: " + data.msg);
+              }
+              // store data/tests to scope and stop spinning
+              $scope.tests = data.tests;
+              $scope.compilationResult.inProgress = false;
+              return data;
+            })
+              .then(function(data) {
+                let i = 0;
+                // do io-test asynchronously one after another
+                return data.tests.reduce((promiseChain, test) => {
 
-                  console.log(data.appropriateTests);
+                  // Note, Promise.resolve() resolve is our initial value
+                  return promiseChain.then(function (id) {
 
-                }).catch(function (err) {
+                    console.log(id);
+
+                    // dont make any further tests after `stopOnFailure`
+                    if(i > 0 && (typeof id === 'undefined' || id === false || id === 0)) {
+                      test.status = "unreachable";
+                      $scope.tests[i] = test; i++;
+                      return 0;
+                      throw {why : "stopOnFailure"};
+                    }
+
+                    $scope.tests[i].status = 'processing';
+
+                    // set compilation/run id from last call
+                    test.id = id;
+
+                    return ProjectFactory.testProject(test)
+                        .then(function(testResult) {
+                          // update testData
+                          $scope.tests[i] = testResult; i++;
+
+                          if(testResult.stopOnFailure && testResult.status === 'fail') {
+                            return false;
+                          }
+                          return testResult.id;
+                        });
+                  });
+                },
+                Promise.resolve()
+              )
+                .then(function(testResult) {
+
+                  // todo brauchen wir ein summary?
+
+                })
+                .catch(function(error) {
+
+                  if(error.why === 'stopOnFailure') {
+
+                    console.log(i);
+
+                    for (i; i < $scope.tests.length; i++) {
+                      if ($scope.tests[i].status === 'pending') {
+                        $scope.tests[i].status = 'unreachable';
+                        break;
+                      }
+                    }
+
+                    console.log("keine weiteren tests pls");
+                  }
+
                   console.log(err);
                 });
-          };
-
-          testProject();
-
-          // NOTE: Entweder Test nacheinander Senden (wie bei repl.it) oder gesamtes Ergebnis zuücknehmen
-          // nachfolgend Code um hier config auszulesen
-          let readIoTests = function() {
-
-            let ioTests = [];
-
-            /* get codeboard config file */
-            let configFile = ProjectFactory.getProject().files.find(function(folder) {
-                return folder.filename === 'Root';
-              }).children.find(function(file) {
-                return file.filename === 'codeboard.json';
               });
 
-            if(configFile) {
-              let configJson = JSON.parse(configFile.content);
-              if(typeof configJson.testMethod !== 'undefined' && configJson.testMethod === 'ioTests' && typeof configJson.ioTests !== 'undefined' && configJson.ioTests.length > 0 ) {
-                ioTests = configJson.ioTests;
-              }
+
+          $scope.getTestMethodOutput = function(method) {
+            switch (method) {
+              case 'ioTest':
+                return 'ideIoTestResult.html';
+              case 'compileTest':
+                return 'ideCompileTestResult.html';
             }
-
-            return ioTests;
           };
-
-
-
-          $scope.allTestsPassed = function() {
-            // todo
-            return true;
-          }
-
-
-
 
           $scope.closeModal = function () {
             $uibModalInstance.close();

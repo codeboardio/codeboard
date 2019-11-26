@@ -233,80 +233,92 @@ body {
 
 
 
-.btn-default,
-.btn-success {
+.btn {
   border-radius: 0;
   border: 0;
   font-weight: 400;
   padding: 4px 6px;
   background-color: #ddd;
-  color: #00000075;
+  color: #444;
   border-bottom: #aaa 2px solid;
   line-height: initial;
+  opacity: 0.8;
 }
-
 .btn.active,
 .btn.focus,
 .btn:active,
 .btn:focus,
 .btn:hover,
-.open>.dropdown-toggle.btn{
-  background-color: #ccc;
-  border-bottom: #888 2px solid;
-  color: rgba(0, 0, 0, 0.91);
+.open > .dropdown-toggle.btn{
+  opacity: 1;
 }
-
 .btn .glyphicon {
   padding: 0 4px;
 }
 
-.btn-success,
-.btn-success.disabled,
-.btn-success.disabled.active,
-.btn-success.disabled.focus,
-.btn-success.disabled:active,
-.btn-success.disabled:focus,
-.btn-success.disabled:hover,
-.btn-success[disabled],
-.btn-success[disabled].active,
-.btn-success[disabled].focus,
-.btn-success[disabled]:active,
-.btn-success[disabled]:focus,
-.btn-success[disabled]:hover,
-fieldset[disabled] .btn-success,
-fieldset[disabled] .btn-success.active,
-fieldset[disabled] .btn-success.focus,
-fieldset[disabled] .btn-success:active,
-fieldset[disabled] .btn-success:focus,
-fieldset[disabled] .btn-success:hover {
-  background: #0064a6;
-  border-bottom: 2px solid #00558e;
-  color: rgba(255, 255, 255, 0.8);
+
+/* Button Primary */
+.btn-primary {
+  background: #0064a6 !important;
+  border-bottom: 2px solid #003f69 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
-.btn-success.active,
-.btn-success.focus,
-.btn-success:active,
-.btn-success:focus,
-.btn-success:hover,
-.open>.dropdown-toggle.btn-success {
-  background: #00558e;
-  border-bottom: 2px solid #004472;
-  color: rgba(255, 255, 255, 0.85);
+/* Button Info */
+.btn-info {
+  background: #17a2b8 !important;
+  border-bottom: 2px solid #096d7d !important;
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
-.btn-group-sm>.btn,
+/* Button Success */
+.btn-success {
+  background: #3da956 !important;
+  border-bottom: 2px solid #116524 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* :disabled */
+.btn.disabled,
+.btn.disabled.active,
+.btn.disabled.focus,
+.btn.disabled:active,
+.btn.disabled:focus,
+.btn.disabled:hover,
+.btn[disabled],
+.btn[disabled].active,
+.btn[disabled].focus,
+.btn[disabled]:active,
+.btn[disabled]:focus,
+.btn[disabled]:hover,
+fieldset[disabled] .btn,
+fieldset[disabled] .btn.active,
+fieldset[disabled] .btn.focus,
+fieldset[disabled] .btn:active,
+fieldset[disabled] .btn:focus,
+fieldset[disabled] .btn:hover {
+  opacity: 0.5;
+}
+
+/* Button small */
+.btn-group-sm > .btn,
 .btn-sm {
   font-size: 11px;
 }
 
+
+/* Override Kendo, to prevent bootstrap grid */
 *[class^='col'] {
-  box-sizing: border-box !important; /* override kendo */
+  box-sizing: border-box !important;
 }
 
 
 
 /* ioTests */
+
+.modal-content {
+    border-radius: 0;
+}
 
 .modal-dialog{
   overflow-y: initial !important
@@ -322,21 +334,66 @@ fieldset[disabled] .btn-success:hover {
   border: 1px solid #fff;
 }
 
-#ioTestsAccordion .panel .panel-heading {
+
+/* Heading */
+#ioTestsAccordion .panel-heading {
   border-radius: 0;
-  font-weight: 900;
-  background: #ecc5c5;
-}
-#ioTestsAccordion .panel .panel-heading.pass {
-  background: #dceede;
 }
 
-#ioTestsAccordion .panel .panel-heading a {
+#ioTestsAccordion .panel-heading.processing,
+#ioTestsAccordion .panel-heading.processing a,
+#ioTestsAccordion .panel-heading.pending,
+#ioTestsAccordion .panel-heading.pending a {
+    pointer-events: none;
+    cursor: default;
+}
+
+#ioTestsAccordion .panel-heading.processing,
+#ioTestsAccordion .panel-heading.processing a {
+    background-color: #ddd;
+    color: #bbb !important;
+}
+
+#ioTestsAccordion .panel-heading.pending,
+#ioTestsAccordion .panel-heading.pending a {
+  background-color: #ccc;
+  color: #aaa !important;
+}
+
+#ioTestsAccordion .panel-heading.fail,
+#ioTestsAccordion .panel-heading.fail a {
+  background: #ecc5c5;
   color: #ab5c5c !important;
 }
-#ioTestsAccordion .panel .panel-heading.pass a {
+
+#ioTestsAccordion .panel-heading.success,
+#ioTestsAccordion .panel-heading.success a {
+  background: #dceede;
   color: #77af87 !important;
 }
+
+#ioTestsAccordion .compileTest .panel-heading.fail,
+#ioTestsAccordion .compileTest .panel-heading.fail a {
+  background: #ec9494;
+  color: #ab2228 !important;
+}
+#ioTestsAccordion .compileTest .panel-heading.success,
+#ioTestsAccordion .compileTest .panel-heading.success a {
+    background: #a7d5e6;
+    color: #5c89af !important;
+}
+
+
+
+#ioTestsAccordion .compileTest {
+  margin-bottom: 15px;
+}
+
+
+
+
+
+
 
 #ioTestsAccordion .panel .panel-body {
   border-top: 0;
@@ -345,11 +402,13 @@ fieldset[disabled] .btn-success:hover {
 
 #ioTestsAccordion .inputOutputArea {
   width: 100%;
+  max-width: 100%;
   min-height: 80px;
   background: #fff;
   border: 0;
   padding: 8px;
   color: #aaa;
+  border-radius: 0;
 }
 
 #ioTestsAccordion .inputOutputArea.actualOutput {
@@ -371,6 +430,118 @@ fieldset[disabled] .btn-success:hover {
   z-index: auto !important;
 }
 
-.modal{
-  overflow: visible !important;
+
+
+/* - - - Footer - - - */
+.ideFooter {
+  overflow: hidden !important;
+}
+
+.ideFooter .userInput {
+  position: absolute;
+  bottom: 2px;
+  left: 3px;
+  right: 3px;
+  background: #333;
+  border-top: 1px solid #e7e7e7;
+}
+.ideFooter .userInput:after {
+  content: "";
+  clear: both;
+}
+.ideFooter .userInputField {
+  box-sizing: border-box;
+  float: left;
+  width: 100%;
+}
+.ideFooter .userInputButton {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+
+.ideFooter #idFooterUserInput {
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  padding-left: 50px;
+  color: #aaa;
+  background: none;
+}
+.ideFooter .userInputField .glyphicon {
+  position: absolute;
+  padding: 8px 12px;
+  pointer-events: none;
+  left: 0px;
+  color: #666;
+}
+
+
+
+
+/**
+ * Loading Animations
+ */
+
+/* - - Growing Spinner -- */
+@keyframes spinner-grow {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.spinner-grow {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  vertical-align: text-bottom;
+  background-color: #0064a6;
+  border-radius: 50%;
+  opacity: 0;
+  animation: spinner-grow .9s linear infinite;
+}
+
+/** Spinninc Glyphicons **/
+.gly-spin {
+    -webkit-animation: spin 2s infinite linear;
+    -moz-animation: spin 2s infinite linear;
+    -o-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+}
+@-moz-keyframes spin {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        -moz-transform: rotate(359deg);
+    }
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+    }
+}
+@-o-keyframes spin {
+    0% {
+        -o-transform: rotate(0deg);
+    }
+    100% {
+        -o-transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
 }
