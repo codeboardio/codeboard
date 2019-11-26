@@ -1501,11 +1501,10 @@ app.controller('IdeCtrl',
                     console.log(id);
 
                     // dont make any further tests after `stopOnFailure`
-                    if(i > 0 && (typeof id === 'undefined' || id === false || id === 0)) {
+                    if(i > 0 && id === 0) {
                       test.status = "unreachable";
                       $scope.tests[i] = test; i++;
                       return 0;
-                      throw {why : "stopOnFailure"};
                     }
 
                     $scope.tests[i].status = 'processing';
@@ -1519,7 +1518,7 @@ app.controller('IdeCtrl',
                           $scope.tests[i] = testResult; i++;
 
                           if(testResult.stopOnFailure && testResult.status === 'fail') {
-                            return false;
+                            return 0;
                           }
                           return testResult.id;
                         });
@@ -1528,27 +1527,10 @@ app.controller('IdeCtrl',
                 Promise.resolve()
               )
                 .then(function(testResult) {
-
-                  // todo brauchen wir ein summary?
-
+                    $scope.$apply(); // force update of scope (used for status)
                 })
                 .catch(function(error) {
-
-                  if(error.why === 'stopOnFailure') {
-
-                    console.log(i);
-
-                    for (i; i < $scope.tests.length; i++) {
-                      if ($scope.tests[i].status === 'pending') {
-                        $scope.tests[i].status = 'unreachable';
-                        break;
-                      }
-                    }
-
-                    console.log("keine weiteren tests pls");
-                  }
-
-                  console.log(err);
+                  console.log(error);
                 });
               });
 

@@ -553,10 +553,8 @@
             <div class="panel-heading {{test.status}}">
               <a href="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
                 <span class="title" title="{{test.name}}">{{test.name}}</span>
-                <span ng-show="(test.status === 'success')" class="pull-right flag glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
-                <span ng-show="(test.status === 'fail')" class="pull-right flag glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
-                <span ng-hide="(test.status !== 'processing')" class="pull-right flag glyphicon glyphicon-repeat gly-spin" aria-hidden="true"></span>
-               </a>
+                <span ng-class="{'gly-spin': (test.status === 'processing')}" class="pull-right flag glyphicon {{test.status}}" aria-hidden="true"></span>
+              </a>
             </div>
 
             <div id="ioTest{{$index}}" class="panel-collapse collapse">
