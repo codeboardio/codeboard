@@ -1498,8 +1498,6 @@ app.controller('IdeCtrl',
                   // Note, Promise.resolve() resolve is our initial value
                   return promiseChain.then(function (id) {
 
-                    console.log(id);
-
                     // dont make any further tests after `stopOnFailure`
                     if(i > 0 && id === 0) {
                       test.status = "unreachable";

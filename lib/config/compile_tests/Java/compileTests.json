@@ -3,8 +3,13 @@
     "name": "Suche nach Kompilierungsfehler",
     "tests": [
       {
-        "error": "cannot find symbol",
-        "note": "Variable oder Methode falsch bennant",
+        "error": ".+cannot find symbol.*method.*",
+        "note": "Du hast eine Methode falsch bennant.",
+        "placeholders": []
+      },
+      {
+        "error": ".+cannot find symbol.*variable.*",
+        "note": "Du verwendest eine Variable ohne diese zuvor deklariert zu haben",
         "placeholders": []
       },
       {
