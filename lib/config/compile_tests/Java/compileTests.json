@@ -1,0 +1,22 @@
+{
+  "compTests": {
+    "name": "Suche nach Kompilierungsfehler",
+    "tests": [
+      {
+        "error": "cannot find symbol",
+        "note": "Variable oder Methode falsch bennant",
+        "placeholders": []
+      },
+      {
+        "error": "reached end of file while parsing",
+        "note": "Diese Fehlermeldung tritt in Java normalerweise auf, wenn dem Programm die abschliessende geschweifte Klammer (\"}\") fehlt.",
+        "placeholders": []
+      },
+      {
+        "error": "expected",
+        "note": "Dieser Fehler tritt auf, wenn im Code etwas fehlt. Oftmals wird dies durch ein fehlendes Semikolon oder durch schliessende Klammern verursacht.\n",
+        "placeholders": []
+      }
+    ]
+  }
+}
