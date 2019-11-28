@@ -476,8 +476,58 @@
   </div>
   <!-- end of the modal window -->
 
+  <!-- the modal window for showing the "Test project" information -->
+  <div>
+    <script type="text/ng-template" id="ideTestProjectModal.html">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="closeModal()">&times;</button>
+        <h4 class="modal-title">Deine Lösung wird überprüft</h4>
+      </div>
+      <div class="modal-body">
 
-  <!-- templates for the different test methods -->
+        <!-- Spinner  -->
+        <div ng-show="tests.length === 0" class="text-center">
+          <span class="spinner-grow"></span>
+        </div>
+
+        <!-- Accordion with ioTests -->
+        <div class="panel-group" id="ioTestsAccordion">
+          <div ng-repeat="test in tests" class="panel panel-default {{test.method}}">
+            <div class="panel-heading {{test.status}}">
+              <a href="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
+                <span class="title" title="{{test.name}}">{{test.name}}</span>
+                <span ng-class="{'gly-spin': (test.status === 'processing')}" class="pull-right flag glyphicon {{test.status}}" aria-hidden="true"></span>
+              </a>
+            </div>
+
+            <div id="ioTest{{$index}}" class="panel-collapse collapse">
+              <div ng-include="getTestMethodOutput(test.method)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="closeModal()">
+          <span class="glyphicon glyphicon-circle-arrow-down"></span> Fortfahren
+        </button>
+
+        <button ng-hide="allTestsPassed" class="btn btn-info" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+          <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
+        </button>
+
+        <button ng-show="allTestsPassed" class="btn btn-primary" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project" disabled="disabled">
+          <span class="glyphicon glyphicon-send"></span> Submit
+        </button>
+      </div>
+    </script>
+  </div>
+  <!-- end of modal window -->
+
+
+  <!---- Each TestMethod has its on template: ---->
+
+  <!-- ioTest -->
   <div>
     <script type="text/ng-template" id="ideIoTestResult.html">
       <div class="panel-body">
@@ -507,80 +557,30 @@
     </script>
   </div>
 
-
+  <!-- compileTest -->
   <div>
     <script type="text/ng-template" id="ideCompileTestResult.html">
       <div class="panel-body">
-        <p ng-show="(test.status === 'fail')" class="failureReason text-danger"><b>Fehler aufgetreten: </b> Dein Code scheint noch nich ganz zu stimmen</b></p>
+
         <p ng-show="(test.status === 'success')" class="successNote text-success"><b>Keine Fehler aufgetreten: </b>Dein Code konnte erfolgreich kompiliert werden</p>
+
+        <div ng-show="(test.status === 'fail')">
+          <p class="failureReason text-danger"><b>Fehler aufgetreten: </b></p>
+          <ul class="failureReason text-danger">
+            <li ng-repeat="res in test.result">
+              {{res.note}}
+            </li>
+          </ul>
+        </div>
 
         <div class="form-group" ng-hide="(test.status === 'success')">
           <label class="areaLabel">Output:</label>
           <textarea class="inputOutputArea teachersInput" disabled>{{test.output}}</textarea>
         </div>
 
-        <div class="form-group" ng-hide="(test.status === 'success')">
-          <label class="areaLabel">Hinweise zum Fehler:</label>
-          <div class="form-control inputOutputArea expectedOutput">
-            <p ng-repeat="res in test.result">
-              {{res.note}}
-            </p>
-          </div>
-        </div>
-
       </div>
     </script>
   </div>
-
-
-  <!-- the modal window for showing the "Share project" information -->
-  <div>
-    <script type="text/ng-template" id="ideTestProjectModal.html">
-      <div class="modal-header">
-        <button type="button" class="close" ng-click="closeModal()">&times;</button>
-        <h4 class="modal-title">Deine Lösung wird überprüft</h4>
-      </div>
-      <div class="modal-body">
-
-        <!-- Spinner  -->
-        <div ng-show="tests.length === 0" class="text-center">
-          <span class="spinner-grow"></span>
-        </div>
-
-        <!-- Accordion with ioTests -->
-        <div class="panel-group" id="ioTestsAccordion">
-          <div ng-repeat="test in tests" class="panel panel-default {{test.method}}">
-            <div class="panel-heading {{test.status}}">
-              <a href="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
-                <span class="title" title="{{test.name}}">{{test.name}}</span>
-                <span ng-class="{'gly-spin': (test.status === 'processing')}" class="pull-right flag glyphicon {{test.status}}" aria-hidden="true"></span>
-              </a>
-            </div>
-
-            <div id="ioTest{{$index}}" class="panel-collapse collapse">
-              <div ng-include="getTestMethodOutput(test.method)"></div>
-            </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="closeModal()">
-          <span class="glyphicon glyphicon-circle-arrow-down"></span> Fortfahren
-        </button>
-
-        <button ng-hide="allTestsPassed" class="btn btn-info" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
-          <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
-        </button>
-
-        <button ng-show="allTestsPassed" class="btn btn-primary" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project" disabled="disabled">
-          <span class="glyphicon glyphicon-send"></span> Submit
-        </button>
-      </div>
-    </script>
-  </div>
-
-  <!-- end of modal window -->
+  <!---- End of TestMethod templates ---->
 
 </div>
