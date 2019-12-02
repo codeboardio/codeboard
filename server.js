@@ -123,7 +123,7 @@ var server = require('http').createServer(app);
 
 
 // Create a proxy server that redirects WebSocket request directly to the Docker daemon.
-var wsLoadBalancer = httpProxy.createProxyServer({target: 'ws://' + config.mantra.ip + ':' + config.mantra.port, changeOrigin: true});
+var wsLoadBalancer = httpProxy.createProxyServer({target: config.mantra.protocol + config.mantra.ip + ':' + config.mantra.port, changeOrigin: true});
 // Intercept upgrade events (from http to WS) and forward the to docker daemon
 server.on('upgrade', function(req, socket, head) {
 
