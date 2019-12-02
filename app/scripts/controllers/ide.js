@@ -864,12 +864,11 @@ app.controller('IdeCtrl',
        * @param submit {number} if 1, submit action will be set enabled
        */
       var setEnabledActions = function(compile, run, test, tool, submit) {
-        $scope.disabledActions.compile = !(compile == 1);
-        $scope.disabledActions.run = !(run == 1);
-        $scope.disabledActions.test = !(test == 1);
-        $scope.disabledActions.tool = !(tool == 1);
-        // $scope.disabledActions.submit = !(submit == 1);
-        $scope.disabledActions.submit = 0;
+        $scope.disabledActions.compile = (compile !== 1);
+        $scope.disabledActions.run = (run !== 1);
+        $scope.disabledActions.test = (test !== 1);
+        $scope.disabledActions.tool = (tool !== 1);
+        $scope.disabledActions.submit = (submit !== 1);
 
         // trigger a digest because when the WebSocket closes, the buttons sometimes don't get enabled
         if(!$scope.$$phase) {
