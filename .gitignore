@@ -20,4 +20,6 @@ test/coverage
 # Ignore .idea
 /.idea/
 
+# Package.lock
+.package-lock.json
 

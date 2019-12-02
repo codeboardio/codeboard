@@ -420,28 +420,28 @@ app.controller('IdeCtrl',
 
         // handler for when the promise is resolved
         promise.then(
-          function (data) { // note: we only get the data because the resolution to 'then' indicates that the call was successful; thus no header information
+            function (data) { // note: we only get the data because the resolution to 'then' indicates that the call was successful; thus no header information
 
-            console.log(data);
+              console.log(data);
 
-            //
-            ideState.stopUrl = data.stopUrl;
+              //
+              ideState.stopUrl = data.stopUrl;
 
-            // the success case gives us a url to the Mantra WebSocket and a url how to start the container
-            displayWSOutputStream(data.streamUrl, data.startUrl);
-          },
-          function (reason) {
-            // the error callback
-            $log.debug('Error while trying to run your program. The server responded:\n' + reason);
+              // the success case gives us a url to the Mantra WebSocket and a url how to start the container
+              displayWSOutputStream(data.streamUrl, data.startUrl);
+            },
+            function (reason) {
+              // the error callback
+              $log.debug('Error while trying to run your program. The server responded:\n' + reason);
 
-            setOutput('Error while trying to run your program. The server responded:\n' + reason, false);
+              setOutput('Error while trying to run your program. The server responded:\n' + reason, false);
 
-            // disable the action to send another compile request
-            setEnabledActions(1,0,0,1,0);
+              // disable the action to send another compile request
+              setEnabledActions(1,0,0,1,0);
 
-            // make sure all listeners know that there's no stoppable action available
-            $rootScope.$broadcast(IdeMsgService.msgStoppableActionGone().msg);
-          }
+              // make sure all listeners know that there's no stoppable action available
+              $rootScope.$broadcast(IdeMsgService.msgStoppableActionGone().msg);
+            }
         );
       };
 
@@ -491,9 +491,141 @@ app.controller('IdeCtrl',
 
 
       /**
+       *
+       * @author Janick Michot
+       */
+      let compileAndRunProject = function (runCleanCompile) {
+
+        // make sure we save the current content before submitting
+        saveCurrentlyDisplayedContent();
+
+        // remove previous compilation results
+        setOutput('Waiting for (previous) results...', false);
+
+        // todo diese funktion allenfalls anpassen | oder compileAndRun an compile anhängen
+        // disable all actions till the compile request is completed
+        setEnabledActions(0,0,0,0,0);
+
+        ProjectFactory.compileAndRunProject(false)
+            .then(function(data) {
+              ideState.stopUrl = data.stopUrl;
+              displayWSOutputStream(data.streamUrl, data.startUrl, true);
+            })
+            .catch(function(reason) {
+              // the error callback
+              $log.debug('Error when trying to compile and run your program. The server responded:\n' + reason);
+
+              // display the error to the user
+              setOutput('Error when trying to compile and run your program. The server responded:\n' + reason, false);
+
+              // something went wrong while trying to run the program (maybe it was deleted?)
+              // so we only allow the user to compile
+              setEnabledActions(1,0,0,1,0);
+
+              // make sure all listeners know that there's no stoppable action available
+              $rootScope.$broadcast(IdeMsgService.msgStoppableActionGone().msg);
+            });
+      };
+
+
+      /**
+       * Handles the event that the Modal for "Test Project" should show be shown.
+       *
+       * @author Janick Michot
+       */
+      let testProject = function () {
+
+        // make sure we save the current content before submitting
+        saveCurrentlyDisplayedContent();
+
+        /** The controller for the modal */
+        var testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
+
+          $scope.compilationResult = { 'inProgress': true };
+          $scope.tests = [];
+
+          // get all tests related to this project
+          ProjectFactory.getTests()
+              .then(function(data) {
+                if(data.fail) {
+                  Promise.reject("Fehlgeschlagen: " + data.msg);
+                }
+                // store data/tests to scope and stop spinning
+                $scope.tests = data.tests;
+                $scope.compilationResult.inProgress = false;
+                return data;
+              })
+              .then(function(data) {
+                let i = 0;
+                // do io-test asynchronously one after another
+                return data.tests.reduce((promiseChain, test) => {
+
+                      // Note, Promise.resolve() resolve is our initial value
+                      return promiseChain.then(function (id) {
+
+                        // dont make any further tests after `stopOnFailure`
+                        if(i > 0 && id === 0) {
+                          test.status = "unreachable";
+                          $scope.tests[i] = test; i++;
+                          return 0;
+                        }
+
+                        $scope.tests[i].status = 'processing';
+
+                        // set compilation/run id from last call
+                        test.id = id;
+
+                        return ProjectFactory.testProject(test)
+                            .then(function(testResult) {
+                              // update testData
+                              $scope.tests[i] = testResult; i++;
+
+                              if(testResult.stopOnFailure && testResult.status === 'fail') {
+                                return 0;
+                              }
+                              return testResult.id;
+                            });
+                      });
+                    },
+                    Promise.resolve()
+                )
+                    .then(function(testResult) {
+                      $scope.$apply(); // force update of scope (used for status)
+                    })
+                    .catch(function(error) {
+                      console.log(error);
+                    });
+              });
+
+
+          $scope.getTestMethodOutput = function(method) {
+            switch (method) {
+              case 'ioTest':
+                return 'ideIoTestResult.html';
+              case 'compileTest':
+                return 'ideCompileTestResult.html';
+            }
+          };
+
+          $scope.closeModal = function () {
+            $uibModalInstance.close();
+          };
+        }];
+
+        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
+        $uibModal.open({
+          templateUrl: 'ideTestProjectModal.html',
+          controller: testProjectModalInstanceCtrl
+        });
+
+      };
+
+
+      /**
+       * Old testing function (Janick Michot)
        * Tests the current project
        */
-      var testProject = function() {
+      var _testProject = function() {
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
@@ -845,17 +977,21 @@ app.controller('IdeCtrl',
               ideState.actionAllowsForStopping = true;
             }
             break;
+          case ('compileAndRun'):
+            if(!($scope.disabledActions.compileAndRun)) {
+              req = IdeMsgService.msgCompileAndRunRequest();
+              $rootScope.$broadcast(req.msg);
+              ideState.actionAllowsForStopping = true;
+            }
+            break;
           case ('stop'):
             req = IdeMsgService.msgStopRequest();
             $rootScope.$broadcast(req.msg);
             break;
           case ('test'):
             if(!($scope.disabledActions.test)) {
-
-              // req = IdeMsgService.msgTestRequest(); -> original via console
-              req = IdeMsgService.msgTestRequestOpenModal();
+              req = IdeMsgService.msgTestRequest();
               $rootScope.$broadcast(req.msg);
-
             }
             break;
           case ('tool'):
@@ -1218,6 +1354,15 @@ app.controller('IdeCtrl',
         stopAction();
       });
 
+      /** Handles a "compileAndRunReqeusted" event */
+      $scope.$on(IdeMsgService.msgCompileAndRunRequest().msg, function () {
+        $log.debug('Compile request received');
+        compileAndRunProject(false);
+        // set the focus on the editor so user can start typing right away
+        $scope.ace.editor.focus();
+      });
+
+
 
       /** Handles a "testRequested" event */
       $scope.$on(IdeMsgService.msgTestRequest().msg, function () {
@@ -1465,96 +1610,6 @@ app.controller('IdeCtrl',
           domElem.focus();
         }
       };
-
-      /**
-       * Handles the event that the Modal for "Test Project" should show be shown.
-       *
-       * @author Janick Michot
-       */
-      $scope.$on(IdeMsgService.msgTestRequestOpenModal().msg, function (aEvent, aMsgData) {
-
-        /** The controller for the modal */
-        var testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
-
-          $scope.compilationResult = { 'inProgress': true };
-          $scope.tests = [];
-
-          // get all tests related to this project
-          ProjectFactory.getTests()
-            .then(function(data) {
-              if(data.fail) {
-                Promise.reject("Fehlgeschlagen: " + data.msg);
-              }
-              // store data/tests to scope and stop spinning
-              $scope.tests = data.tests;
-              $scope.compilationResult.inProgress = false;
-              return data;
-            })
-              .then(function(data) {
-                let i = 0;
-                // do io-test asynchronously one after another
-                return data.tests.reduce((promiseChain, test) => {
-
-                  // Note, Promise.resolve() resolve is our initial value
-                  return promiseChain.then(function (id) {
-
-                    // dont make any further tests after `stopOnFailure`
-                    if(i > 0 && id === 0) {
-                      test.status = "unreachable";
-                      $scope.tests[i] = test; i++;
-                      return 0;
-                    }
-
-                    $scope.tests[i].status = 'processing';
-
-                    // set compilation/run id from last call
-                    test.id = id;
-
-                    return ProjectFactory.testProject(test)
-                        .then(function(testResult) {
-                          // update testData
-                          $scope.tests[i] = testResult; i++;
-
-                          if(testResult.stopOnFailure && testResult.status === 'fail') {
-                            return 0;
-                          }
-                          return testResult.id;
-                        });
-                  });
-                },
-                Promise.resolve()
-              )
-                .then(function(testResult) {
-                    $scope.$apply(); // force update of scope (used for status)
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-              });
-
-
-          $scope.getTestMethodOutput = function(method) {
-            switch (method) {
-              case 'ioTest':
-                return 'ideIoTestResult.html';
-              case 'compileTest':
-                return 'ideCompileTestResult.html';
-            }
-          };
-
-          $scope.closeModal = function () {
-            $uibModalInstance.close();
-          };
-        }];
-
-        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
-        $uibModal.open({
-          templateUrl: 'ideTestProjectModal.html',
-          controller: testProjectModalInstanceCtrl
-        });
-
-      });
-
 
       /** Below list all one-time invocations for functions which should run whenever the controller is loaded from scratch.*/
 

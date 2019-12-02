@@ -759,7 +759,59 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       );
 
       return deferred.promise;
-    }
+    };
+
+    /**
+     * Compiles and runs the current project on the server.
+     * @param runCleanCompile if true, a clean compile will be executed, otherwise a regular compilation
+     * @returns a promise that resolves when a the compilation result is received
+     */
+    var compileAndRunProject = function (runCleanCompile) {
+
+      var payload = getPayloadForCompilation(runCleanCompile);
+
+      payload.language = getProject().language;
+      payload.action = 'compileandrun'; // must be written in lower case
+
+      // create the promise that is returned
+      var deferred = $q.defer();
+
+      // make call to the server
+      ProjectRes.save(
+        {projectId: $routeParams.projectId},
+        payload,
+        function success(data, status, header, config) {
+          // store the id of the compilation so we can use the next time we make a request
+          lastCompilationId = data.id;
+
+          // resolve the promise
+          deferred.resolve(data);
+        },
+        function error(response) {
+          // there was an error while trying to run the project. We remove the stored compilationId to ensure
+          // we can start fresh
+          lastCompilationId = '';
+
+          // compose the error message
+          var _errorMsg = '\n-- Error details --';
+          if (response.status && response.data && response.data.msg) {
+            _errorMsg += '\nStatus code: ' + response.status;
+            _errorMsg += '\nError message: ' + response.data.msg;
+          }
+          else {
+            // the Codeboard server should always return an error that has a status and data.msg
+            // for the rare cases where, e.g. there's no internet connection, we give a full dump
+            // of the error message
+            _errorMsg += '\n' + JSON.stringify(response);
+          }
+
+          // reject the promise and forward the reason the the compilation service returned
+          deferred.reject(_errorMsg);
+        }
+      );
+
+      return deferred.promise;
+    };
 
 
     /**
@@ -991,6 +1043,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       setProjectFromJSONdata: setProjectFromJSONdata,
       saveProjectToServer: saveProjectToServer,
       compileProject: compileProject,
+      compileAndRunProject: compileAndRunProject,
       runProject: runProject,
       getTests: getTests,
       testProject: testProject,

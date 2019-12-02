@@ -174,6 +174,16 @@ angular.module('codeboardApp')
       };
     };
 
+      /**
+       * Returns msg object used to signal that project should be compiled and run.
+       * @return {{msg: string}}
+       */
+      this.msgCompileAndRunRequest = function () {
+          return {
+              msg: 'ide.compileAndRunRequest'
+          };
+      };
+
 
     /**
      * Returns msg object used to signal that an action that can be stopped
