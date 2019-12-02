@@ -810,6 +810,7 @@ app.controller('IdeCtrl',
       // state variables to indicate which actions in the IDE are hidden
       $scope.hiddenActions = {
         compileDynamic: false,
+        compileAndRun: false,
         run: false,
         stop: true
       };
@@ -1478,6 +1479,7 @@ app.controller('IdeCtrl',
 
         $scope.hiddenActions.compileDynamic = true;
         $scope.hiddenActions.run = true;
+        $scope.hiddenActions.compileAndRun = true;
         $scope.hiddenActions.stop = false;
       });
 
@@ -1489,6 +1491,7 @@ app.controller('IdeCtrl',
         // reset the state of hidden buttons to default
         $scope.hiddenActions.compileDynamic = false;
         $scope.hiddenActions.run = false;
+        $scope.hiddenActions.compileAndRun = false;
         $scope.hiddenActions.stop = true;
 
         // reset that a stoppable action is available
@@ -1525,6 +1528,20 @@ app.controller('IdeCtrl',
 
         // $log.debug('Project uses langguage that needs compilation: ' + result);
         return _compilationIsNeeded;
+      };
+
+
+      /**
+       * Returns true or false wheter actions `compile` and `run` should be combined or not
+       * @author Janick Michot
+       */
+      $scope.combineActionsCompileAndRun = function() {
+        let _combineActionsCompileAndRun= true;
+
+        // todo in welchem Fall nicht? Einstellungen?
+
+        return _combineActionsCompileAndRun;
+
       };
 
 
