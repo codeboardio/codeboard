@@ -10,7 +10,6 @@ var express = require('express'),
   MongoStore = require('connect-mongo')(session),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  compression = require('compression'),
   busboy = require('connect-busboy'),
   httpProxy = require('http-proxy'),
   url = require('url'),
@@ -30,7 +29,7 @@ var app = express();
 
 
 
-if (env == 'development') {
+if (env === 'development') {
   app.use(require('connect-livereload')());
 
   // Disable caching of scripts for easier testing
@@ -51,7 +50,7 @@ if (env == 'development') {
   app.set('views', config.root + '/app/views');
 }
 
-if(env == 'production') {
+if(env === 'production') {
 
   var compression = require('compression');
 
@@ -64,9 +63,7 @@ if(env == 'production') {
 
 app.use(busboy());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(expressValidator());
 
 
@@ -123,7 +120,7 @@ var server = require('http').createServer(app);
 
 
 // Create a proxy server that redirects WebSocket request directly to the Docker daemon.
-var wsLoadBalancer = httpProxy.createProxyServer({target: config.mantra.protocol + config.mantra.ip + ':' + config.mantra.port, changeOrigin: true});
+var wsLoadBalancer = httpProxy.createProxyServer({target: 'ws://' + config.mantra.ip + ':' + config.mantra.port, changeOrigin: true});
 // Intercept upgrade events (from http to WS) and forward the to docker daemon
 server.on('upgrade', function(req, socket, head) {
 
