@@ -89,8 +89,8 @@
                       <!--<button id="compileButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="{{isCompilationNeeded()? 'Compile this project' : 'Run this project'}}">
                         <span class="{{isCompilationNeeded() ? 'glyphicon glyphicon-cog' : 'glyphicon glyphicon-play-circle'}}"></span> {{isCompilationNeeded() ? "Compile" : "Run"}}
                       </button>-->
-                      <button id="compileAndRunButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded() && combineActionsCompileAndRun() && !(hiddenActions.compileAndRun)" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
-                          <span class="glyphicon glyphicon-cog"></span> Compile and Run
+                      <button id="compileAndRunButton" class="btn btn-warning btn-sm" ng-show="isCompilationNeeded() && combineActionsCompileAndRun() && !(hiddenActions.compileAndRun)" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
+                          <span class="glyphicon glyphicon-play-circle"></span> Run
                       </button>
                       <button id="compileButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded() && !combineActionsCompileAndRun()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
                         <span class="glyphicon glyphicon-cog"></span> Compile
