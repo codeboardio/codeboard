@@ -558,7 +558,7 @@ app.controller('IdeCtrl',
               .then(function(data) {
                 let i = 0;
                 // do io-test asynchronously one after another
-                return data.tests.reduce((promiseChain, test) => {
+                return data.tests.reduce(function (promiseChain, test) {
 
                       // Note, Promise.resolve() resolve is our initial value
                       return promiseChain.then(function (id) {

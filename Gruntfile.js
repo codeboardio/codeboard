@@ -37,7 +37,7 @@ module.exports = function (grunt) {
       },
       prod: {
         options: {
-          script: 'dist/server.js',
+          script: 'distRepo/server.js',
           node_env: 'production'
         }
       }
@@ -371,14 +371,39 @@ module.exports = function (grunt) {
          }
        }
     },
+
+    babel: {
+      options: {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              "targets": {
+                "browsers": [
+                  "last 2 versions"
+                ]
+              },
+              "forceAllTransforms": true // this line turns "let" into "var", etc
+            }
+          ]
+        ],
+        compact: true
+      },
+      dist: {
+        files: {
+          '<%= yeoman.dist %>/public/scripts/babel-scripts.js': '.tmp/concat/scripts/scripts.js',
+          '<%= yeoman.dist %>/public/scripts/babel-vendor.js': '.tmp/concat/scripts/vendor.js'
+        }
+      }
+    },
+
     uglify: {
-       dist: {
-         files: {
-           '<%= yeoman.dist %>/scripts/scripts.js': [
-             '<%= yeoman.dist %>/scripts/scripts.js'
-           ]
-         }
-       }
+      dist: {
+        files: {
+          '<%= yeoman.dist %>/public/scripts/scripts.js': '<%= yeoman.dist %>/public/scripts/babel-scripts.js',
+          '<%= yeoman.dist %>/public/scripts/vendor.js': '<%= yeoman.dist %>/public/scripts/babel-vendor.js'
+        }
+      }
     },
     concat: {
        dist: {}
@@ -424,7 +449,7 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify-es');
+  // grunt.loadNpmTasks('grunt-contrib-uglify-es');
 
   // Used for delaying livereload until after server has restarted
   grunt.registerTask('wait', function () {
@@ -443,7 +468,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('serve', function (target) {
-    if (target === 'dist') {
+    if (target === 'distRepo') {
       return grunt.task.run(['build', 'express:prod', 'open', 'express-keepalive']);
     }
 
@@ -502,6 +527,7 @@ module.exports = function (grunt) {
     'ngAnnotate',
     'copy:dist',
     'cssmin',
+    'babel',
     'uglify',
     //'rev',
     'usemin'
