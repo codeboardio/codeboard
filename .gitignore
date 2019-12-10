@@ -9,7 +9,7 @@ app/bower_components
 .sass-cache
 
 # the folder created when running "grunt build" || use submodule instead
-distRepo
+/distRepo/
 
 # Ignore the profile pictures of users
 app/images/users/profiles

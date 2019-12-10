@@ -241,6 +241,16 @@ angular.module('codeboardApp')
       };
     };
 
+    /**
+     * Returns msg object used to signal that a student requires help.
+     * @return {{msg: string}}
+     */
+    this.msgHelpRequest = function () {
+      return {
+        msg: 'ide.HelpRequest'
+      };
+    };
+
 
     /**
      * Returns msg object used to signal that the editor should be shown or hidden.

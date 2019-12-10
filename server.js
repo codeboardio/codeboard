@@ -47,7 +47,7 @@ if (env === 'development') {
   //app.use(express.static(path.join(config.root, ''));
 
 
-  app.set('views', config.root + '/app/views');
+  app.set('views', path.normalize(config.root + '/app/views'));
 }
 
 if(env === 'production') {

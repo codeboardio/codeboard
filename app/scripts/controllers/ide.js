@@ -242,6 +242,23 @@ app.controller('IdeCtrl',
 
 
       /**
+       * if the project Url has a query string with a "collapseTree" parameter, we use that information to collapse
+       * tree view or not
+       *
+       * @author Janick Michot
+       */
+      let processCollapsedQuery = function() {
+
+        $scope.collapseTree = true;
+
+        // check for the "view" query string
+        if($routeParams.collapseTree) {
+          $scope.collapseTree = ($routeParams.collapseTree);
+        }
+      };
+
+
+      /**
        * Function that handles the displaying of a Mantra WebSocket output.
        * @param {string} aStreamUrl - the WS Url to connect to the Mantra container
        * @param {string} aStartUrl - the Url to start the Mantra container
@@ -502,7 +519,6 @@ app.controller('IdeCtrl',
         // remove previous compilation results
         setOutput('Waiting for (previous) results...', false);
 
-        // todo diese funktion allenfalls anpassen | oder compileAndRun an compile anhängen
         // disable all actions till the compile request is completed
         setEnabledActions(0,0,0,0,0);
 
@@ -529,75 +545,103 @@ app.controller('IdeCtrl',
 
 
       /**
-       * Handles the event that the Modal for "Test Project" should show be shown.
+       * Handles the event that the Modal for "Test Project" should be shown.
        *
        * @author Janick Michot
        */
       let testProject = function () {
 
+        $scope.testResult = 0;
+
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
         /** The controller for the modal */
-        var testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
+        let testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
 
           $scope.compilationResult = { 'inProgress': true };
           $scope.tests = [];
 
           // get all tests related to this project
           ProjectFactory.getTests()
-              .then(function(data) {
-                if(data.fail) {
-                  Promise.reject("Fehlgeschlagen: " + data.msg);
-                }
-                // store data/tests to scope and stop spinning
-                $scope.tests = data.tests;
-                $scope.compilationResult.inProgress = false;
-                return data;
-              })
-              .then(function(data) {
-                let i = 0;
-                // do io-test asynchronously one after another
-                return data.tests.reduce(function (promiseChain, test) {
+            .then(function(data) {
+              if(data.fail) {
+                Promise.reject("Fehlgeschlagen: " + data.msg);
+              }
+              // store data/tests to scope and stop spinning
+              $scope.tests = data.tests;
+              $scope.compilationResult.inProgress = false;
+              return data;
+            })
+            .then(function(data) {
+              let i = 0;
+              // do io-test asynchronously one after another
+              return data.tests.reduce(function (promiseChain, test) {
 
-                      // Note, Promise.resolve() resolve is our initial value
-                      return promiseChain.then(function (id) {
+                // Note, Promise.resolve() resolve is our initial value
+                return promiseChain.then(function (id) {
 
-                        // dont make any further tests after `stopOnFailure`
-                        if(i > 0 && id === 0) {
-                          test.status = "unreachable";
-                          $scope.tests[i] = test; i++;
-                          return 0;
-                        }
+                  // dont make any further tests after `stopOnFailure`
+                  if(i > 0 && id === 0) {
+                    test.status = "unreachable";
+                    $scope.tests[i] = test; i++;
+                    return 0;
+                  }
 
-                        $scope.tests[i].status = 'processing';
+                  $scope.tests[i].status = 'processing';
 
-                        // set compilation/run id from last call
-                        test.id = id;
+                  // set compilation/run id from last call
+                  test.id = id;
 
-                        return ProjectFactory.testProject(test)
-                            .then(function(testResult) {
-                              // update testData
-                              $scope.tests[i] = testResult; i++;
-
-                              if(testResult.stopOnFailure && testResult.status === 'fail') {
-                                return 0;
-                              }
-                              return testResult.id;
-                            });
-                      });
-                    },
-                    Promise.resolve()
-                )
+                  return ProjectFactory.testProject(test)
                     .then(function(testResult) {
-                      $scope.$apply(); // force update of scope (used for status)
-                    })
-                    .catch(function(error) {
-                      console.log(error);
+                      // update testData
+                      $scope.tests[i] = testResult; i++;
+
+                      if(testResult.stopOnFailure && testResult.status === 'fail') {
+                        return 0;
+                      }
+                      return testResult.id;
                     });
-              });
+                  });
+                },
+                Promise.resolve()
+              )
+                .then(function(testResult) {
+
+                  // create summary
+                  $scope.numTestsPassed = $scope.tests.filter(test => { return (test.status === 'success'); }).length;
+                  $scope.numTestsFailed = $scope.tests.filter(test => { return (test.status !== 'success'); }).length;
+                  $scope.testResult = (1 / $scope.tests.length * $scope.numTestsPassed);
+
+                  // force update of scope (used for status)
+                  $scope.$apply();
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            });
 
 
+          /**
+           * because we can not trigger navBarClick from within the modal, we need
+           * to define a separate functions
+           */
+          $scope.submitAfterTest = function() {
+            let req = IdeMsgService.msgSubmitRequest();
+            $rootScope.$broadcast(req.msg);
+          };
+          $scope.helpAfterTest = function() {
+            let req = IdeMsgService.msgHelpRequest();
+            $rootScope.$broadcast(req.msg);
+          };
+
+          /**
+           * because the html of different test methods can vary, this functions cis used to load the html for
+           * a certain test method
+           * @param method
+           * @returns {string}
+           */
           $scope.getTestMethodOutput = function(method) {
             switch (method) {
               case 'ioTest':
@@ -619,50 +663,6 @@ app.controller('IdeCtrl',
         });
 
       };
-
-
-      /**
-       * Old testing function (Janick Michot)
-       * Tests the current project
-       */
-      var _testProject = function() {
-        // make sure we save the current content before submitting
-        saveCurrentlyDisplayedContent();
-
-        // update the message in the console
-        setOutput('Testing your solution. This might take a few seconds. Please wait...', false);
-
-        // disable all other actions while we wait for the test to complete
-        setEnabledActions(0,0,0,0,0);
-
-        // test the project
-        var promise = ProjectFactory.testProject();
-        promise.then(
-          function(data) {
-            $log.debug('Testing successful.');
-
-            if(data.compilationError) {
-              // a compilation error occured and thus the tests will not have been run
-              // we display the compilation error
-              setOutput('Testing failed. Your program does not compile.\nFix all compilation errors and try again.\n\n--- Details ---\n\n' + data.outputCompiler, false);
-            } else {
-              setOutput('Number of passing tests: ' + data.numTestsPassing + '\nNumber of failing tests: ' + data.numTestsFailing + '\n\n--- Details ---\n\n' + data.output, false);
-            }
-
-            // enable all actions except running
-            setEnabledActions(1,0,1,1,1);
-          },
-          function(reason) {
-            $log.debug('Error while trying to test your program. The server responded:\n' + reason);
-
-            setOutput('Error while trying to test your program. The server responded:\n' + reason, false);
-
-            // something went wrong so we only enable compilation and testing again
-            setEnabledActions(1,0,1,1,0);
-          }
-        )
-      }
-
 
       /**
        * Execute the "tool" action on the current project
@@ -704,7 +704,7 @@ app.controller('IdeCtrl',
             // something went wrong so we only enable compilation and testing again
             setEnabledActions(1,0,1,1,0);
           }
-        )
+        );
       };
 
 
@@ -738,7 +738,7 @@ app.controller('IdeCtrl',
             // the submission failed; because we don't know why, we enable compilation and submission
             setEnabledActions(1,0,1,1,1);
           }
-        )
+        );
       }
 
 
@@ -756,6 +756,84 @@ app.controller('IdeCtrl',
             });
         }
       };
+
+
+      /**
+       *
+       */
+      let getHelp = function() {
+
+        // todo scope definieren
+
+
+
+        /** The controller for the modal */
+        let getHelpModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
+
+          // todo hier modal definieren
+
+
+
+          $scope.closeModal = function () {
+            $uibModalInstance.close();
+          };
+        }];
+
+        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
+        $uibModal.open({
+          templateUrl: 'ideGetHelpModal.html',
+          controller: getHelpModalInstanceCtrl,
+          size: 'lg'
+        });
+
+
+
+
+        /**
+         * todo im Modal soll folgendes angezeigt werden
+         *  1) Informationen zum Stundenten
+         *    a) Name
+         *    b) Vorname
+         *    c) E-Mail
+       *    2) Informationen zur Aufgabe
+         *    a) Name der Aufgabe
+       *    3) Die Lösung
+         *  4) Bemerkungen des Studenten / Was hat er für ein Problem?
+         *  5) Das Testresultat
+         *    => Wird das Test-Resultat immer mitgeschickt oder nur wenn es der Student verlangt?  Was macht an dieser Stelle mehr Sinn?!
+         *    => Tests wie im Test-Modal durchlaufen lassen oder wie beim der Submission nur Resultat laden?
+         *    => Soll der Student das Test-Resultat sehen oder sollte nur im Hintergrund getestet werden?
+         */
+
+
+        /**
+         * todo wie wird die Hilfe-Anfrage verarbeitet?
+         *  Irgendwie muss eine Notifikation stattfinden:
+         *   - Mail and Dozent? -> Dazu müssten wir noch Mail einrichten
+         *
+         */
+
+
+        /**
+         * todo Gestaltung E-Mail
+         *  Welche Inhalte gehören zum E-Mail?
+         *    a) Informationen zum Studenten (Name, Vorname, E-Mail)
+         *    b) Informationen des Studenten (Bemerkungen)
+         *    c) Informationen zur Aufgabe (Link zur Aufgabe / Link zur Moodle-Aufgabe -> für manuelle Bewertung oder ähnliches)
+         *    d)
+         */
+
+
+        /**
+         * Praktisch wäre zudem ein Dashboard über welches der Admin alle offenen Tassks einsehen und verwalten kann.
+         * Alles zu seiner Zeit
+         */
+
+      };
+
+
+
+
 
 
       // we need a way to hold some state of the IDE; this object contains the states that are required
@@ -1006,6 +1084,12 @@ app.controller('IdeCtrl',
               $rootScope.$broadcast(req.msg);
             }
             break;
+          case ('help'):
+            if(!($scope.disabledActions.help)) { // todo getHelp in disabledActions definieren
+              req = IdeMsgService.msgHelpRequest();
+              $rootScope.$broadcast(req.msg);
+            }
+            break;
         }
       };
 
@@ -1085,14 +1169,7 @@ app.controller('IdeCtrl',
           $scope.ace.editor.setSession(ace.createEditSession(lFileContent, lAceMode));
 
           // set the aceKeyboardHandler to the default 'ace'
-          aceKeyboardHandler= $scope.ace.editor.getKeyboardHandler()
-
-          // setting the tabsize for haskell to be 8 (requested by Andreas)
-          if(lAceMode === 'ace/mode/haskell') {
-            $scope.ace.editor.getSession().setTabSize(8);
-          } else {
-            $scope.ace.editor.getSession().setTabSize(4);
-          }
+          aceKeyboardHandler= $scope.ace.editor.getKeyboardHandler();
 
           // enable ACE autocompletion and snippets
           var snippetManager = ace.require("ace/snippets").snippetManager;
@@ -1102,27 +1179,9 @@ app.controller('IdeCtrl',
             $scope.ace.editor.setOptions({
               enableBasicAutocompletion: true,
               enableSnippets: true,
-              enableLiveAutocompletion: false
-            })
-          });
-
-          if (lAceMode=='ace/mode/eiffel') {
-            // update Eiffel snippets
-            ace.config.loadModule("ace/snippets/eiffel", function(m) {
-              if (m) {
-                snippetManager.files.eiffel = m;
-
-                m.snippetText = 'snippet feature modifier\n	feature {${1:CLASS}} -- ${2:comment}  \n';
-                m.snippets = snippetManager.parseSnippetFile(m.snippetText);
-
-                // add the Eiffel snippets (snippet objects defined in IdeSnippetsSrv)
-                for (var i=0; i<IdeSnippetsSrv.getEiffelSnippet().length;i++) {
-                  m.snippets.push(IdeSnippetsSrv.getEiffelSnippet()[i]);
-                }
-                snippetManager.register(m.snippets, m.scope);
-              }
+              enableLiveAutocompletion: true
             });
-          }
+          });
 
           // Note: this relates to static files only (only they have a isContentSet property and a url for now)
           if(lNode.url && !lNode.isContentSet) {
@@ -1445,6 +1504,13 @@ app.controller('IdeCtrl',
       });
 
 
+      /** Handles a "getHelp" event */
+      $scope.$on(IdeMsgService.msgHelpRequest().msg, function () {
+        $log.debug('Help request received');
+        getHelp();
+      });
+
+
       /** Handles request to show or hide the editor */
       $scope.$on(IdeMsgService.msgDisplayEditorRequest().msg, function (aEvent, aMsgData) {
         if (aMsgData.displayEditor) {
@@ -1507,6 +1573,7 @@ app.controller('IdeCtrl',
         // To achieve this, we use a $timeout as describe here: http://tech.endeepak.com/blog/2014/05/03/waiting-for-angularjs-digest-cycle/
         $timeout(function(){
           processViewQueryString();
+          processCollapsedQuery(); // checks if treeView should be collapsed or not (Janick Michot)
         });
       });
 

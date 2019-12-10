@@ -92,10 +92,10 @@
                       <button id="compileAndRunButton" class="btn btn-warning btn-sm" ng-show="isCompilationNeeded() && combineActionsCompileAndRun() && !(hiddenActions.compileAndRun)" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
                           <span class="glyphicon glyphicon-play-circle"></span> Run
                       </button>
-                      <button id="compileButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded() && !combineActionsCompileAndRun()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
+                      <button id="compileButton" class="btn btn-warning btn-sm" ng-show="isCompilationNeeded() && !combineActionsCompileAndRun()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
                         <span class="glyphicon glyphicon-cog"></span> Compile
                       </button>
-                      <button id="compileRunBtn" class="btn btn-default btn-sm" ng-hide="isCompilationNeeded() || hiddenActions.compileDynamic" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
+                      <button id="compileRunBtn" class="btn btn-warning btn-sm" ng-hide="isCompilationNeeded() || hiddenActions.compileDynamic" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
                         <span class="glyphicon glyphicon-play-circle"></span> Run
                       </button>
                       <button id="runButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded() && !combineActionsCompileAndRun() && !(hiddenActions.run)" ng-disabled="disabledActions.run" ng-click="navBarClick('run')" title="Run the last compiled program">
@@ -162,7 +162,7 @@
 
       <div id="ideMiddlePartId" class="ideSplitterOverflowVisible">
         <!-- the inner split part; left is the tree view, right is the editor -->
-        <div kendo-splitter k-orientation="'horizontal'" k-panes='[{ collapsible: true, size: "220px" }, {collapsible: false}]' class="ideSplitterOverflowVisible ideSplitterFullHeight">
+        <div kendo-splitter k-orientation="'horizontal'" k-panes='[{ collapsible: true, collapsed: {{collapseTree}}, size: "220px" }, {collapsible: false}]' class="ideSplitterOverflowVisible ideSplitterFullHeight">
             <div id="ideTreeviewPartOfMiddlePart" class="ideSplitterOverflowVisible">
               <!-- everything related to the tree view -->
 
@@ -512,14 +512,14 @@
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="closeModal()">
-          <span class="glyphicon glyphicon-circle-arrow-down"></span> Fortfahren
+          Test beenden
         </button>
 
-        <button ng-hide="allTestsPassed" class="btn btn-info" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+        <button ng-show="(testResult !== 1)" class="btn btn-info" ng-disabled="disabledActions.help" ng-click="closeModal(); helpAfterTest()" title="Hilfe anfordern">
           <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
         </button>
 
-        <button ng-show="allTestsPassed" class="btn btn-primary" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project" disabled="disabled">
+        <button ng-show="(testResult === 1)" class="btn btn-primary" ng-disabled="disabledActions.submit" ng-click="closeModal(); submitAfterTest()" title="Submit this project" disabled="disabled">
           <span class="glyphicon glyphicon-send"></span> Submit
         </button>
       </div>
@@ -586,4 +586,78 @@
   </div>
   <!---- End of TestMethod templates ---->
 
+</div>
+
+
+
+<!-- the modal window for showing the "Request Help" information -->
+<div>
+  <script type="text/ng-template" id="ideGetHelpModal.html">
+
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="closeModal()">&times;</button>
+      <h4 class="modal-title">Hilfe anfragen</h4>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Informationen zum Studenten -->
+      <h6>Deine Angaben / Diese Informationen sollten wir von Moodle erhalten</h6>
+
+      <div class="form-inline">
+        <div class="form-group">
+          <label for="firstname">Vorname</label>
+          <input type="text" class="form-control" id="firstname" name="firstname">
+        </div>
+        <div class="form-group">
+          <label for="lastname">Nachname</label>
+          <input type="text" class="form-control" id="lastname" name="lastname">
+        </div>
+        <div class="form-group">
+          <label for="email">E-Mail</label>
+          <input type="text" class="form-control" id="email" name="email">
+        </div>
+      </div>
+
+      <!-- Informationen zur Aufgabe -->
+      <h6>Informationen zur Aufgabe</h6>
+      <div class="form-inline">
+        <div class="form-group">
+          <label for="assignment">Aufgabe</label>
+          <input type="text" class="form-control" id="assignment" name="assignment">
+        </div>
+      </div>
+
+      <!-- Bemerkungen -->
+      <h6>Dein Problem:</h6>
+      <textarea>Bemerkungen</textarea>
+
+      <!-- Code -->
+      <h6>Deine Lösung</h6>
+      <textarea>
+        Welches File / Welche Files werden hier angezeigt?
+        => Entsprechend MainClassForRunning oder einfache alle?
+
+        Mit Tabs (in etwa wie im Editor) oder wie sollen mehrere File angezeigt werden?
+      </textarea>
+
+
+      <!-- Tests -->
+      <h6>Ergebnis der Überprüfung</h6>
+      <textarea>Wie wollen wir die Tests darstellen?</textarea>
+
+
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="closeModal()">
+        Schliessen
+      </button>
+      <button class="btn btn-success" ng-click="closeModal()">
+        Anfrage senden
+      </button>
+    </div>
+
+  </script>
 </div>
