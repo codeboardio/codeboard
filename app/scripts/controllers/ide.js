@@ -7,7 +7,6 @@ app.controller('IdeCtrl',
   ['$scope', '$rootScope', '$log', '$sce', '$location', '$routeParams', '$window', '$http', '$timeout', '$uibModal', 'ProjectFactory', 'projectData', 'ltiData', 'IdeMsgService', 'IdeSnippetsSrv','UserSrv', 'WebsocketSrv',
     function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, IdeSnippetsSrv, UserSrv, WebsocketSrv) {
 
-
       // First we handle all data that was injected as part of the app.js resolve.
       // set the ProjectFactory to contain the project loaded from the server
       ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
@@ -23,7 +22,7 @@ app.controller('IdeCtrl',
         // if the current user in the role of 'user' (and not 'owner'),
         // we check if there's a saved version that we could load
         // also, we only need to check if the current user is actually authenticated (rather than being #anonymous)
-        if (ProjectFactory.getProject().userRole == 'user' &&  UserSrv.isAuthenticated()) {
+        if (ProjectFactory.getProject().userRole === 'user' &&  UserSrv.isAuthenticated()) {
 
           // the url from which to get the files of the user's project
           var _urlForUserProject = '/api/users/' + UserSrv.getUsername() + '/projects/' + $routeParams.projectId;
@@ -51,7 +50,7 @@ app.controller('IdeCtrl',
 
                 $scope.getUsername = function() {
                   return UserSrv.getUsername();
-                }
+                };
               }];
 
 
@@ -250,7 +249,6 @@ app.controller('IdeCtrl',
       let processCollapsedQuery = function() {
 
         $scope.collapseTree = true;
-
         // check for the "view" query string
         if($routeParams.collapseTree) {
           $scope.collapseTree = ($routeParams.collapseTree);
@@ -438,8 +436,6 @@ app.controller('IdeCtrl',
         // handler for when the promise is resolved
         promise.then(
             function (data) { // note: we only get the data because the resolution to 'then' indicates that the call was successful; thus no header information
-
-              console.log(data);
 
               //
               ideState.stopUrl = data.stopUrl;
@@ -760,6 +756,7 @@ app.controller('IdeCtrl',
 
       /**
        *
+       * @author Janick Michot
        */
       let getHelp = function() {
 
@@ -832,11 +829,50 @@ app.controller('IdeCtrl',
       };
 
 
+      /**
+       * Reset project and restore original
+       * @author Janick Michot
+       */
+      let resetSolution = function() {
 
+        // todo braucht es noch ein Bestätigungs-Modal?
 
+        // the url from which to get the files of the project
+        var _urlForProject = '/api/projects/' + $routeParams.projectId;
 
+        // load original
+        $http.get(_urlForProject)
+          .success(function(result) {
 
-      // we need a way to hold some state of the IDE; this object contains the states that are required
+            let userProjectData = {
+              // the name of the project
+              name: result.projectname,
+              // the last unique Id that was used to create a file
+              lastUId: result.lastUId,
+              // programming language of the project
+              language: ProjectFactory.getProject().language,
+              // the role of the user who is currently looking at the project in the browser
+              userRole: ProjectFactory.getProject().userRole,
+              // the files of the user
+              fileSet: result.fileSet
+            };
+
+            // update the project data in the ProjectFactory
+            ProjectFactory.setProjectFromJSONdata(result, ltiData, ProjectFactory.getProject().staticFiles);
+
+            // reload tree view
+            $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
+
+            // reload current file in editor
+            let req = IdeMsgService.msgDisplayFileRequest($scope.ace.currentNodeId, true);
+            $rootScope.$broadcast(req.msg, req.data);
+
+            // todo kontrollieren, ob mehrere Files auch funktionieren. Bis jetzt scheint es zu stimmen
+
+          });
+      };
+
+          // we need a way to hold some state of the IDE; this object contains the states that are required
       var ideState = {
         // if the user clicks an action (e.g. compile, run), this variable can be set to indicate that the action supports user-stopping
         actionAllowsForStopping: false,
@@ -1090,6 +1126,12 @@ app.controller('IdeCtrl',
               $rootScope.$broadcast(req.msg);
             }
             break;
+          case ('reset'):
+            if(!($scope.disabledActions.help)) {
+              req = IdeMsgService.msgResetRequest();
+              $rootScope.$broadcast(req.msg);
+            }
+            break;
         }
       };
 
@@ -1100,7 +1142,7 @@ app.controller('IdeCtrl',
        */
       $scope.$on(IdeMsgService.msgDisplayFileRequest().msg, function (aEvent, aMsgData) {
 
-        if ($scope.ace.currentNodeId !== -1) {
+        if ($scope.ace.currentNodeId !== -1 && !aMsgData.forceReload) {
           // if the value is !== -1, then some tab is already open
           // thus, we need to store the session related the current tab before loading the session for the requested tab
           ProjectFactory.getNode($scope.ace.currentNodeId).session = $scope.ace.editor.getSession();
@@ -1510,6 +1552,12 @@ app.controller('IdeCtrl',
         getHelp();
       });
 
+      /** Handles a "reset" event */
+      $scope.$on(IdeMsgService.msgResetRequest().msg, function () {
+        $log.debug('Reset request received');
+        resetSolution();
+      });
+
 
       /** Handles request to show or hide the editor */
       $scope.$on(IdeMsgService.msgDisplayEditorRequest().msg, function (aEvent, aMsgData) {
@@ -1568,6 +1616,9 @@ app.controller('IdeCtrl',
        * Handles an request event for processing the URI query string "?view=...".
        */
       $scope.$on(IdeMsgService.msgProcessViewQueryStringRequest().msg, function () {
+
+        $scope.collapseTree = true;
+
         // we want to call the processViewQueryString function but only once we're sure Angular is done rendering the HTML page
         // because only at that time is the ACE editor ready to open any files
         // To achieve this, we use a $timeout as describe here: http://tech.endeepak.com/blog/2014/05/03/waiting-for-angularjs-digest-cycle/
@@ -1732,7 +1783,7 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
     var lSelectedNode = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId);
 
     // ignore the click if the selected node is a folder
-    if (lSelectedNode != null && !lSelectedNode.isFolder) {
+    if (lSelectedNode !== null && !lSelectedNode.isFolder) {
       var req = IdeMsgService.msgDisplayFileRequest(lSelectedNode.uniqueId);
       $rootScope.$broadcast(req.msg, req.data);
     }
@@ -1862,29 +1913,13 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
       $log.debug('Node is hidden: ' + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
     }
     else {
-      alert("The root folder can't be hidden.");
+      console.log("The root folder can't be hidden.");
     }
 
 
   });
 
 
-  // TODO: it should be save to remove this because we now always have a node selected
-  /**
-   * Listens for an event that a new node should be added;
-   * If currently no node is selected, this will select the root node.
-   */
-  //$scope.$on(IdeMsgService.msgNewNodeRequest().msg, function (aEvent, aMsgData) {
-  //
-  //  // check if there's no node selected currently
-  //  if($scope.mytree.currentNode === undefined) {
-  //
-  //    // set the root node to be selected
-  //    ProjectFactory.getNode(0).selected = 'selected';
-  //    // set the root node as the current node
-  //    $scope.mytree.currentNode = ProjectFactory.getNode(0);
-  //  }
-  //});
 }]);
 
 
@@ -2079,13 +2114,13 @@ app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'Project
         if ($scope.form.inputCheckbox) {
 
           // by default the view query string is empty
-          var viewQueryString = ''
+          var viewQueryString = '';
 
           // if tabs are open, we append to the veiw query string
           if (tabs.length > 0) {
 
             // the key of the query string
-            viewQueryString += '?view='
+            viewQueryString += '?view=';
             // calculates the values of the query string
             for (var i = 0; i < tabs.length; i++) {
 
@@ -2116,68 +2151,6 @@ app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'Project
       });
 
   });
-
-}]);
-
-
-app.controller('LibraryCtrl', ['$scope', '$rootScope', '$http', 'ProjectFactory', 'IdeMsgService', function($scope, $rootScope, $http, ProjectFactory, IdeMsgService){
-
-  // the currently selected file (the ng-model)
-  $scope.file = {};
-
-  // all the library files
-  $scope.files = [];
-
-
-  // fetch the list of files from the server
-  var init = function() {
-
-    $http
-      .get('staticfiles/eiffelfiles.json')
-      .success(function(result) {
-
-        $scope.files = result;
-
-      })
-      .error(function(err) {
-        console.log(err);
-      })
-
-  }();
-
-
-  $scope.showFile = function() {
-    var req = IdeMsgService.msgDisplayFileRequest($scope.file.selected.index);
-    $rootScope.$broadcast(req.msg, req.data);
-
-    $scope.file = {};
-
-  }
-
-  $scope.foo = function() {
-    alert('Click');
-  }
-
-
-//  $scope.isEiffelLanguageCompatible = function() {
-//    //console.log("Language "+ProjectFactory.getProject().language);
-//    return ProjectFactory.getProject().language ==='Eiffel';
-//  }
-
-  /** Array that will have information about static files (i.e. the eiffelfiles.json file) */
-  //var staticFiles = [];
-
-  /** fetch the information about the static files */
-  $scope.fetchStaticFiles = function() {
-    $http
-      .get('staticfiles/eiffelfiles.json')
-      .success(function(result) {
-        ProjectFactory.getProject().staticFiles = result;
-      })
-      .error(function(err) {
-
-      })
-  }();
 
 }]);
 

@@ -10,13 +10,12 @@ angular.module('codeboardApp')
      * @param {number} aNodeId the unique id of the node that should be displayed
      * @return {{msg: string, data: {nodeId: *}}}
      */
-    this.msgDisplayFileRequest = function (aNodeId) {
+    this.msgDisplayFileRequest = function (aNodeId, forceReload = false) {
       return {
         msg: 'ide.displayFileRequest',
-        data: {nodeId: aNodeId}
+        data: {nodeId: aNodeId, forceReload: forceReload}
       };
     };
-
 
     /**
      * Returns msg object for requests of new nodes (files or folders).
@@ -248,6 +247,16 @@ angular.module('codeboardApp')
     this.msgHelpRequest = function () {
       return {
         msg: 'ide.HelpRequest'
+      };
+    };
+
+    /**
+     * Returns msg object used to signal that a student wants to reset the solution.
+     * @return {{msg: string}}
+     */
+    this.msgResetRequest = function () {
+      return {
+        msg: 'ide.ResetRequest'
       };
     };
 

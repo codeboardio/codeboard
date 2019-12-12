@@ -15,6 +15,10 @@ body {
   margin-bottom: 13px;
 }
 
+.ideHeader .navbar-form .nav-item {
+  margin-left: 5px;
+}
+
 #ideTreeViewProjectName {
   /* height: inherit; */
   /*border-top: 1px solid #a9a9a9;*/

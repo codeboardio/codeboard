@@ -122,33 +122,41 @@
 
                       <ul class="nav navbar-nav">
 
-                        <li>
-                          <button ng-hide="allTestsPassed" class="btn btn-info btn-sm" ng-disabled="disabledActions.help" style="margin-right: 5px" ng-click="navBarClick('help')" title="Hilfe anfordern">
+                        <li class="nav-item">
+                          <button ng-hide="allTestsPassed" class="btn btn-info btn-sm nav-link" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
                             <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
                           </button>
                         </li>
 
-                        <li>
-                          <button class="btn btn-default btn-sm" ng-click="fullscreenCtrl.toggleFullscreen()" style="margin-right: 5px" show-if-fullscreen-enabled>
+                        <li class="nav-item">
+                          <button class="btn btn-default btn-sm nav-link" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
                             <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
                             <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
                           </button>
-                        <li>
+                        </li>
+
+                        <li class="nav-item">
+                          <button ng-hide="currentRoleIsOwner()" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
+                            <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
+                          </button>
+                        </li>
+
+                        <li class="nav-item">
                           <div class="dropdown">
-                          <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
-                            <span class="glyphicon glyphicon-cog"></span>
-                          </a>
+                            <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                              <span class="glyphicon glyphicon-cog"></span>
+                            </a>
 
-                          <ul class="dropdown-menu">
-                            <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
+                            <ul class="dropdown-menu">
+                              <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
 
-                            <li ng-show="currentRoleIsOwner()" >
-                              <a ng-click="navBarClick('show_output_as_text')">
-                                <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
+                              <li ng-show="currentRoleIsOwner()" >
+                                <a ng-click="navBarClick('show_output_as_text')">
+                                  <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
                         </li>
                       </ul>
                     </div>
@@ -162,7 +170,7 @@
 
       <div id="ideMiddlePartId" class="ideSplitterOverflowVisible">
         <!-- the inner split part; left is the tree view, right is the editor -->
-        <div kendo-splitter k-orientation="'horizontal'" k-panes='[{ collapsible: true, collapsed: {{collapseTree}}, size: "220px" }, {collapsible: false}]' class="ideSplitterOverflowVisible ideSplitterFullHeight">
+        <div kendo-splitter k-orientation="'horizontal'" k-panes='[{ collapsible: true, collapsed: {{(collapseTree) || "true"}}, size: "220px" }, {collapsible: false}]' class="ideSplitterOverflowVisible ideSplitterFullHeight">
             <div id="ideTreeviewPartOfMiddlePart" class="ideSplitterOverflowVisible">
               <!-- everything related to the tree view -->
 

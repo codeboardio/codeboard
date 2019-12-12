@@ -14,7 +14,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
     var setProject = function (aProject) {
       project = aProject;
-    }
+    };
 
 
     /**
@@ -25,21 +25,14 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      */
     var lastCompilationId = '';
 
-
     // we store a hash of the project by the time we get it from the server
     var hashOfProject = '';
-
-    /** Stores a hash of the current project */
-    var setHashOfProject = function() {
-      hashOfProject = getHashOfProject();
-    }
 
     /**
      * Returns a SHA-256 hash of the current project object.
      * @return {*} a string that is the hash
      */
     var getHashOfProject = function() {
-
 
       var nodeArray = getNodeArray(getProject().files);
 
@@ -64,8 +57,12 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
       var shaObj = new jsSHA(angular.toJson(hashMe), "TEXT");
       return shaObj.getHash("SHA-256", "HEX");
-    }
+    };
 
+    /** Stores a hash of the current project */
+    var setHashOfProject = function() {
+      hashOfProject = getHashOfProject();
+    };
 
     /**
      * Check if the project has been modified based on comparing hashes.
@@ -127,6 +124,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @return an object that represents a node of the project (null if id is invalid)
      */
     var getNode = function (aUniqueNodeId) {
+
+      console.log("aUniqueNodeId " + aUniqueNodeId);
 
       if(typeof aUniqueNodeId === 'string') {
         if(aUniqueNodeId.charAt(0) === 's') {
@@ -278,7 +277,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
             content: aNode.content,
             isHidden: aNode.isHidden
           }
-        )
+        );
 
         // store a reference of the unique-id to the created node object
         getProject().idToNodeMap[lNewNode.uniqueId] = lNewNode;
@@ -288,6 +287,10 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
         // sort the elements of children array based on their names
         lParentNode.children.sort(compareByFileFolder);
+
+        console.log("Node COntent");
+        console.log(getProject().idToNodeMap[lNewNode.uniqueId]);
+        console.log(lNewNode.uniqueId);
 
 
         // return the new object
@@ -521,7 +524,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
         // static files are library files (currently only used for Eiffel)
         staticFiles: _staticFiles
-      }
+      };
 
       setProject(lProject);
 
