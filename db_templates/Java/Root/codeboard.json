@@ -1,5 +1,48 @@
 {
     "_comment": "Specify the main file used for compiling your application. Specify the main class used for running your application.",
     "MainFileForCompilation": "Main.java",
-    "MainClassForRunning": "Main"
+    "MainClassForRunning": "Main",
+    "userDisabledActions": [
+        "run",
+        "compile",
+        "save_project",
+        "help",
+        "test"
+    ],
+    "Testing": {
+        "onSuccess": "Gratulation! Alle Tests waren erfolgreich",
+        "useCompileTests": true,
+        "ioTests": [
+            {
+                "name": "Test 1",
+                "input": [
+                    "i1",
+                    "i2"
+                ],
+                "expectedOutput": "Die Summe aus i1 und i2",
+                "tests": [
+                    {
+                        "output": "output",
+                        "pass": true,
+                        "note": "Super",
+                        "type": "flexible"
+                    },
+                    {
+                        "output": ".*",
+                        "pass": false,
+                        "note": "Fehler",
+                        "type": "regex"
+                    }
+                ]
+            }
+        ]
+    },
+    "Help": {
+        "tips": [
+            {
+                "name": "Verwende eine Schleife",
+                "note": "Wiederhole die Schleife so oft wie es Elemente im Array hat"
+            }
+        ]
+    }
 }
