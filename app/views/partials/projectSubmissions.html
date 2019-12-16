@@ -47,7 +47,7 @@
               <td>{{sub.numTestsPassed === -1 ? '-' : sub.numTestsPassed}}</td>
               <td>{{sub.numTestsFailed === -1 ? '-' : sub.numTestsFailed}}</td>
               <td>{{sub.isLtiSubmission ? 'yes' : 'no'}}</td>
-              <td><a class="btn btn-default btn-xs"  ng-href="/projects/{{projectId}}/submissions/{{sub.submissionId}}">Open in IDE</a></td>
+              <td><a class="btn btn-default btn-xs"  ng-href="/projects/{{projectId}}/version/submission/{{sub.submissionId}}">Open in IDE</a></td>
             </tr>
           </table>
         </li>

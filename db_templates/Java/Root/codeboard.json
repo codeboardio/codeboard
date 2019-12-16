@@ -22,13 +22,13 @@
                 "expectedOutput": "Die Summe aus i1 und i2",
                 "tests": [
                     {
-                        "output": "output",
+                        "matching": "i1: .* i2: .* Summe: .* 0",
                         "pass": true,
                         "note": "Super",
                         "type": "flexible"
                     },
                     {
-                        "output": ".*",
+                        "matching": ".*",
                         "pass": false,
                         "note": "Fehler",
                         "type": "regex"

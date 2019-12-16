@@ -43,6 +43,58 @@ app.config(['uiSelectConfig', function(uiSelectConfig) {
   uiSelectConfig.theme = 'selectize';
 }]);
 
+
+/**
+ *
+ * @author Janick Michot
+ *
+ * @param $route
+ * @param $http
+ * @param type
+ * @param id
+ * @returns {*}
+ */
+let getProjectDataForSubmissionOrHelpRequest = function($route, $http, type = 'submission', id = null) {
+
+  // if id is not set we use submissionId
+  id = (id === null) ? $route.current.params.submissionId : id;
+
+  return $http.get('/api/projects/' + $route.current.params.projectId + '/' + type + '/' + id)
+    .then(function(response) {
+
+      // we got the data from the sever but it's not in the exact form that the IdeCtrl expects
+      // thus we reformat it here; we also have to calculate the lastUId (though the user is not likely to add files)
+
+      let projectData = {
+        projectname: response.data.project.projectname,
+        language: response.data.project.language,
+        userRole: type,
+        // the user that's being inspected
+        username: response.data.user.username
+      };
+
+      // construct the fileSet
+      projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);
+
+      // calculate the lastUId by iterating over all files in fileSet
+      var _lastUId = 0;
+      projectData.fileSet.every(function(elem) {
+        if (elem.uniqueId > _lastUId) {
+          _lastUId = elem.uniqueId;
+        }
+      });
+      projectData.lastUId = _lastUId;
+
+      // we always disable the option to "submit" when looking at a submission
+      projectData.isSubmissionAllowed = false;
+
+      return projectData;
+    });
+};
+
+
+
+
 app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
     $routeProvider
       .when('/', {
@@ -136,6 +188,16 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }]
         }
       })
+      .when('/projects/:projectId/helpRequests', {
+        templateUrl: 'partials/projectHelpRequests',
+        controller: 'ProjectHelpRequestsCtrl',
+        resolve: {
+          // we don't inject any data but only check if the user is authorized to access this page
+          placeHolder: ['$route', '$http', function($route, $http) {
+            return $http.get('/api/projects/' + $route.current.params.projectId + '/authorizedownercheck');
+          }]
+        }
+      })
       .when('/projects/:projectId/userprojects', {
         templateUrl: 'partials/projectUserProjects',
         controller: 'ProjectUserProjectsCtrl',
@@ -207,6 +269,56 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }]
         }
       })
+      .when('/projects/:projectId/version/:versionType/:resourceId', {
+        // loads a project in the ide (publicly accessible if project is public)
+        templateUrl: 'partials/ide',
+        controller: 'IdeCtrl',
+        resolve: {
+          ltiData: ['$route', '$q', function ($route, $q) {
+            let deferred = $q.defer();
+            let _ltiData = {};
+            deferred.resolve(_ltiData);
+            return deferred.promise;
+          }],
+          projectData: ['$route', '$http', function($route, $http) {
+            let type = ($route.current.params.versionType === 'help') ? 'helpRequests' : 'submissions';
+            return $http.get('/api/projects/' + $route.current.params.projectId + '/' + type + '/' + $route.current.params.resourceId)
+              .then(function (response) {
+
+                // we got the data from the sever but it's not in the exact form that the IdeCtrl expects
+                // thus we reformat it here; we also have to calculate the lastUId (though the user is not likely to add files)
+
+                let projectData = {
+                  projectname: response.data.project.projectname,
+                  language: response.data.project.language,
+                  userRole: $route.current.params.versionType,
+                  username: response.data.user.username // the user that's being inspected
+                };
+
+                // construct the fileSet
+                if(response.data.hiddenFilesDump !== null) {
+                  projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);
+                } else {
+                  projectData.fileSet = response.data.userFilesDump;
+                }
+
+                // calculate the lastUId by iterating over all files in fileSet
+                let _lastUId = 0;
+                projectData.fileSet.every(function (elem) {
+                  if (elem.uniqueId > _lastUId) {
+                    _lastUId = elem.uniqueId;
+                  }
+                });
+                projectData.lastUId = _lastUId;
+
+                // we always disable the option to "submit" when looking at a submission
+                projectData.isSubmissionAllowed = false;
+
+                return projectData;
+              });
+          }]
+        }
+      })
       .when('/projects/:projectId/submissions/:submissionId', {
         // loads a project in the ide (publicly accessible if project is public)
         templateUrl: 'partials/ide',
@@ -232,7 +344,7 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
                   userRole: 'submission',
                   // the user that's being inspected
                   username: response.data.user.username
-                }
+                };
 
                 // construct the fileSet
                 projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);

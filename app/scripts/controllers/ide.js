@@ -760,7 +760,23 @@ app.controller('IdeCtrl',
        */
       let getHelp = function() {
 
-        // todo scope definieren
+        // make sure we save the current content before submitting
+        saveCurrentlyDisplayedContent();
+
+        // update the message in the console
+        setOutput('Create Help Request. This might take a few seconds. Please wait...', false);
+
+        ProjectFactory.requestHelp()
+            .then(function() {
+
+            })
+            .catch(function(error) {
+              console.log(error)
+            });
+
+
+        // zunächst einfach mal Hilfe senden
+
 
 
 

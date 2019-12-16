@@ -2,8 +2,8 @@
 
 var services = angular.module('codeboardApp');
 
-services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'ProjectRes', 'ProjectSubmissionRes',
-  function ($http, $routeParams, $q, $log, ProjectRes, ProjectSubmissionRes) {
+services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'ProjectRes', 'ProjectSubmissionRes', 'ProjectRequestHelpRes',
+  function ($http, $routeParams, $q, $log, ProjectRes, ProjectSubmissionRes, ProjectRequestHelpRes) {
 
     // an object that represents a project
     var project = {};
@@ -1030,7 +1030,38 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       );
 
       return deferred.promise;
-    }
+    };
+
+    /**
+     * Request Help for the current project.
+     * @returns a promise that resolves when a the request was completed
+     * @author Janick Michot
+     */
+    let requestHelp = function () {
+
+      // create payload
+      let payload = {};
+      payload.hasLtiData = getProject().hasLtiData;
+      payload.ltiData = getProject().ltiData;
+      payload.filesInDefaultFormat = getNodeArray(getProject().files);
+      payload.userRole = getProject().userRole;
+
+      // create the promise that is returned
+      let deferred = $q.defer();
+
+      // make call to the server
+      ProjectRequestHelpRes.save( { projectId: $routeParams.projectId }, payload,
+          function success(data, status, header, config) {
+            deferred.resolve(data); // resolve the promise
+          },
+          function error(response) {
+            deferred.reject(response); // reject the promise
+          }
+      );
+
+      // return the promise
+      return deferred.promise;
+    };
 
 
     // Public API here
@@ -1052,6 +1083,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       testProject: testProject,
       toolAction: toolAction,
       submitProject: submitProject,
+      requestHelp: requestHelp,
       isProjectModified: isProjectModified,
 
       // the following are only exported for testing

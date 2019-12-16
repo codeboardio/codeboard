@@ -23,10 +23,17 @@ angular.module('codeboardApp')
     );
   }])
 
+  .factory('ProjectRequestHelpRes', ['$resource', function($resource) {
+    return $resource(
+        '/api/projects/:projectId/helpRequests',
+        {projectId: '@id'}
+    );
+  }])
+
   .factory('ProjectRes', ['$resource', function($resource) {
     return $resource(
       '/api/projects/:projectId',
       {projectId: '@id'},
       {update: {method: 'PUT'}}
     );
-  }])
+  }]);
