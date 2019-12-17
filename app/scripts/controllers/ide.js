@@ -766,24 +766,38 @@ app.controller('IdeCtrl',
         // update the message in the console
         setOutput('Create Help Request. This might take a few seconds. Please wait...', false);
 
-        ProjectFactory.requestHelp()
-            .then(function() {
-
-            })
-            .catch(function(error) {
-              console.log(error)
-            });
-
-
-        // zunächst einfach mal Hilfe senden
-
-
-
-
         /** The controller for the modal */
         let getHelpModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
 
-          // todo hier modal definieren
+          $scope.tips = [];
+
+          // read tips from config file
+          let config = ProjectFactory.getConfig();
+          if("Help" in config && "tips" in config.Help) {
+            $scope.tips = config.Help.tips;
+            $scope.helpIntro = config.Help.helpIntro;
+          }
+
+
+
+
+
+
+
+
+
+
+          $scope.sendHelpRequest = function () {
+
+            // vorläufig einfach mal speichern ...
+            ProjectFactory.requestHelp()
+                .then(function() {
+
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+          };
 
 
 

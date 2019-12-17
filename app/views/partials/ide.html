@@ -502,10 +502,10 @@
         </div>
 
         <!-- Accordion with ioTests -->
-        <div class="panel-group" id="ioTestsAccordion">
+        <div class="panel-group modalAccordion" id="ioTestsAccordion">
           <div ng-repeat="test in tests" class="panel panel-default {{test.method}}">
             <div class="panel-heading {{test.status}}">
-              <a href="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
+              <a data-target="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
                 <span class="title" title="{{test.name}}">{{test.name}}</span>
                 <span ng-class="{'gly-spin': (test.status === 'processing')}" class="pull-right flag glyphicon {{test.status}}" aria-hidden="true"></span>
               </a>
@@ -604,10 +604,29 @@
 
     <div class="modal-header">
       <button type="button" class="close" ng-click="closeModal()">&times;</button>
-      <h4 class="modal-title">Hilfe anfragen</h4>
+      <h4 class="modal-title">Wie kann ich dir helfen?</h4>
     </div>
 
     <div class="modal-body">
+
+      <p>{{helpIntro}}</p>
+
+
+      <div class="panel-group modalAccordion" id="helpTipsAccordion">
+        <div ng-repeat="tip in tips" class="panel panel-default">
+          <div class="panel-heading">
+            <a data-target="#tip{{$index}}" data-toggle="collapse" data-parent="#helpTipsAccordion">
+              <span class="title" title="{{tip.name}}">{{tip.name}}</span>
+            </a>
+          </div>
+
+          <div id="tip{{$index}}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <p>{{tip.note}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Informationen zum Studenten -->
       <h6>Deine Angaben / Diese Informationen sollten wir von Moodle erhalten</h6>
@@ -662,7 +681,7 @@
       <button class="btn btn-default" ng-click="closeModal()">
         Schliessen
       </button>
-      <button class="btn btn-success" ng-click="closeModal()">
+      <button class="btn btn-success" ng-click="sendHelpRequest()">
         Anfrage senden
       </button>
     </div>

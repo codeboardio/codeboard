@@ -339,7 +339,7 @@ fieldset[disabled] .btn:hover {
   overflow-y: auto;
 }
 
-#ioTestsAccordion .panel {
+.modalAccordion .panel {
   margin: 0;
   border-radius: 0;
   border: 1px solid #fff;
@@ -347,110 +347,104 @@ fieldset[disabled] .btn:hover {
 
 
 /* Heading */
-#ioTestsAccordion .panel-heading {
+.modalAccordion .panel-heading {
   border-radius: 0;
 }
 
 /* Processing */
-#ioTestsAccordion .panel-heading.processing,
-#ioTestsAccordion .panel-heading.processing a {
+.modalAccordion .panel-heading.processing,
+.modalAccordion .panel-heading.processing a {
     background-color: #ddd;
     color: #bbb !important;
 }
-#ioTestsAccordion .panel-heading.processing .glyphicon:before {
+.modalAccordion .panel-heading.processing .glyphicon:before {
   content: "\e030";
 }
 
 /* Pending */
-#ioTestsAccordion .panel-heading.pending,
-#ioTestsAccordion .panel-heading.pending a {
+.modalAccordion .panel-heading.pending,
+.modalAccordion .panel-heading.pending a {
   background-color: #ccc;
   color: #aaa !important;
 }
-#ioTestsAccordion .panel-heading.pending .glyphicon:before {
+.modalAccordion .panel-heading.pending .glyphicon:before {
   content: "";
 }
 
 /* Fail */
-#ioTestsAccordion .panel-heading.fail,
-#ioTestsAccordion .panel-heading.fail a {
+.modalAccordion .panel-heading.fail,
+.modalAccordion .panel-heading.fail a {
   background: #ecc5c5;
   color: #ab5c5c !important;
 }
-#ioTestsAccordion .panel-heading.fail .glyphicon:before {
+.modalAccordion .panel-heading.fail .glyphicon:before {
   content: "\e083";
 }
 
 /* Success */
-#ioTestsAccordion .panel-heading.success,
-#ioTestsAccordion .panel-heading.success a {
+.modalAccordion .panel-heading.success,
+.modalAccordion .panel-heading.success a {
   background: #dceede;
   color: #77af87 !important;
 }
-#ioTestsAccordion .panel-heading.success .glyphicon:before {
+.modalAccordion .panel-heading.success .glyphicon:before {
   content: "\e084";
 }
 
 /* Ignored */
-#ioTestsAccordion .panel-heading.ignored,
-#ioTestsAccordion .panel-heading.ignored a {
+.modalAccordion .panel-heading.ignored,
+.modalAccordion .panel-heading.ignored a {
   background: #f7f1b2;
   color: #c3ae2a !important;
 }
-#ioTestsAccordion .panel-heading.ignored .glyphicon:before {
+.modalAccordion .panel-heading.ignored .glyphicon:before {
   content: "\e086"
 }
 
 /* Unreachable */
-#ioTestsAccordion .panel-heading.unreachable,
-#ioTestsAccordion .panel-heading.unreachable a {
+.modalAccordion .panel-heading.unreachable,
+.modalAccordion .panel-heading.unreachable a {
   background: #eee;
   color: #ddd !important;
 }
 
 /* Compile :: Fail */
-#ioTestsAccordion .compileTest .panel-heading.fail,
-#ioTestsAccordion .compileTest .panel-heading.fail a {
+.modalAccordion .compileTest .panel-heading.fail,
+.modalAccordion .compileTest .panel-heading.fail a {
   background: #ec9494;
   color: #ab2228 !important;
 }
 
 /* Compile :: Success */
-#ioTestsAccordion .compileTest .panel-heading.success,
-#ioTestsAccordion .compileTest .panel-heading.success a {
+.modalAccordion .compileTest .panel-heading.success,
+.modalAccordion .compileTest .panel-heading.success a {
     background: #a7d5e6;
     color: #5c89af !important;
 }
 
 /* disable click events */
-#ioTestsAccordion .panel-heading.processing,
-#ioTestsAccordion .panel-heading.processing a,
-#ioTestsAccordion .panel-heading.pending,
-#ioTestsAccordion .panel-heading.pending a,
-#ioTestsAccordion .panel-heading.unreachable,
-#ioTestsAccordion .panel-heading.unreachable a,
-#ioTestsAccordion .panel-heading.ignored,
-#ioTestsAccordion .panel-heading.ignored a {
+.modalAccordion .panel-heading.processing,
+.modalAccordion .panel-heading.processing a,
+.modalAccordion .panel-heading.pending,
+.modalAccordion .panel-heading.pending a,
+.modalAccordion .panel-heading.unreachable,
+.modalAccordion .panel-heading.unreachable a,
+.modalAccordion .panel-heading.ignored,
+.modalAccordion .panel-heading.ignored a {
   pointer-events: none;
   cursor: default;
 }
 
-#ioTestsAccordion .compileTest {
+.modalAccordion .compileTest {
   margin-bottom: 15px;
 }
 
-
-
-
-
-
-
-#ioTestsAccordion .panel .panel-body {
+.modalAccordion .panel .panel-body {
   border-top: 0;
   background: #fafafa;
 }
 
-#ioTestsAccordion .inputOutputArea {
+.modalAccordion .inputOutputArea {
   width: 100%;
   max-width: 100%;
   min-height: 80px;
@@ -461,16 +455,16 @@ fieldset[disabled] .btn:hover {
   border-radius: 0;
 }
 
-#ioTestsAccordion .inputOutputArea.actualOutput {
+.modalAccordion .inputOutputArea.actualOutput {
   background: #f7e9e9;
   color: #d28484;
 }
-#ioTestsAccordion .inputOutputArea.expectedOutput {
+.modalAccordion .inputOutputArea.expectedOutput {
   background: #e7f3e8;
   color: #7ebf84;
 }
 
-#ioTestsAccordion .areaLabel {
+.modalAccordion .areaLabel {
   color: #aaa;
   font-weight: 100;
 }
