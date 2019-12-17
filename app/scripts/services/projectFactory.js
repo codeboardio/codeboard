@@ -125,8 +125,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      */
     var getNode = function (aUniqueNodeId) {
 
-      console.log("aUniqueNodeId " + aUniqueNodeId);
-
       if(typeof aUniqueNodeId === 'string') {
         if(aUniqueNodeId.charAt(0) === 's') {
           // it's a request for a static library file
@@ -287,11 +285,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
         // sort the elements of children array based on their names
         lParentNode.children.sort(compareByFileFolder);
-
-        console.log("Node COntent");
-        console.log(getProject().idToNodeMap[lNewNode.uniqueId]);
-        console.log(lNewNode.uniqueId);
-
 
         // return the new object
         return lNewNode;
@@ -874,11 +867,34 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       return deferred.promise;
     };
 
+
+    /**
+     * Use this function to retrieves the configuration for the current project
+     * @author Janick Michot
+     */
+    let getConfig = function () {
+
+      // get all the files of the projects but an flat array (don't need nested arrays)
+      let aFileSet = getNodeArray(getProject().files);
+
+      // get the config file from the fileSet
+      let configFile = aFileSet.find(file => file.filename === 'codeboard.json');
+
+      // by doing the parsing inside a try-catch block we check json-validity
+      try {
+        return JSON.parse(configFile.content);
+      } catch (e) {
+        return { };
+      }
+
+    };
+
+
     /**
      * Retrieves all test for this project in an array
      * @author Janick Michot
      */
-    var getTests = function() {
+    let getTests = function() {
 
       let payload = getPayloadForCompilation(true);
       payload.action = 'getTests';
@@ -897,7 +913,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         );
 
       return deferred.promise;
-    }
+    };
 
 
     var testProject = function(testData) {
@@ -1085,6 +1101,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       submitProject: submitProject,
       requestHelp: requestHelp,
       isProjectModified: isProjectModified,
+      getConfig: getConfig,
 
       // the following are only exported for testing
       getNodeArray: getNodeArray,
