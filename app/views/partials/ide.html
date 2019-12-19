@@ -170,11 +170,12 @@
 
       <div id="ideMiddlePartId" class="ideSplitterOverflowVisible">
         <!-- the inner split part; left is the tree view, right is the editor -->
-        <div kendo-splitter k-orientation="'horizontal'" k-panes='[{ collapsible: true, collapsed: {{(collapseTree) || "true"}}, size: "220px" }, {collapsible: false}]' class="ideSplitterOverflowVisible ideSplitterFullHeight">
+        <div id="innerSplitPart" ng-controller="RightBarCtrl" class="ideSplitterOverflowVisible ideSplitterFullHeight">
+
             <div id="ideTreeviewPartOfMiddlePart" class="ideSplitterOverflowVisible">
               <!-- everything related to the tree view -->
 
-              <div kendo-splitter k-orientation="'vertical'" k-panes="[{resizable: false, size: '29px'},{},{resizable: false, collapsible: false, size: '55px'}]" class="ideSplitterOverflowVisible ideSplitterFullHeight">
+              <div kendo-splitter k-orientation="'vertical'" k-panes="[{resizable: false, size: '29px'},{}]" class="ideSplitterOverflowVisible ideSplitterFullHeight">
 
                 <!-- the project name -->
                 <div id="ideTreeViewProjectName">
@@ -195,26 +196,11 @@
                   </div>
                 </div>
 
-                <!-- todo hier der Fehler ui.select:items -> wieder auskommentieren (janick) -->
-                <!-- the select box that lists library interface files -->
-
-                <!--
-                <div ng-controller="LibraryCtrl" class="ideSplitterOverflowVisible">
-                  <div ng-init="fetchStaticFiles()" style="max-width: 320px; padding: 4px;" ng-show="isEiffelLanguageCompatible()">
-                    <ui-select reset-search-input="true" ng-change="showFile()" ng-model="file.selected" theme="selectize" ng-disabled="disabled" append-to-body="'true'" style="width: 80%">
-                      <ui-select-match placeholder="Browse library" style="width: 80%;">{{$select.selected.classname}}</ui-select-match>
-                      <ui-select-choices repeat="file in files | filter: $select.search">
-                        <small ng-bind-html="file.classname | highlight: $select.search"></small>
-                      </ui-select-choices>
-                    </ui-select>
-                  </div>
-                </div>
-                -->
-
                 <!-- end of the select box that lists library interface files -->
               </div> <!-- end of splitter that splits everything related to the tree view (projectname, treeview, library select box -->
 
             </div> <!-- end of left-part split-->
+
             <div id="ideRightPartOfMiddlePart"> <!-- begin of right-part of the middle part, that is the editor and tabs -->
               <!-- everything related to the editor -->
                 <div ng-controller="TabCtrl" id="ideTabArea"> <!-- the tabs -->
@@ -243,25 +229,49 @@
                   </div>
                 </div>
                 <!-- end of everything related to the editor -->
+
+                <div class="ideFooter"> <!-- the lower part of splitter area, where the terminal lives -->
+                    <div ng-show="renderHtmlOutput" ng-bind-html="htmlOutput" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
+                    <div ng-hide="renderHtmlOutput" ng-bind="output" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
+                    <div class="userInput"><!-- the area for the user input and send button -->
+                        <div class="userInputField">
+                            <i class="glyphicon glyphicon-console"></i>
+                            <input type="text" id="idFooterUserInput" ng-model="userInputData" ng-enter="sendUserInputClick(userInputData, 'idFooterUserInput')" ng-select-on-focus class="ideOutputText ideOutputBorder" placeholder="Input to your program (press Enter to send)"/>
+                        </div>
+                        <div class="userInputButton">
+                            <button ng-click="sendUserInputClick(userInputData, 'idFooterUserInput')" class="btn btn-default btn-xs">
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
+
+            <div id="ideRighterPartOfMiddlePart" class="ideSplitterFullHeight">
+
+                <div class="ide-tabs" ng-repeat="(slug, tab) in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(slug)"></div>
+
+            </div> <!-- end of left-part split-->
+
+            <div id="ideRightestPartOfMiddlePart" class="ideSplitterFullHeight">
+
+                <div class="ideAdditionalTabs">
+                    <a ng-repeat="(slug, tab) in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(slug)" class="tab tab-{{slug}}" id="rightBarTabs{{slug}}">
+                        <span class="glyphicon {{tab.icon}}"></span>{{tab.title}}
+                    </a>
+                </div>
+
+
+            </div> <!-- end of left-part split-->
+
+
+
+
+
+
         </div><!-- closing the high-level splitter in the middle part-->
       </div><!-- End of the middle part, where left is the tree view etc., right is the editor etc. -->
-      <div class="ideFooter"> <!-- the lower part of splitter area, where the terminal lives -->
-        <div ng-show="renderHtmlOutput" ng-bind-html="htmlOutput" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
-        <div ng-hide="renderHtmlOutput" ng-bind="output" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
-        <div class="userInput"><!-- the area for the user input and send button -->
-          <div class="userInputField">
-            <i class="glyphicon glyphicon-console"></i>
-            <input type="text" id="idFooterUserInput" ng-model="userInputData" ng-enter="sendUserInputClick(userInputData, 'idFooterUserInput')" ng-select-on-focus class="ideOutputText ideOutputBorder" placeholder="Input to your program (press Enter to send)"/>
-          </div>
-          <div class="userInputButton">
-            <button ng-click="sendUserInputClick(userInputData, 'idFooterUserInput')" class="btn btn-default btn-xs">
-              Send
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div><!-- closing the outermost splitter that splits into header, middle, and footer -->
 
     <!-- the status bar on the bottom of the page, showing username, role, info etc.-->
@@ -275,6 +285,22 @@
   </div>
 
   <!-- End of Kendo splitter layout -->
+
+    <script>
+
+        // todo wieder als html attribute verpacken oder angular scope
+
+        $("#innerSplitPart").kendoSplitter({
+            orientation: "horizontal",
+            panes: [
+                { collapsible: true, collapsed: true, size: "220px" },
+                { collapsible: false },
+                { collapsible: false, collapsed: false, size: "100px" },
+                { collapsible: false, resizable: false, size: "26px" }
+            ]
+        });
+
+    </script>
 
 
   <!-- the modal window used to add a file or folder -->

@@ -867,18 +867,27 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       return deferred.promise;
     };
 
+    /**
+     * Get a file by filename
+     * @author Janick Michot
+     * @param filename
+     */
+    let getFile = function(filename) {
+      // get all the files of the projects but an flat array (don't need nested arrays)
+      let aFileSet = getNodeArray(getProject().files);
+
+      // return file from the fileSet
+      let file = aFileSet.find(file => file.filename === filename);
+      return (file === undefined) ? false : file;
+    };
 
     /**
      * Use this function to retrieves the configuration for the current project
      * @author Janick Michot
      */
     let getConfig = function () {
-
-      // get all the files of the projects but an flat array (don't need nested arrays)
-      let aFileSet = getNodeArray(getProject().files);
-
       // get the config file from the fileSet
-      let configFile = aFileSet.find(file => file.filename === 'codeboard.json');
+      let configFile = getFile('codeboard.json');
 
       // by doing the parsing inside a try-catch block we check json-validity
       try {
@@ -886,7 +895,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       } catch (e) {
         return { };
       }
-
     };
 
 
@@ -916,7 +924,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     };
 
 
-    var testProject = function(testData) {
+    let testProject = function(testData) {
 
       var payload = getPayloadForCompilation(false);
       payload.action = 'test';
@@ -1102,6 +1110,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       requestHelp: requestHelp,
       isProjectModified: isProjectModified,
       getConfig: getConfig,
+      getFile: getFile,
 
       // the following are only exported for testing
       getNodeArray: getNodeArray,

@@ -4,8 +4,8 @@ var app = angular.module('codeboardApp');
 
 
 app.controller('IdeCtrl',
-  ['$scope', '$rootScope', '$log', '$sce', '$location', '$routeParams', '$window', '$http', '$timeout', '$uibModal', 'ProjectFactory', 'projectData', 'ltiData', 'IdeMsgService', 'IdeSnippetsSrv','UserSrv', 'WebsocketSrv',
-    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, IdeSnippetsSrv, UserSrv, WebsocketSrv) {
+  ['$scope', '$rootScope', '$log', '$sce', '$location', '$routeParams', '$window', '$http', '$timeout', '$uibModal', 'ProjectFactory', 'projectData', 'ltiData', 'IdeMsgService', 'UserSrv', 'WebsocketSrv',
+    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv) {
 
       // First we handle all data that was injected as part of the app.js resolve.
       // set the ProjectFactory to contain the project loaded from the server
@@ -2183,6 +2183,85 @@ app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'Project
   });
 
 }]);
+
+
+/**
+ * Controller for the new right bar
+ * @author Janick Michot
+ */
+app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'ProjectFactory', 'IdeMsgService',
+  function($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService) {
+
+    $scope.navBarRightContent = "";
+    $scope.activeTab = "";
+    $scope.rightBarTabs = {};
+
+    // tab for project description
+    $scope.rightBarTabs.description = {
+      title: "Aufgabenbeschreibung",
+      disabled: false,
+      icon: "",
+      contentURL: "partials/navBarRight/navBarRightDescription"
+    };
+
+    // tab for tips related to this project
+    $scope.rightBarTabs.tips = {
+      title: "Tipps",
+      icon: "glyphicon-list-alt",
+      contentURL: "partials/navBarRight/navBarRightTips"
+    };
+
+    // tab for project description
+    $scope.rightBarTabs.testResult = {
+      title: "Testresulat",
+      icon: "glyphicon-list-alt",
+      contentURL: "partials/navBarRight/navBarRightTestResult"
+    };
+
+    // tab for test result
+    $scope.rightBarTabs.testResult = {
+      title: "Testresulat",
+      icon: "glyphicon-list-alt",
+      contentURL: "partials/navBarRight/navBarRightTestResult"
+    };
+
+    // tab for help / chat
+    $scope.rightBarTabs.help = {
+      title: "Hilfe",
+      icon: "glyphicon-comment",
+      contentURL: "partials/navBarRight/navBarRightHelp"
+    };
+
+    // todo define other tabs
+
+
+    /**
+     * check is tab is active
+     * @returns {boolean}
+     */
+    $scope.isTabActive = function(slug) {
+      return ($scope.activeTab === slug);
+    };
+
+    /**
+     * Change content of tab splitter
+     * @param slug
+     */
+    $scope.rightBarTabClick = function(slug) {
+      $scope.activeTab = slug;
+    };
+
+    /**
+     * This broadcast can be used to disable tabs from withing a controller
+     */
+    $scope.$on(IdeMsgService.msgNavBarRightDisableTab().msg, function (event, data) {
+      $scope.rightBarTabs[data.slug].disabled = true;
+    });
+
+
+
+
+  }]);
 
 
 app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', 'ProjectFactory', function($scope, $routeParams, UserSrv, ProjectFactory){

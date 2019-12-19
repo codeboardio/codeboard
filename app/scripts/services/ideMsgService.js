@@ -362,4 +362,16 @@ angular.module('codeboardApp')
       };
     };
 
+      /**
+       * This broadcast can be used to disable a navBarRightTab from within a controller
+       * @return {{msg: string}}
+       * @author Janick Michot
+       */
+      this.msgNavBarRightDisableTab = function (slug) {
+          return {
+              msg: 'ide.navBarRightDisableTab',
+              data: { "slug": slug }
+          };
+      };
+
   });

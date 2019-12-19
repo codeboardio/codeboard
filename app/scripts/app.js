@@ -44,57 +44,6 @@ app.config(['uiSelectConfig', function(uiSelectConfig) {
 }]);
 
 
-/**
- *
- * @author Janick Michot
- *
- * @param $route
- * @param $http
- * @param type
- * @param id
- * @returns {*}
- */
-let getProjectDataForSubmissionOrHelpRequest = function($route, $http, type = 'submission', id = null) {
-
-  // if id is not set we use submissionId
-  id = (id === null) ? $route.current.params.submissionId : id;
-
-  return $http.get('/api/projects/' + $route.current.params.projectId + '/' + type + '/' + id)
-    .then(function(response) {
-
-      // we got the data from the sever but it's not in the exact form that the IdeCtrl expects
-      // thus we reformat it here; we also have to calculate the lastUId (though the user is not likely to add files)
-
-      let projectData = {
-        projectname: response.data.project.projectname,
-        language: response.data.project.language,
-        userRole: type,
-        // the user that's being inspected
-        username: response.data.user.username
-      };
-
-      // construct the fileSet
-      projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);
-
-      // calculate the lastUId by iterating over all files in fileSet
-      var _lastUId = 0;
-      projectData.fileSet.every(function(elem) {
-        if (elem.uniqueId > _lastUId) {
-          _lastUId = elem.uniqueId;
-        }
-      });
-      projectData.lastUId = _lastUId;
-
-      // we always disable the option to "submit" when looking at a submission
-      projectData.isSubmissionAllowed = false;
-
-      return projectData;
-    });
-};
-
-
-
-
 app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
     $routeProvider
       .when('/', {
