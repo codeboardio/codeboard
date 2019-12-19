@@ -2200,7 +2200,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     $scope.rightBarTabs.description = {
       title: "Aufgabenbeschreibung",
       disabled: false,
-      icon: "",
+      icon: "glyphicon-education",
       contentURL: "partials/navBarRight/navBarRightDescription"
     };
 
@@ -2245,10 +2245,20 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
 
     /**
      * Change content of tab splitter
+     *
+     * todo ein case wird noch nicht abgefangen: Wenn Tab offen und geschlossen mit >. Will mein gleichen Tab öffnen funktionierts nicht!
+     *
      * @param slug
      */
     $scope.rightBarTabClick = function(slug) {
-      $scope.activeTab = slug;
+
+      if($scope.activeTab !== slug) {
+        $scope.splitter.expand("#ideRighterPartOfMiddlePart");
+        $scope.activeTab = slug;
+      } else {
+        $scope.splitter.collapse("#ideRighterPartOfMiddlePart");
+        $scope.activeTab = "";
+      }
     };
 
     /**

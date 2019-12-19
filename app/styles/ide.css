@@ -478,6 +478,10 @@ fieldset[disabled] .btn:hover {
 
 /** - - - Additional Tabs - - - */
 
+#ideRighterPartOfMiddlePart + #ideRightestPartOfMiddlePart {
+  display: none;
+}
+
 #ideRightestPartOfMiddlePart {
   background-color: #4a80a5;
   padding-top: 5px;

@@ -170,7 +170,7 @@
 
       <div id="ideMiddlePartId" class="ideSplitterOverflowVisible">
         <!-- the inner split part; left is the tree view, right is the editor -->
-        <div id="innerSplitPart" ng-controller="RightBarCtrl" class="ideSplitterOverflowVisible ideSplitterFullHeight">
+        <div kendo-splitter="splitter" k-orientation="'horizontal'" k-panes='[{ collapsible: true, collapsed: true, size: "220px" }, {collapsible: false}, { collapsible: true, resizable: true, collapsed: true, size: "400px" }, { collapsible: false, resizable: false, collapsed: false, size: "26px" }]' id="innerSplitPart" ng-controller="RightBarCtrl" class="ideSplitterOverflowVisible ideSplitterFullHeight">
 
             <div id="ideTreeviewPartOfMiddlePart" class="ideSplitterOverflowVisible">
               <!-- everything related to the tree view -->
@@ -257,7 +257,7 @@
             <div id="ideRightestPartOfMiddlePart" class="ideSplitterFullHeight">
 
                 <div class="ideAdditionalTabs">
-                    <a ng-repeat="(slug, tab) in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(slug)" class="tab tab-{{slug}}" id="rightBarTabs{{slug}}">
+                    <a tab-click ng-repeat="(slug, tab) in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(slug)" class="tab tab-{{slug}}" id="rightBarTabs{{slug}}">
                         <span class="glyphicon {{tab.icon}}"></span>{{tab.title}}
                     </a>
                 </div>
@@ -285,22 +285,6 @@
   </div>
 
   <!-- End of Kendo splitter layout -->
-
-    <script>
-
-        // todo wieder als html attribute verpacken oder angular scope
-
-        $("#innerSplitPart").kendoSplitter({
-            orientation: "horizontal",
-            panes: [
-                { collapsible: true, collapsed: true, size: "220px" },
-                { collapsible: false },
-                { collapsible: false, collapsed: false, size: "100px" },
-                { collapsible: false, resizable: false, size: "26px" }
-            ]
-        });
-
-    </script>
 
 
   <!-- the modal window used to add a file or folder -->
