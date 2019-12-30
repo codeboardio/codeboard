@@ -1,6 +1,27 @@
+<div class="tab-body ide-tab-help ide-tab-chat" ng-controller="ideNavBarHelpChatCtrl">
 
-<div>
+    <h1 class="modal-title">Wie kann ich dir helfen?</h1>
 
-    Inhalt von `navBarRightChat`;
-
+    <div class="chat">
+        <ul class="conversation">
+            <li ng-repeat="chatLine in chatLines" ng-include="getChatLine((chatLine.authorId === chatLine.userId))"></li>
+        </ul>
+    </div>
 </div>
+
+
+
+
+<script type="text/ng-template" id="chatLineQuestion.html">
+    <div class="chat-line left mb-3 float-left" ng-class="chatLine.type">
+        <p class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</p>
+        <span class="date float-right"><small>{{chatLine.createdAt}}</small></span>
+    </div>
+</script>
+
+<script type="text/ng-template" id="chatLineAnswer.html">
+    <div class="chat-line right mb-3 float-left" ng-class="chatLine.type">
+        <p class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</p>
+        <span class="date float-right"><small>{{chatLine.createdAt}}</small></span>
+    </div>
+</script>

@@ -1,0 +1,118 @@
+.brand_logo_chat_container {
+    width: 60px;
+    height: 60px
+}
+.brand_logo_chat_container .brand_logo {
+    max-height: 80%;
+    max-width: 80%
+}
+
+.chat {
+    background-color: #fafafa;
+}
+
+.chat .user_card {
+    height: 400px;
+    position: relative;
+    padding-bottom: 100px !important;
+}
+
+.chat ul.conversation {
+    width:100%;
+    list-style-type: none;
+}
+
+.chat .chat-line {
+    border-radius:5px;
+    padding:5px;
+    margin-bottom: 8px;
+    box-shadow: 1px 1px 6px #4487;
+    -webkit-box-shadow: 1px 1px 2px #4487;
+    width: 85%;
+    position: relative;
+}
+.chat .chat-line.left {
+    background: #fff;
+}
+.chat .chat-line.right {
+    background: #e1e6ed;
+}
+
+.chat .chat-line.left:before,
+.chat .chat-line.right:after {
+    width: 0;
+    height: 0;
+    content: "";
+    top:0;
+    position: absolute;
+    border-style: solid;
+}
+.chat .chat-line.left:before {
+    left: -10px;
+    border-width: 0 13px 13px 0;
+    border-color: transparent #fff transparent transparent;
+}
+.chat .chat-line.right:after {
+    right: -10px;
+    border-width: 13px 13px 0 0;
+    border-color: #e1e6ed transparent transparent transparent;
+}
+
+.chat .chat-line .text{
+    border:0;
+    color: #333;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+
+.chat .send-message {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.chat .send-message input.ask {
+    height: 50px;
+}
+.chat .send-message input.ask::placeholder {
+    color: #ddd;
+}
+.chat .send-message input.ask:focus {
+    box-shadow: none !important;
+    border-color: #0064a6 !important;
+}
+
+.chat .send-message .send {
+    height: 50px;
+    background: #0064a6 !important;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.chat .send-message .send i {
+    font-size: 1.4em;
+    color: #ffffffba;
+}
+
+
+.new-conversation .group {
+    display: table;
+    margin: 0 auto;
+}
+.new-conversation .item {
+    display: table-cell;
+}
+.new-conversation .text {
+    white-space: nowrap;
+    width: 1%;
+    padding: 0 10px;
+}
+.new-conversation .line {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.23921568627450981);
+    position: relative;
+    top: -.6em;
+}
