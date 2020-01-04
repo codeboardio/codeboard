@@ -4,8 +4,8 @@ var app = angular.module('codeboardApp');
 
 
 app.controller('IdeCtrl',
-  ['$scope', '$rootScope', '$log', '$sce', '$location', '$routeParams', '$window', '$http', '$timeout', '$uibModal', 'ProjectFactory', 'projectData', 'ltiData', 'IdeMsgService', 'UserSrv', 'WebsocketSrv',
-    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv) {
+  ['$scope', '$rootScope', '$log', '$sce', '$location', '$routeParams', '$window', '$http', '$timeout', '$uibModal', 'ProjectFactory', 'projectData', 'ltiData', 'IdeMsgService', 'UserSrv', 'WebsocketSrv', 'ChatSrv',
+    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv) {
 
       // First we handle all data that was injected as part of the app.js resolve.
       // set the ProjectFactory to contain the project loaded from the server
@@ -36,6 +36,8 @@ app.controller('IdeCtrl',
           $http
             .get(_urlForUserProject)
             .success(function(result) {
+
+              console.log(result);
 
               /** The controller for the modal */
               var loadUserProjectModalInstanceCtrl =  ['$scope', '$uibModalInstance', 'UserSrv', function ($scope, $uibModalInstance, UserSrv) {
@@ -347,7 +349,17 @@ app.controller('IdeCtrl',
           // if the value is !== -1, then some tab is open
           ProjectFactory.getNode($scope.ace.currentNodeId).content = $scope.ace.editor.getSession().getValue();
         }
-      }
+      };
+
+      /**
+       * Opens a nav bar right tab
+       * @author Janick Michot
+       * @date 30.12.2019
+       */
+      let openNavBarRightTab = function(tab) {
+        let req = IdeMsgService.msgNavBarRightOpenTab(tab);
+        $rootScope.$broadcast(req.msg, req.data);
+      };
 
 
       /**
@@ -549,6 +561,13 @@ app.controller('IdeCtrl',
 
         $scope.testResult = 0;
 
+
+        $scope.splitter.expand("#ideRighterPartOfMiddlePart");
+
+        // let req = IdeMsgService.msgDisplayFileRequest($scope.ace.currentNodeId, true);
+        // $rootScope.$broadcast(req.msg, req.data);
+
+
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
@@ -726,6 +745,14 @@ app.controller('IdeCtrl',
 
             // enable compilation and submission (not running, because what the submission compiles might differ from the last compilation if the user changed something; that could be confusing for the user)
             setEnabledActions(1,0,1,1,1);
+
+            console.log("Nun sende eine ChatLine");
+            // add chat line card
+            ChatSrv.addChatLine({
+              cardHeader: "Aufgabe Abgegeben #wieId",
+              cardBody: "So viele Tests passed.. So viele failed",
+              cardType: "submission"
+            }, 'card');
           },
           function(reason) {
             $log.debug('Submission failed.' + reason.data.msg);
@@ -753,114 +780,11 @@ app.controller('IdeCtrl',
         }
       };
 
-
-      /**
-       *
-       * @author Janick Michot
-       */
-      let getHelp = function() {
-
-        // make sure we save the current content before submitting
-        saveCurrentlyDisplayedContent();
-
-        // update the message in the console
-        setOutput('Create Help Request. This might take a few seconds. Please wait...', false);
-
-        /** The controller for the modal */
-        let getHelpModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
-
-          $scope.tips = [];
-
-          // read tips from config file
-          let config = ProjectFactory.getConfig();
-          if("Help" in config && "tips" in config.Help) {
-            $scope.tips = config.Help.tips;
-            $scope.helpIntro = config.Help.helpIntro;
-          }
-
-
-
-
-
-
-
-
-
-
-          $scope.sendHelpRequest = function () {
-
-            // vorläufig einfach mal speichern ...
-            ProjectFactory.requestHelp()
-                .then(function() {
-
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-          };
-
-
-
-          $scope.closeModal = function () {
-            $uibModalInstance.close();
-          };
-        }];
-
-        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
-        $uibModal.open({
-          templateUrl: 'ideGetHelpModal.html',
-          controller: getHelpModalInstanceCtrl,
-          size: 'lg'
-        });
-
-
-
-
-        /**
-         * todo im Modal soll folgendes angezeigt werden
-         *  1) Informationen zum Stundenten
-         *    a) Name
-         *    b) Vorname
-         *    c) E-Mail
-       *    2) Informationen zur Aufgabe
-         *    a) Name der Aufgabe
-       *    3) Die Lösung
-         *  4) Bemerkungen des Studenten / Was hat er für ein Problem?
-         *  5) Das Testresultat
-         *    => Wird das Test-Resultat immer mitgeschickt oder nur wenn es der Student verlangt?  Was macht an dieser Stelle mehr Sinn?!
-         *    => Tests wie im Test-Modal durchlaufen lassen oder wie beim der Submission nur Resultat laden?
-         *    => Soll der Student das Test-Resultat sehen oder sollte nur im Hintergrund getestet werden?
-         */
-
-
-        /**
-         * todo wie wird die Hilfe-Anfrage verarbeitet?
-         *  Irgendwie muss eine Notifikation stattfinden:
-         *   - Mail and Dozent? -> Dazu müssten wir noch Mail einrichten
-         *
-         */
-
-
-        /**
-         * todo Gestaltung E-Mail
-         *  Welche Inhalte gehören zum E-Mail?
-         *    a) Informationen zum Studenten (Name, Vorname, E-Mail)
-         *    b) Informationen des Studenten (Bemerkungen)
-         *    c) Informationen zur Aufgabe (Link zur Aufgabe / Link zur Moodle-Aufgabe -> für manuelle Bewertung oder ähnliches)
-         *    d)
-         */
-
-
-        /**
-         * Praktisch wäre zudem ein Dashboard über welches der Admin alle offenen Tassks einsehen und verwalten kann.
-         * Alles zu seiner Zeit
-         */
-
-      };
-
-
       /**
        * Reset project and restore original
+       *
+       * todo reset to version function
+       * todo wieso wird `userProjectData` nicht verwendet?
        * @author Janick Michot
        */
       let resetSolution = function() {
@@ -1151,9 +1075,9 @@ app.controller('IdeCtrl',
             }
             break;
           case ('help'):
-            if(!($scope.disabledActions.help)) { // todo getHelp in disabledActions definieren
-              req = IdeMsgService.msgHelpRequest();
-              $rootScope.$broadcast(req.msg);
+            // todo getHelp in disabledActions definieren
+            if(!($scope.disabledActions.help)) {
+              openNavBarRightTab('help');
             }
             break;
           case ('reset'):
@@ -1315,7 +1239,22 @@ app.controller('IdeCtrl',
         $scope.ace.editor.resize();
       });
 
+      /**
+       * Triggers a save of the current view used to make submissions / help requests
+       * @author Janick Michot
+       * @date 30.12.2019
+       */
+      $scope.$on(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg, function () {
+        $log.debug('Save request received');
 
+        //  we need to store the current content first
+        saveCurrentlyDisplayedContent();
+      });
+
+
+      /**
+       * Triggers a save of the current project
+       */
       $scope.$on(IdeMsgService.msgSaveProjectRequest().msg, function () {
         $log.debug('Save request received');
 
@@ -1573,13 +1512,6 @@ app.controller('IdeCtrl',
 
         // set the focus on the editor so user can start typing right away
         $scope.ace.editor.focus();
-      });
-
-
-      /** Handles a "getHelp" event */
-      $scope.$on(IdeMsgService.msgHelpRequest().msg, function () {
-        $log.debug('Help request received');
-        getHelp();
       });
 
       /** Handles a "reset" event */
@@ -2196,6 +2128,11 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     $scope.activeTab = "";
     $scope.rightBarTabs = {};
 
+    // In the following all tabs are defined, which are displayed in the right bar. The definition consists of a title,
+    // an icon and the ContentUrl. The ContentUrl specifies which template is to be loaded. These templates can in turn
+    // be controlled by a controller. With 'disable' you can also define whether the tab should be displayed. This value
+    // can be adjusted in a controller via broadcast.
+
     // tab for project description
     $scope.rightBarTabs.description = {
       title: "Aufgabenbeschreibung",
@@ -2209,13 +2146,6 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
       title: "Tipps",
       icon: "glyphicon-list-alt",
       contentURL: "partials/navBarRight/navBarRightTips"
-    };
-
-    // tab for project description
-    $scope.rightBarTabs.testResult = {
-      title: "Testresulat",
-      icon: "glyphicon-list-alt",
-      contentURL: "partials/navBarRight/navBarRightTestResult"
     };
 
     // tab for test result
@@ -2246,12 +2176,11 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     /**
      * Change content of tab splitter
      *
-     * todo ein case wird noch nicht abgefangen: Wenn Tab offen und geschlossen mit >. Will mein gleichen Tab öffnen funktionierts nicht!
+     * todo Double-Click notwending, wenn Tab mit > geschlossen wird und gleicher Tab wieder geöffnet werden soll
      *
      * @param slug
      */
     $scope.rightBarTabClick = function(slug) {
-
       if($scope.activeTab !== slug) {
         $scope.splitter.expand("#ideRighterPartOfMiddlePart");
         $scope.activeTab = slug;
@@ -2262,14 +2191,19 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     };
 
     /**
-     * This broadcast can be used to disable tabs from withing a controller
+     * This broadcast can be used to disable tabs from within a tab specific controller
      */
     $scope.$on(IdeMsgService.msgNavBarRightDisableTab().msg, function (event, data) {
       $scope.rightBarTabs[data.slug].disabled = true;
     });
 
-
-
+    /**
+     * Listens to open tab actions
+     */
+    $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
+      $scope.splitter.expand("#ideRighterPartOfMiddlePart");
+      $scope.activeTab = data.tab;
+    });
 
   }]);
 

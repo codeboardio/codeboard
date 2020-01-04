@@ -118,6 +118,16 @@ angular.module('codeboardApp')
       };
     };
 
+    /**
+     * Returns msg object used to signal that the currently displayed project should be saved.
+     * @return {{msg: string}}
+     */
+    this.msgSaveCurrentlyDisplayedContent = function () {
+      return {
+        msg: 'ide.saveCurrentlyDisplayedContent'
+      };
+    };
+
 
     /**
      * Returns msg object used to signal that a node should be hidden/unhidden.
@@ -240,15 +250,6 @@ angular.module('codeboardApp')
       };
     };
 
-    /**
-     * Returns msg object used to signal that a student requires help.
-     * @return {{msg: string}}
-     */
-    this.msgHelpRequest = function () {
-      return {
-        msg: 'ide.HelpRequest'
-      };
-    };
 
     /**
      * Returns msg object used to signal that a student wants to reset the solution.
@@ -362,16 +363,28 @@ angular.module('codeboardApp')
       };
     };
 
-      /**
-       * This broadcast can be used to disable a navBarRightTab from within a controller
-       * @return {{msg: string}}
-       * @author Janick Michot
-       */
-      this.msgNavBarRightDisableTab = function (slug) {
-          return {
-              msg: 'ide.navBarRightDisableTab',
-              data: { "slug": slug }
-          };
+    /**
+     * This broadcast can be used to disable a navBarRightTab from within a controller
+     * @return {{msg: string}}
+     * @author Janick Michot
+     */
+    this.msgNavBarRightDisableTab = function (slug) {
+      return {
+        msg: 'ide.navBarRightDisableTab',
+        data: { "slug": slug }
       };
+    };
+
+    /**
+     * This broadcast can be used to disable a navBarRightTab from within a controller
+     * @param tabId
+     * @returns {{msg: string, data: {tabId: *}}}
+     */
+    this.msgNavBarRightOpenTab = function (tab) {
+      return {
+        msg: 'ide.navBarRightOpenTab',
+        data: { "tab": tab }
+      };
+    };
 
   });

@@ -489,13 +489,15 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         _staticFiles = staticFiles;
       }
 
-
       var lProject = {
         // the name of the project
         name: projectDataFromServer.projectname,
 
         // the last unique Id that was used to create a file
         lastUId: projectDataFromServer.lastUId,
+
+        // date of the last update (Janick Michot)
+        updatedAt: projectDataFromServer.updatedAt,
 
         // array that holds the (root) files
         files: [],
@@ -1061,14 +1063,16 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @returns a promise that resolves when a the request was completed
      * @author Janick Michot
      */
-    let requestHelp = function () {
+    let requestHelp = function (note) {
 
       // create payload
-      let payload = {};
-      payload.hasLtiData = getProject().hasLtiData;
-      payload.ltiData = getProject().ltiData;
-      payload.filesInDefaultFormat = getNodeArray(getProject().files);
-      payload.userRole = getProject().userRole;
+      let payload = {
+        note: note,
+        hasLtiData: getProject().hasLtiData,
+        ltiData: getProject().ltiData,
+        filesInDefaultFormat: getNodeArray(getProject().files),
+        userRole: getProject().userRole
+      };
 
       // create the promise that is returned
       let deferred = $q.defer();

@@ -237,13 +237,12 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
                 // we got the data from the sever but it's not in the exact form that the IdeCtrl expects
                 // thus we reformat it here; we also have to calculate the lastUId (though the user is not likely to add files)
 
-                console.log(response);
-
                 let projectData = {
                   projectname: response.data.project.projectname,
                   language: response.data.project.language,
                   userRole: $route.current.params.versionType,
-                  username: response.data.user.username // the user that's being inspected
+                  username: response.data.user.username, // the user that's being inspected
+                  updatedAt: response.data.updatedAt
                 };
 
                 // construct the fileSet
@@ -294,7 +293,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
                   language: response.data.project.language,
                   userRole: 'submission',
                   // the user that's being inspected
-                  username: response.data.user.username
+                  username: response.data.user.username,
+                  updatedAt: response.data.updatedAt
                 };
 
                 // construct the fileSet

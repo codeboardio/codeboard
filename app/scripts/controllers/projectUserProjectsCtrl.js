@@ -29,18 +29,25 @@ angular.module('codeboardApp')
 
         var _projectId = $routeParams.projectId;
 
+        console.log(_projectId);
+
         $http.get('/api/projects/' + _projectId + '/userprojects')
           .success(function(data, status, headers, config) {
+
+            console.log(data);
 
             $scope.userProjects = data;
           })
           .error(function(data, status, headers, config) {
 
+            console.log(data);
+
             $log.debug('Can not get the userprojects');
 
           });
-      }();
+      };
 
+      init();
 
       /**
        * Function to return the sum of all values stored in an array under "propertyname".

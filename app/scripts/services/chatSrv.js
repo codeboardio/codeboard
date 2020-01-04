@@ -12,18 +12,15 @@ angular.module('codeboardApp')
         /**
          * add chat line
          */
-        let addChatLine = function(aMessage) {
+        let addChatLine = function(aMessage, type = 'text') {
             // data used for this call
             let username = ProjectFactory.getProject().userBeingInspected || UserSrv.getUsername(),
                 projectId = $routeParams.projectId,
                 payload = {
-                    aMessage: aMessage,
-                    author: UserSrv.getUsername()
+                    aMessage: (typeof aMessage === 'object') ? JSON.stringify(aMessage) : aMessage,
+                    author: UserSrv.getUsername(),
+                    type: type
                 };
-
-            console.log(username);
-            console.log(projectId);
-            console.log(payload);
 
             // create the promise that is returned
             let deferred = $q.defer();
