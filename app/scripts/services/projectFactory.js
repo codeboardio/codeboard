@@ -82,7 +82,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @param uniqueId {number} the unique id of this node within the scope of the project
      * @param parentUId {number} the unique id of the parent node of this node
      * @param {Object|*} options optional object with properties.
-     * Supported properties are 'id' (default -1), 'isFolder' (default false), 'content' (default ''), 'isHidden' (default false)
+     * Supported properties are 'id' (default -1), 'isFolder' (default false), 'content' (default ''), 'isHidden' (default false), 'isStatic' (default false)
      * @returns {Object} the newly created node object.
      */
     var getNewNode = function (filename, path, uniqueId, parentUId, options) {
@@ -97,6 +97,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       n.isFolder = options.isFolder || false;
       n.content = options.content || '';
       n.isHidden = options.isHidden || false;
+      n.isStatic = options.isStatic || false;
 
       // now we add properties that are not stored in the db.
 
@@ -163,45 +164,62 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       else {
         return false;
       }
-    }
-
-
-    /**
-     * @description Hides or unhides a node, depending on wheather it's currently hidden or not.
-     * @param aNode the node to hide or unhide
-     */
-    var setNodeHidden = function (aNode) {
-      aNode.isHidden = !aNode.isHidden;
-
-      // update the annotated filename
-      aNode.filename_annotated = aNode.filename + getNodeAnnotation(aNode);
-    }
-
+    };
 
     /**
      * Returns an annotation string, e.g. '(h)', that indicates the properties of a node.
      * @param aNode the node for which the annoation string should be calculated
      * @returns {string} the string represents the annotation that should be added the filename
      */
-    var getNodeAnnotation = function (aNode) {
+    let getNodeAnnotation = function (aNode) {
 
       var result = '';
 
-      if (aNode.isHidden /* or some other node property is true */) {
+      if (aNode.isHidden || aNode.isStatic /* or some other node property is true */) {
 
         // the opening bracket
         result += ' (';
 
         // the character used to indicate that a file is hidden
-        if (aNode.isHidden)
+        if (aNode.isHidden) {
           result += 'h';
+        }
+        // the character used to indicate that a file is uneditable
+        else if (aNode.isStatic) {
+          result += 's';
+        }
 
         // the closing bracket
         result += ')';
       }
 
       return result;
-    }
+    };
+
+    /**
+     * Hides or unhides a node, depending on wheather it's currently hidden or not.
+     * @param aNode the node to hide or unhide
+     */
+    let setNodeHidden = function (aNode) {
+      aNode.isHidden = !aNode.isHidden;
+
+      // update the annotated filename
+      aNode.filename_annotated = aNode.filename + getNodeAnnotation(aNode);
+    };
+
+    /**
+     * Toggle if a node is static or not
+     * @param aNode the node to make static or not
+     * @author Janick Michot
+     */
+    let setNodeStatic = function (aNode) {
+      aNode.isStatic = !aNode.isStatic;
+
+      // update the annotated filename
+      aNode.filename_annotated = aNode.filename + getNodeAnnotation(aNode);
+    };
+
+
 
     /**
      * @private
@@ -273,7 +291,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
             isFolder: aNode.isFolder,
             id: aNode.id, // the database id
             content: aNode.content,
-            isHidden: aNode.isHidden
+            isHidden: aNode.isHidden,
+            isStatic: aNode.isStatic,
           }
         );
 
@@ -467,27 +486,12 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @param ltiData {Object} (optional) an object containing
      * @param staticFiles {Array} (optional) an array that
      */
-    var setProjectFromJSONdata = function (projectDataFromServer, ltiData, staticFiles) {
-
-      // default values for the two optional parameters
-      var _ltiData = {}, _staticFiles = [];
+    var setProjectFromJSONdata = function (projectDataFromServer, ltiData) {
 
       // set the lastCompilationId to be empty
       // Otherwise we might switch to a different project
       // but still use the lastCompilationId from the previous project
       lastCompilationId = '';
-
-
-      if(Object.prototype.toString.call(arguments[1]) === '[object Object]') {
-        _ltiData = arguments[1];
-      }
-      else if (Object.prototype.toString.call(arguments[1]) === '[object Array]') {
-        _staticFiles = arguments[1];
-      }
-
-      if(Object.prototype.toString.call(arguments[2]) === '[object Array]') {
-        _staticFiles = staticFiles;
-      }
 
       var lProject = {
         // the name of the project
@@ -515,16 +519,13 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         userRole: projectDataFromServer.userRole,
 
         // name of the user being inspected; the username only exists if we're looking at a submission or a userproject
-        userBeingInspected: projectDataFromServer.username ? projectDataFromServer.username : null,
-
-        // static files are library files (currently only used for Eiffel)
-        staticFiles: _staticFiles
+        userBeingInspected: projectDataFromServer.username ? projectDataFromServer.username : null
       };
 
       setProject(lProject);
 
       // set any Lti data for this project
-      setLtiData(_ltiData);
+      setLtiData(ltiData);
 
       // get files (in flat from) as the server returned them
       // Note: for now we assume that projectDataFromServer always has a .fileSet property with at least 1 file
@@ -551,7 +552,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
           content: files[0].content,
           isFolder: files[0].isFolder,
           id: files[0].id,
-          isHidden: files[0].isHidden
+          isHidden: files[0].isHidden,
+          isStatic: files[0].isStatic
         }
       );
 
@@ -606,7 +608,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
             parentUId: array[i].parentUId,
             isFolder: array[i].isFolder,
             id: array[i].id,
-            isHidden: array[i].isHidden
+            isHidden: array[i].isHidden,
+            isStatic: array[i].isStatic
           }
         ];
 
@@ -1102,6 +1105,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       getNode: getNode,
       hasNode: hasNode,
       setNodeHidden: setNodeHidden,
+      setNodeStatic: setNodeStatic,
       setProjectFromJSONdata: setProjectFromJSONdata,
       saveProjectToServer: saveProjectToServer,
       compileProject: compileProject,

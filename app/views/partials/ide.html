@@ -58,6 +58,7 @@
 
                            <li ng-show="currentRoleIsOwner()" class="divider"></li>
                            <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
+                           <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('make_file_static')">Make file static or not</a></li>
 
                            <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
                            <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
@@ -205,9 +206,10 @@
               <!-- everything related to the editor -->
                 <div ng-controller="TabCtrl" id="ideTabArea"> <!-- the tabs -->
                   <ul class="ideTabs">
-                    <li ng-repeat="tab in tabs" ng-class="{ideTabActive: tab.isActive}" ng-click="selectClick(tab.arrayIndex)" style="float: left;">
+                    <li ng-repeat="tab in tabs" ng-class="{ideTabActive: tab.isActive, ideTabStatic: tab.isStatic}" ng-click="selectClick(tab.arrayIndex)" style="float: left;">
+                      <i ng-show="tab.isStatic" title="Dieser Tab kann nicht bearbeitet werden" class="isStatic-icon glyphicon glyphicon-eye-open"></i>
                       <span title="{{tab.title}}">{{tab.name}}</span>
-                        <span class="remove glyphicon glyphicon-remove" ng-click="closeClick(tab.arrayIndex)"></span>
+                      <span class="remove glyphicon glyphicon-remove" ng-click="closeClick(tab.arrayIndex)"></span>
                     </li>
                   </ul>
                 </div>
@@ -249,21 +251,16 @@
             </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
 
             <div id="ideRighterPartOfMiddlePart" class="ideSplitterFullHeight">
-
                 <div class="ide-tabs" ng-repeat="(slug, tab) in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(slug)"></div>
-
-            </div> <!-- end of left-part split-->
+            </div>
 
             <div id="ideRightestPartOfMiddlePart" class="ideSplitterFullHeight">
-
                 <div class="ideAdditionalTabs">
                     <a tab-click ng-repeat="(slug, tab) in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(slug)" class="tab tab-{{slug}}" id="rightBarTabs{{slug}}">
                         <span class="glyphicon {{tab.icon}}"></span>{{tab.title}}
                     </a>
                 </div>
-
-
-            </div> <!-- end of left-part split-->
+            </div>
 
 
 

@@ -116,7 +116,7 @@ app.controller('IdeCtrl',
 
 
                 // update the project data in the ProjectFactory
-                ProjectFactory.setProjectFromJSONdata(userProjectData, ltiData, ProjectFactory.getProject().staticFiles);
+                ProjectFactory.setProjectFromJSONdata(userProjectData, ltiData);
 
 
                 // make sure the Tree reloads and shows the user's version
@@ -812,7 +812,7 @@ app.controller('IdeCtrl',
             };
 
             // update the project data in the ProjectFactory
-            ProjectFactory.setProjectFromJSONdata(result, ltiData, ProjectFactory.getProject().staticFiles);
+            ProjectFactory.setProjectFromJSONdata(result, ltiData);
 
             // reload tree view
             $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
@@ -1007,6 +1007,10 @@ app.controller('IdeCtrl',
             req = IdeMsgService.msgHideNodeRequest();
             $rootScope.$broadcast(req.msg);
             break;
+          case ('make_file_static'):
+            req = IdeMsgService.msgMakeNodeStaticNodeRequest();
+            $rootScope.$broadcast(req.msg);
+            break;
           case ('show_share_project'):
             req = IdeMsgService.msgShowShareProjectModalRequest();
             $rootScope.$broadcast(req.msg);
@@ -1179,38 +1183,15 @@ app.controller('IdeCtrl',
             });
           });
 
-          // Note: this relates to static files only (only they have a isContentSet property and a url for now)
-          if(lNode.url && !lNode.isContentSet) {
-            $http
-              .get(lNode.url)
-              .success(function(result) {
-
-                $log.debug('Got HTTP response for content of the file');
-
-                // we store the content so the next time we don't need to load it from the server
-                ProjectFactory.getNode(aMsgData.nodeId).content = result;
-                ProjectFactory.getNode(aMsgData.nodeId).isContentSet = true;
-
-                $scope.ace.editor.getSession().setValue(result);
-
-              })
-              .error(function(err) {
-                $log.debug(err);
-              });
-
-          }
+          console.log(lNode.isStatic);
         }
 
-
-        // if the currently displayed nodeId indicates that we're displaying a static file, we need to make the editor read-only
-        if(typeof(aMsgData.nodeId) === 'string' && aMsgData.nodeId.charAt(0) === 's') {
+        // if the currently displayed node is static set editor to ready only (Janick Michot)
+        if(ProjectFactory.getNode(aMsgData.nodeId).isStatic && !$scope.currentRoleIsOwner()) {
           $scope.ace.editor.setReadOnly(true);
-        }
-        else {
-          // otherwise the user is allowed to edit the file
+        } else {
           $scope.ace.editor.setReadOnly(false);
         }
-
 
         // update the information about which node is currently displayed in the editor
         $scope.ace.currentNodeId = aMsgData.nodeId;
@@ -1866,7 +1847,6 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
   $scope.$on(IdeMsgService.msgHideNodeRequest().msg, function () {
     $log.debug('Hide_node request received');
 
-
     var lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
 
     if(lSelectedNodeUId > 0) {
@@ -1877,8 +1857,25 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
     else {
       console.log("The root folder can't be hidden.");
     }
+  });
 
 
+  /**
+   * Listens for the event that node should be uneditable.
+   * If received the currently selected node will be uneditable or editable, depending on its current status.
+   * @author Janick Michot
+   */
+  $scope.$on(IdeMsgService.msgMakeNodeStaticNodeRequest().msg, function () {
+    $log.debug('Uneditable_node request received');
+
+    var lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
+
+    if(lSelectedNodeUId > 0) {
+      ProjectFactory.setNodeStatic(ProjectFactory.getNode(lSelectedNodeUId));
+      $log.debug('Node is hidden: ' + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
+    } else {
+      console.log("The root folder can't be uneditable.");
+    }
   });
 
 
@@ -1983,6 +1980,8 @@ app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'Project
       // get the node for which a tab should be added
       var lRequestedNode = ProjectFactory.getNode(aMsgData.nodeId);
 
+      console.log(lRequestedNode);
+
       // push a new tab to the list of tabs
       $scope.tabs.push(
         {
@@ -1990,7 +1989,8 @@ app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'Project
           title: lRequestedNode.path + '/' + lRequestedNode.filename,
           nodeIndex: aMsgData.nodeId,
           arrayIndex: $scope.tabs.length,
-          isActive: false
+          isActive: false,
+          isStatic: (lRequestedNode.isStatic && !$scope.currentRoleIsOwner()) ? true : false
         });
 
       //make the new tab active (this call will also make the previous active tab inactive)

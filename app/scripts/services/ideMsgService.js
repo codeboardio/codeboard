@@ -139,6 +139,17 @@ angular.module('codeboardApp')
       };
     };
 
+    /**
+     * Returns msg object used to signal that a node should be static or not.
+     * @author Janick Michot
+     * @return {{msg: string}}
+     */
+    this.msgMakeNodeStaticNodeRequest = function () {
+      return {
+        msg: 'ide.uneditableNodeRequest'
+      };
+    };
+
 
     /**
      * Returns msg object used to signal that project should be compiled.

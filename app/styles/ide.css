@@ -184,6 +184,18 @@ body {
   color: #777;
 }
 
+.ideTabs li.ideTabStatic {
+  background: rgb(255,53,58);
+  background: linear-gradient(90deg, rgba(255,53,58,1) 0%, rgba(255,94,98,1) 100%);
+  color: #fff;
+}
+.ideTabs li.ideTabStatic .isStatic-icon {
+  margin-right: 5px;
+}
+.ideTabs li.ideTabStatic .remove {
+  color: #fff;
+}
+
 .ideTabs li .remove {
     font-size: 7px;
     padding-left: 5px;
