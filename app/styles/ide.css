@@ -3,7 +3,7 @@ body {
     overflow-x: hidden;
 }
 
-
+/** - - - - - - - IDE Header - - - - - - - */
 .ideHeader {
   width: 100%;
   /* height: 54px; /* set the header to the same height as the navbar */
@@ -17,6 +17,101 @@ body {
 
 .ideHeader .navbar-form .nav-item {
   margin-left: 5px;
+}
+
+.ideHeader .projectTitle {
+  font-size: 1.2em;
+  font-weight: 900;
+  color: #5697c2;
+  margin: 10px 0;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#ideNavBar {
+  border-radius: 0;
+  margin-bottom: 0;
+  background-color: #f5f5f5;
+}
+
+.navbar-brand {
+  padding-left: 15px;
+  padding-top: 5px;
+}
+
+.dropdown {
+  /* want a pointer for all the menus */
+  /* we don't get it by default because we don't provide a href in the <a> element */
+  cursor: pointer !important;
+}
+
+
+/** - - - - - - - Main Content of IDE - - - - - - - */
+#ideTabArea {
+  overflow-y: auto; /* if we have too many tabs, a scroll bar appears */
+  padding: 0;
+  height: 30px;
+  margin-top: 20px;
+}
+
+#ideRightPartOfMiddlePart {
+  background-color: #e7e7e7;
+}
+
+/* Make sure the kendo-splitter is not visible in the treeview where it splits the project-name and the LibraryCtrl */
+#ideTreeviewPartOfMiddlePart .k-splitbar {
+  background-color: #ffffff;
+}
+
+/* hide kendo-splitter between right-content and right-icon */
+#ideRighterPartOfMiddlePart + .k-splitbar {
+  display: none;
+}
+
+#ideRightestPartOfMiddlePart {
+  background-color: #4a80a5;
+  padding-top: 5px;
+}
+
+.ideSplitterOverflowVisible {
+  overflow: visible !important;
+}
+
+.ideSplitterFullHeight {
+  height: 100%;
+}
+
+.ace_gutter {
+  /* overwrite the ace gutter bg-color to match the bootstrap gray */
+  background-color: #e7e7e7 !important;
+  /* width: 50px !important;  static width */
+  border-right: 0 !important;
+}
+.ace_gutter,
+.ace_content {
+  padding: 10px 0;
+}
+
+#ace_editor {
+  border-top: 0 !important;
+  height: 100%;
+  width: 100%;
+  padding-bottom: 20px; /* damit verschwindet scrollbar-y */
+}
+
+/* Override Kendo, to prevent bootstrap grid */
+*[class^='col'] {
+  box-sizing: border-box !important;
+}
+
+
+/** - - - Tree View - - - */
+.ideTree {
+  height: 100%;
+  overflow: auto;
 }
 
 #ideTreeViewProjectName {
@@ -37,130 +132,11 @@ body {
   white-space: nowrap;
 }
 
-.ideHeader .projectTitle {
-  font-size: 1.2em;
-  font-weight: 900;
-  color: #5697c2;
-  margin: 10px 0;
-  padding: 4px 6px;
-  border: 1px solid #ccc;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.ideHeader .projectTitle span {
-
-}
-
-
-#ideTabArea {
-  overflow-y: auto; /* if we have too many tabs, a scroll bar appears */
-  padding: 0;
-  height: 30px;
-  margin-top: 20px;
-
-}
-
-.dropdown {
-  /* want a pointer for all the menus */
-  /* we don't get it by default because we don't provide a href in the <a> element */
-  cursor: pointer !important;
-}
-
-.ideFooter {
-  position: absolute;
-  height: 204px;
-  width: 100%;
-  bottom: 0;
-  background-color: #e7e7e7;
-}
-
-.ideOutput {
-  overflow: auto;
-  background-color: #222;
-  color: #aaa;
-  white-space: pre;
-  padding: 10px;
-  position: absolute;
-  top: 3px;
-  bottom: 25px;
-  left: 3px;
-  right: 3px;
-
-}
-
-.ideOutputText {
-  font-family: monospace;
-  font-size: 12px;
-  line-height: 1.42857143;
-}
-
-.ideOutputBorder {
-  border: 0;
-}
-
-.ideFooterStatusBar {
-  height: 18px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 1px;
-  border-top: 1px solid #e7e7e7;
-  font-size: 11px;
-  color: #777;
-  overflow: hidden;
-  background-color: #f5f5f5;
-}
-
-.ideTree {
-  /*position: absolute; */
-  /* width: 220px; */
-  height: 100%;
-  overflow: auto;
-}
-
-.ideEditorArea {
-  /* padding-left: 220px; */
-  /* height:100%; */
-  overflow: auto;
-}
-
-.ideEditor {
-  border-top: 1px solid #9f9f9f;
-}
-
-#ideAceNotVisible {
-  background-color: #e7e7e7;
-  /* height: 100%; */
-}
-
-#ideMsgNoFilesOpen {
-  text-align: center;
-  padding-top: 100px;
-  color: #a9a9a9;
-}
-
-#ideMsgNotSignedIn {
-  max-width: 300px;
-  text-align: center;
-  margin: 0 auto;
-  margin-top: 25px;
-}
-
-.ideSplitterOverflowVisible {
-  overflow: visible !important;
-}
-
-.ideSplitterFullHeight {
-  height: 100%;
-}
-
+/** - - - IDE Tabs - - - */
 .ideTabs {
-  /* margin-top: 2px;*/
   margin-bottom: 0;
-  margin-left: 40px;
+  margin-left: 47px;
   padding: 0;
-  /* background-color: #e8e8e8; */
 }
 
 .ideTabs li {
@@ -209,44 +185,259 @@ body {
   margin: 0 0 0 4px;
 }
 
-#ideNavBar {
-  border-radius: 0;
-  margin-bottom: 0;
-  background-color: #f5f5f5;
+
+
+/* - - - Main Area - - - */
+#ideEditorAndConsole {
+  height: calc(100% - 50px);
+  overflow: hidden;
+}
+.ideEditor {
+  overflow: hidden;
 }
 
-.navbar-brand {
-  padding-left: 15px;
-  padding-top: 5px;
+.ideEditorArea {
+  height:100%;
+  overflow: hidden !important;
 }
 
-.ace_gutter {
-  /* overwrite the ace gutter bg-color to match the bootstrap gray */
-  background-color: #e7e7e7 !important;
-  width: 40px !important; /* static width */
-  border-right: 0 !important;;
+.ideEditor {
+  border-top: 1px solid #9f9f9f;
 }
 
-#ace_editor {
-  border-top: 0 !important;
-  /* height: 100%; */
+#ideAceNotVisible {
+  background-color: #e7e7e7;
+  height: 100%;
+}
+
+#ideMsgNoFilesOpen {
+  text-align: center;
+  padding-top: 100px;
+  color: #a9a9a9;
+}
+
+#ideMsgNotSignedIn {
+  max-width: 300px;
+  text-align: center;
+  margin: 25px auto 0;
+}
+
+
+
+
+/* - - - Console - - - */
+.ideOutput {
+  overflow: auto;
+  background-color: #222;
+  color: #aaa;
+  white-space: pre;
+  padding: 10px;
+  height: calc(100% - 70px);
+}
+
+.ideOutputText {
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.42857143;
+}
+
+.ideOutputBorder {
+  border: 0;
+}
+
+/* - - - User Input - - - */
+.ideFooter {
+  overflow: hidden !important;
+  z-index: 999;
   width: 100%;
-  /*padding-bottom: 40px; /* padding for the tab bar */
-  position: absolute;
-  top: 49px;
-  bottom: 0px;
-}
-
-
-#ideRightPartOfMiddlePart {
   background-color: #e7e7e7;
 }
 
-/* Make sure the kendo-splitter is not visible in the treeview where it splits the project-name and the LibraryCtrl */
-#ideTreeviewPartOfMiddlePart .k-splitbar {
-  background-color: #ffffff;
+.ideFooter .userInput {
+  width: 100%;
+  background: #333;
+  border-top: 1px solid #e7e7e7;
+  height: 40px;
+  overflow: hidden;
+}
+.ideFooter .userInput:after {
+  content: "";
+  clear: both;
 }
 
+
+.ideFooter .userInputField {
+  box-sizing: border-box;
+  width: 80%;
+  float:left;
+
+}
+.ideFooter .userInputField .glyphicon {
+  pointer-events: none;
+  color: #666;
+  display: inline-block;
+  padding: 10px;
+}
+
+.ideFooter #idFooterUserInput {
+  height: 40px;
+  width: 80%;
+  line-height: 40px;
+  color: #aaa;
+  background: none;
+}
+
+.ideFooter .userInputButton {
+  float: right;
+  width: 20%;
+  text-align: right;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+
+/** - - - Additional Tabs - - - */
+.ideAdditionalTabs .tab {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  color: #eee;
+  display: inline-block;
+  width: 26px;
+  line-height: 26px;
+  font-weight: 300;
+  cursor: pointer;
+  font-size: 0.75em;
+  border-bottom: 4px solid #d0d0d0;
+}
+
+.ideAdditionalTabs .tab .glyphicon {
+  margin-bottom: 3px;
+}
+
+/** todo nachfolgenden css-Angaben in separates File **/
+
+.ide-tabs .tab-body {
+  padding: 20px;
+  font-size: 0.8em;
+}
+.ide-tabs .tab-body h1 {
+  font-size: 20px;
+}
+.ide-tabs .tab-body h2 {
+  font-size: 16px;
+}
+.ide-tabs .tab-body h3 {
+  font-size: 13px;
+}
+.ide-tabs .tab-body h4 {
+  font-size: 11px;
+}
+.ide-tabs .tab-body h1,
+.ide-tabs .tab-body h2,
+.ide-tabs .tab-body h3,
+.ide-tabs .tab-body h4 {
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+.ide-tabs .tab-body pre {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+
+/* - - - Footer Status Bar - - - */
+.ideFooterStatusBar {
+  height: 18px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 1px;
+  border-top: 1px solid #e7e7e7;
+  font-size: 11px;
+  color: #777;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+
+
+
+
+
+
+/** todo alle CSS-Angaben zu Buttons und Spinners in main.css */
+
+/* - - Growing Spinner -- */
+@keyframes spinner-grow {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.spinner-grow {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  vertical-align: text-bottom;
+  background-color: #0064a6;
+  border-radius: 50%;
+  opacity: 0;
+  animation: spinner-grow .9s linear infinite;
+}
+
+/** Spinninc Glyphicons **/
+.gly-spin {
+    -webkit-animation: spin 2s infinite linear;
+    -moz-animation: spin 2s infinite linear;
+    -o-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+}
+@-moz-keyframes spin {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        -moz-transform: rotate(359deg);
+    }
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+    }
+}
+@-o-keyframes spin {
+    0% {
+        -o-transform: rotate(0deg);
+    }
+    100% {
+        -o-transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+
+
+
+
+
+/** - - - Buttons - - - */
 
 
 .btn {
@@ -330,17 +521,13 @@ fieldset[disabled] .btn:hover {
 }
 
 
-/* Override Kendo, to prevent bootstrap grid */
-*[class^='col'] {
-  box-sizing: border-box !important;
-}
 
 
-
+/** todo CSS-Angaben zu Test in separates File? */
 /* ioTests */
 
 .modal-content {
-    border-radius: 0;
+  border-radius: 0;
 }
 
 .modal-dialog{
@@ -366,8 +553,8 @@ fieldset[disabled] .btn:hover {
 /* Processing */
 .modalAccordion .panel-heading.processing,
 .modalAccordion .panel-heading.processing a {
-    background-color: #ddd;
-    color: #bbb !important;
+  background-color: #ddd;
+  color: #bbb !important;
 }
 .modalAccordion .panel-heading.processing .glyphicon:before {
   content: "\e030";
@@ -430,8 +617,8 @@ fieldset[disabled] .btn:hover {
 /* Compile :: Success */
 .modalAccordion .compileTest .panel-heading.success,
 .modalAccordion .compileTest .panel-heading.success a {
-    background: #a7d5e6;
-    color: #5c89af !important;
+  background: #a7d5e6;
+  color: #5c89af !important;
 }
 
 /* disable click events */
@@ -484,183 +671,4 @@ fieldset[disabled] .btn:hover {
 .list-group-item,
 .list-group-item:hover{
   z-index: auto !important;
-}
-
-
-
-/** - - - Additional Tabs - - - */
-
-#ideRighterPartOfMiddlePart + #ideRightestPartOfMiddlePart {
-  display: none;
-}
-
-#ideRightestPartOfMiddlePart {
-  background-color: #4a80a5;
-  padding-top: 5px;
-}
-
-.ideAdditionalTabs .tab {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-  color: #eee;
-  display: inline-block;
-  width: 26px;
-  line-height: 26px;
-  font-weight: 300;
-  cursor: pointer;
-  font-size: 0.75em;
-  border-bottom: 4px solid #d0d0d0;
-}
-
-.ideAdditionalTabs .tab .glyphicon {
-  margin-bottom: 3px;
-}
-
-/** - - - Additional Tab Content - - - */
-
-.ide-tabs .tab-body {
-  padding: 12px;
-  font-size: 0.8em;
-}
-.ide-tabs .tab-body h1 {
-  font-size: 20px;
-}
-.ide-tabs .tab-body h2 {
-  font-size: 16px;
-}
-.ide-tabs .tab-body h3 {
-  font-size: 13px;
-}
-.ide-tabs .tab-body h4 {
-  font-size: 11px;
-}
-.ide-tabs .tab-body h1,
-.ide-tabs .tab-body h2,
-.ide-tabs .tab-body h3,
-.ide-tabs .tab-body h4 {
-  margin-top: 14px;
-  margin-bottom: 6px;
-}
-
-.ide-tabs .tab-body pre {
-  font-size: 11px;
-  line-height: 1.2;
-}
-
-
-  /* - - - Footer - - - */
-.ideFooter {
-  overflow: hidden !important;
-  z-index: 999;
-}
-
-.ideFooter .userInput {
-  position: absolute;
-  bottom: 2px;
-  left: 3px;
-  right: 3px;
-  background: #333;
-  border-top: 1px solid #e7e7e7;
-}
-.ideFooter .userInput:after {
-  content: "";
-  clear: both;
-}
-.ideFooter .userInputField {
-  box-sizing: border-box;
-  float: left;
-  width: 100%;
-}
-.ideFooter .userInputButton {
-  position: absolute;
-  right: 3px;
-  top: 3px;
-}
-
-.ideFooter #idFooterUserInput {
-  width: 100%;
-  height: 30px;
-  line-height: 30px;
-  padding-left: 50px;
-  color: #aaa;
-  background: none;
-}
-.ideFooter .userInputField .glyphicon {
-  position: absolute;
-  padding: 8px 12px;
-  pointer-events: none;
-  left: 0px;
-  color: #666;
-}
-
-
-
-
-/**
- * Loading Animations
- */
-
-/* - - Growing Spinner -- */
-@keyframes spinner-grow {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.spinner-grow {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  vertical-align: text-bottom;
-  background-color: #0064a6;
-  border-radius: 50%;
-  opacity: 0;
-  animation: spinner-grow .9s linear infinite;
-}
-
-/** Spinninc Glyphicons **/
-.gly-spin {
-    -webkit-animation: spin 2s infinite linear;
-    -moz-animation: spin 2s infinite linear;
-    -o-animation: spin 2s infinite linear;
-    animation: spin 2s infinite linear;
-}
-@-moz-keyframes spin {
-    0% {
-        -moz-transform: rotate(0deg);
-    }
-    100% {
-        -moz-transform: rotate(359deg);
-    }
-}
-@-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(359deg);
-    }
-}
-@-o-keyframes spin {
-    0% {
-        -o-transform: rotate(0deg);
-    }
-    100% {
-        -o-transform: rotate(359deg);
-    }
-}
-@keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
 }
