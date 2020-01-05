@@ -255,12 +255,12 @@
             </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
 
             <div id="ideRighterPartOfMiddlePart" class="ideSplitterFullHeight">
-                <div class="ide-tabs" ng-repeat="(slug, tab) in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(slug)"></div>
+                <div class="ide-tabs" ng-repeat="tab in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(tab.slug)"></div>
             </div>
 
             <div id="ideRightestPartOfMiddlePart" class="ideSplitterFullHeight">
                 <div class="ideAdditionalTabs">
-                    <a tab-click ng-repeat="(slug, tab) in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(slug)" class="tab tab-{{slug}}" id="rightBarTabs{{slug}}">
+                    <a tab-click ng-repeat="tab in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(tab.slug)" class="tab tab-{{tab.slug}}" id="rightBarTabs{{tab.slug}}">
                         <span class="glyphicon {{tab.icon}}"></span>{{tab.title}}
                     </a>
                 </div>

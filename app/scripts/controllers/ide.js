@@ -561,13 +561,6 @@ app.controller('IdeCtrl',
 
         $scope.testResult = 0;
 
-
-        $scope.splitter.expand("#ideRighterPartOfMiddlePart");
-
-        // let req = IdeMsgService.msgDisplayFileRequest($scope.ace.currentNodeId, true);
-        // $rootScope.$broadcast(req.msg, req.data);
-
-
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
@@ -1418,7 +1411,14 @@ app.controller('IdeCtrl',
       /** Handles a "testRequested" event */
       $scope.$on(IdeMsgService.msgTestRequest().msg, function () {
         $log.debug('Test request received');
-        testProject();
+
+        // the old way
+        // testProject();
+
+        // todo the new way
+        let req = IdeMsgService.msgTestRequestNew();
+        $rootScope.$broadcast(req.msg);
+
         // set the focus on the editor so user can start typing right away
         $scope.ace.editor.focus();
       });
@@ -2135,6 +2135,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
 
     // tab for project description
     $scope.rightBarTabs.description = {
+      slug: "description",
       title: "Aufgabenbeschreibung",
       disabled: false,
       icon: "glyphicon-education",
@@ -2143,13 +2144,15 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
 
     // tab for tips related to this project
     $scope.rightBarTabs.tips = {
+      slug: "tips",
       title: "Tipps",
       icon: "glyphicon-list-alt",
       contentURL: "partials/navBarRight/navBarRightTips"
     };
 
     // tab for test result
-    $scope.rightBarTabs.testResult = {
+    $scope.rightBarTabs.test = {
+      slug: "test",
       title: "Testresulat",
       icon: "glyphicon-list-alt",
       contentURL: "partials/navBarRight/navBarRightTestResult"
@@ -2157,6 +2160,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
 
     // tab for help / chat
     $scope.rightBarTabs.help = {
+      slug: "help",
       title: "Hilfe",
       icon: "glyphicon-comment",
       contentURL: "partials/navBarRight/navBarRightHelp"

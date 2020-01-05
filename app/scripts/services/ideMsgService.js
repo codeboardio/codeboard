@@ -239,6 +239,16 @@ angular.module('codeboardApp')
       };
     };
 
+    /**
+     * Returns msg object used to signal that project should be tested.
+     * @return {{msg: string}}
+     */
+    this.msgTestRequestNew = function () {
+      return {
+        msg: 'ide.testRequestNew'
+      };
+    };
+
 
     /**
      * Returns msg object used to signal that project should be tested.

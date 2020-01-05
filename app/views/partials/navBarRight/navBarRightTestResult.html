@@ -1,6 +1,36 @@
 
-<div>
+<div id="ide-tab-test" class="tab-body" ng-controller="ideTabTestCtrl">
 
-    Inhalt von `navBarRightTestResult`;
+    <h1 class="ide-tab-title ide-tab-title-test" ng-bind="title"></h1>
 
+    <p class="ide-tab-test-description">{{textBefore}}</p>
+
+    <!-- Accordion with ioTests -->
+    <div class="panel-group modalAccordion" id="ioTestsAccordion">
+        <div ng-repeat="test in tests" class="panel panel-default {{test.method}}">
+            <div class="panel-heading {{test.status}}">
+                <a data-target="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
+                    <span class="title" title="{{test.name}}">{{test.name}}</span>
+                    <span ng-class="{'gly-spin': (test.status === 'processing')}" class="pull-right flag glyphicon {{test.status}}" aria-hidden="true"></span>
+                </a>
+            </div>
+
+            <div id="ioTest{{$index}}" class="panel-collapse collapse">
+                <div ng-include="getTestMethodOutput(test.method)"></div>
+            </div>
+        </div>
+    </div>
+
+    <button ng-show="inProgress" class="btn btn-default btn-100">
+        Test beenden (ToDo)
+    </button>
+
+    <button ng-hide="inProgress" class="btn btn-success btn-100" ng-click="doTheIoTesting()">
+        <span class="glyphicon glyphicon-check"></span>
+        <span ng-bind="ioTestButtonText"></span>
+    </button>
+
+    <button ng-show="(testResult !== 1)" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="closeModal(); helpAfterTest()" title="Hilfe anfordern">
+        <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
+    </button>
 </div>
