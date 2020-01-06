@@ -3,6 +3,10 @@ body {
     overflow-x: hidden;
 }
 
+* {
+  box-sizing: border-box !important;
+}
+
 /** - - - - - - - IDE Header - - - - - - - */
 .ideHeader {
   width: 100%;
@@ -142,7 +146,7 @@ body {
 .ideTabs li {
   list-style-type: none;
   border: 0;
-  padding: 6px 8px;
+  padding: 10px 8px;
   margin-right: 4px;
   background-color: #fff;
   cursor: pointer;
@@ -150,7 +154,7 @@ body {
   font-size: 0.75em;
   font-weight: bold;
   color: #bbb;
-  height: 17px;
+  height: 30px;
   line-height: 15px;
 }
 
@@ -230,9 +234,8 @@ body {
   overflow: auto;
   background-color: #222;
   color: #aaa;
-  white-space: pre;
   padding: 10px;
-  height: calc(100% - 70px);
+  height: 100%;
 }
 
 .ideOutputText {
@@ -245,56 +248,37 @@ body {
   border: 0;
 }
 
-/* - - - User Input - - - */
-.ideFooter {
-  overflow: hidden !important;
-  z-index: 999;
-  width: 100%;
-  background-color: #e7e7e7;
+.ideUserInput {
+    position: relative;
+    display: inline-block;
+}
+.ideUserInput input {
+  border: 0;
+  background: 0;
+  outline: 0;
+  font-weight: 900;
+}
+.ideUserInput i {
+    position: absolute;
+    width: 1px;
+    height: 80%;
+    background-color: gray;
+    left: 0;
+    top: 10%;
+    animation-name: blink;
+    animation-duration: 800ms;
+    animation-iteration-count: infinite;
+    opacity: 1;
 }
 
-.ideFooter .userInput {
-  width: 100%;
-  background: #333;
-  border-top: 1px solid #e7e7e7;
-  height: 40px;
-  overflow: hidden;
-}
-.ideFooter .userInput:after {
-  content: "";
-  clear: both;
+.ideUserInput input:focus + i {
+    display: none;
 }
 
-
-.ideFooter .userInputField {
-  box-sizing: border-box;
-  width: 80%;
-  float:left;
-
+@keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
-.ideFooter .userInputField .glyphicon {
-  pointer-events: none;
-  color: #666;
-  display: inline-block;
-  padding: 10px;
-}
-
-.ideFooter #idFooterUserInput {
-  height: 40px;
-  width: 80%;
-  line-height: 40px;
-  color: #aaa;
-  background: none;
-}
-
-.ideFooter .userInputButton {
-  float: right;
-  width: 20%;
-  text-align: right;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
 
 /** - - - Additional Tabs - - - */
 .ideAdditionalTabs .tab {

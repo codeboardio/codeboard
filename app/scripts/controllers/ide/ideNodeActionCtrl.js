@@ -51,7 +51,7 @@ app.controller('IdeNodeActionCtrl', ['$scope', '$rootScope', '$uibModal', '$log'
           label: 'Enter the name of the new file:',
           btnOk: 'Add file',
           btnCancel: 'Cancel'
-        }
+        };
 
 
         // During initialization of the controller we set the correct labels
@@ -86,7 +86,7 @@ app.controller('IdeNodeActionCtrl', ['$scope', '$rootScope', '$uibModal', '$log'
         $scope.submit = function(formData) {
           $scope.data.nodeName = formData.nodeName;
           $scope.ok();
-        }
+        };
 
 
         /**

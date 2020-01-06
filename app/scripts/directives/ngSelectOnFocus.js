@@ -23,5 +23,5 @@ angular.module('codeboardApp')
           }, 10);
         });
       }
-    }
+    };
   }]);

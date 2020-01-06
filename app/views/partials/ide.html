@@ -150,12 +150,6 @@
 
                             <ul class="dropdown-menu">
                               <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
-
-                              <li ng-show="currentRoleIsOwner()" >
-                                <a ng-click="navBarClick('show_output_as_text')">
-                                  <span ng-show="uiSettings.showOutputAsText" class="glyphicon glyphicon-ok"></span> Show output as text
-                                </a>
-                              </li>
                             </ul>
                           </div>
                         </li>
@@ -214,7 +208,7 @@
                   </ul>
                 </div>
 
-                <div id="ideEditorAndConsole" kendo-splitter="splitter" k-orientation="'vertical'" k-panes="[{ collapsible: false }, { collapsible: false, size: '200px' }]">
+                <div id="ideEditorAndConsole" kendo-splitter="splitter" k-orientation="'vertical'" k-panes="[{ collapsible: false }, { collapsible: false, size: '120px' }]">
 
                     <div class="ideEditorArea">
                       <div ng-hide="ace.isVisible" id="ideAceNotVisible">
@@ -236,17 +230,12 @@
                     <!-- end of everything related to the editor -->
 
                     <div class="ideFooter"> <!-- the lower part of splitter area, where the terminal lives -->
-                        <div ng-show="renderHtmlOutput" ng-bind-html="htmlOutput" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
-                        <div ng-hide="renderHtmlOutput" ng-bind="output" scroll-glue class="ideOutput ideOutputText ideOutputBorder"></div>
-                        <div class="userInput"><!-- the area for the user input and send button -->
-                            <div class="userInputField">
-                                <i class="glyphicon glyphicon-console"></i>
-                                <input type="text" id="idFooterUserInput" ng-model="userInputData" ng-enter="sendUserInputClick(userInputData, 'idFooterUserInput')" ng-select-on-focus class="ideOutputText ideOutputBorder" placeholder="Input to your program (press Enter to send)"/>
-                            </div>
-                            <div class="userInputButton">
-                                <button ng-click="sendUserInputClick(userInputData, 'idFooterUserInput')" class="btn btn-default btn-xs">
-                                    Send
-                                </button>
+
+                        <div scroll-glue class="ideOutput ideOutputText ideOutputBorder" ng-focus-child="#idFooterUserInput">
+                            <span class="console-output" ng-bind-html="output"></span>
+                            <div class="ideUserInput">
+                              <input type="text" id="idFooterUserInput" ng-select-on-focus [ng-value]="userInputData" ng-model="userInputData" ng-enter="sendUserInputClick(userInputData, 'idFooterUserInput')" class="ideOutputText ideOutputBorder" autocomplete="off"/>
+                              <i></i>
                             </div>
                         </div>
                     </div>
