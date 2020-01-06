@@ -34,3 +34,64 @@
         <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
     </button>
 </div>
+
+
+
+
+<!---- Each TestMethod has its on template: ---->
+
+<!-- ioTest -->
+<div>
+    <script type="text/ng-template" id="ideIoTestResult.html">
+        <div class="panel-body">
+            <p ng-show="!test.result.pass" class="failureReason text-danger"><b>Fehler:</b> {{test.result.note}}</p>
+            <p ng-show="test.result.pass" class="successNote text-success"><b>Erfolgreich:</b> {{test.result.note}}</p>
+
+            <div class="form-group">
+                <label class="areaLabel">Input:</label>
+                <textarea class="inputOutputArea teachersInput" disabled>{{test.input}}</textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <div class="form-group">
+                        <label class="areaLabel">Erwarteter Output:</label>
+                        <textarea class="inputOutputArea expectedOutput" disabled>{{test.result.outputText ? test.result.outputText : test.result.output}}</textarea>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-6">
+                    <div class="form-group">
+                        <label class="areaLabel">Effektiver Output:</label>
+                        <textarea class="inputOutputArea actualOutput" disabled>{{test.output}}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+</div>
+
+<!-- compileTest -->
+<div>
+    <script type="text/ng-template" id="ideCompileTestResult.html">
+        <div class="panel-body">
+
+            <p ng-show="(test.status === 'success')" class="successNote text-success"><b>Keine Fehler aufgetreten: </b>Dein Code konnte erfolgreich kompiliert werden</p>
+
+            <div ng-show="(test.status === 'fail')">
+                <p class="failureReason text-danger"><b>Fehler aufgetreten: </b></p>
+                <ul class="failureReason text-danger">
+                    <li ng-repeat="res in test.result">
+                        {{res.note}}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="form-group" ng-hide="(test.status === 'success')">
+                <label class="areaLabel">Output:</label>
+                <textarea class="inputOutputArea teachersInput" disabled>{{test.output}}</textarea>
+            </div>
+
+        </div>
+    </script>
+</div>
+<!---- End of TestMethod templates ---->
