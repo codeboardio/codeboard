@@ -262,21 +262,16 @@ app.controller('IdeCtrl',
        * Function that handles the displaying of a Mantra WebSocket output.
        * @param {string} aStreamUrl - the WS Url to connect to the Mantra container
        * @param {string} aStartUrl - the Url to start the Mantra container
-       * @param {boolean} [aRenderAsHtmlOutput=false] - should the output be rendered as HTML
        */
-      var displayWSOutputStream = function(aStreamUrl, aStartUrl, aRenderAsHtmlOutput) {
+      var displayWSOutputStream = function(aStreamUrl, aStartUrl) {
 
         // counter for the number of messages added to the output (1 on every WS send event)
         var numOfMessages = 0;
         // max number of messages we allow
         var maxNumOfMessageCharacters = 15000;
 
-        // if aRenderAsHtmlOutput is undefined, default to false
-        // if the language doesn't require compilation, e.g. Python, enable the html rendering of the output
-        var lRenderOutputAsHTML = aRenderAsHtmlOutput || !($scope.isCompilationNeeded());
-
         // clear the output
-        setOutput('', lRenderOutputAsHTML);
+        setOutput('');
 
         var onWSOpenCallback = function () {
 
@@ -299,14 +294,16 @@ app.controller('IdeCtrl',
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
 
-          var outputLength = addToOutput(aNewlyReceivedData, lRenderOutputAsHTML);
+          // replace line breaks with <br> and allow html
+          aNewlyReceivedData = aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
+          var outputLength = addToOutput(aNewlyReceivedData);
 
           // account for the number of messages
           numOfMessages += 1;
           //if(numOfMessages > maxNumOfMessages) {
           if(outputLength > maxNumOfMessageCharacters) {
             addToOutput("\n\nYour program output has more than " + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" +
-                'For this reason, Codeboard has terminated your program.\n\n', lRenderOutputAsHTML);
+                'For this reason, Codeboard has terminated your program.\n\n');
 
             WebsocketSrv.close(true);
           }
@@ -364,25 +361,11 @@ app.controller('IdeCtrl',
 
       /**
        * Sets the output.
-       * Note that the argument renderAsHtml can be overriden by
-       * the UI setting "showOutputAsText"
        * @param outputToDisplay the value to display in the output
-       * @param renderAsHtml should the output be rendered as html
        */
-      var setOutput = function(outputToDisplay, renderAsHtml) {
-
-        $scope.renderHtmlOutput = false;
-
-        if(renderAsHtml && !($scope.uiSettings.showOutputAsText)) {
-          $scope.output = '';
-          $scope.htmlOutput = $sce.trustAsHtml(outputToDisplay);
-          $scope.renderHtmlOutput = true;
-        }
-        else {
-          $scope.output = outputToDisplay;
-          $scope.htmlOutput = '';
-          $scope.renderHtmlOutput = false;
-        }
+      var setOutput = function(outputToDisplay) {
+        $scope.output = $sce.trustAsHtml(outputToDisplay);
+        $scope.htmlOutput = '';
       };
 
       // the output in the console of the ide
@@ -391,29 +374,16 @@ app.controller('IdeCtrl',
       /**
        * Adds the given aOutputToAdd to the existing output
        * @param aOutputToAdd the value to add to the output
-       * @param renderAsHtml should the output be rendered as html
        * @return {number} the number of characters displayed in the output
        */
-      var addToOutput = function(aOutputToAdd, renderAsHtml) {
-
-        $scope.renderHtmlOutput = false;
-
-        if(renderAsHtml && !($scope.uiSettings.showOutputAsText)) {
-          var lConcatOutput = $scope.htmlOutput + aOutputToAdd;
-          $scope.$apply(function () {
-            $scope.htmlOutput = $sce.trustAsHtml(lConcatOutput);
-            $scope.renderHtmlOutput = true;
-          });
-        }
-        else {
-          $scope.$apply(function () {
-            $scope.output += aOutputToAdd;
-            $scope.renderHtmlOutput = false;
-          });
-        }
+      var addToOutput = function(aOutputToAdd) {
+        $scope.$apply(function () {
+          let output = $scope.output + aOutputToAdd;
+          $scope.output = $sce.trustAsHtml(output);
+        });
 
         // if there is an htmlOutput, we need to unwrap it before we can count it's length.
-        return $scope.output.length + ($scope.htmlOutput.$$unwrapTrustedValue ? $scope.htmlOutput.$$unwrapTrustedValue().length : 0);
+        return $scope.output.length;
       };
 
 
@@ -423,7 +393,7 @@ app.controller('IdeCtrl',
       } else {
         setOutput('Warning: your browser does not support WebSockets.\n' +
           'This may cause Codeboard to not work properly.\n' +
-          'Please consider updating to a newer browser.', false);
+          'Please consider updating to a newer browser.');
       }
 
 
@@ -854,8 +824,6 @@ app.controller('IdeCtrl',
         // do we show the submit button?
         showSubmissionBtn: projectData.isSubmissionAllowed,
 
-        // by default we also render the output as Html; this setting does not get persisted
-        showOutputAsText: false
       };
 
       // state variables to indicate which actions in the IDE are disabled
@@ -1011,10 +979,6 @@ app.controller('IdeCtrl',
           case ('show_editor_settings'):
             req = IdeMsgService.msgShowEditorSettingsRequest($scope.aceEditorSettings);
             $rootScope.$broadcast(req.msg, req.data);
-            break;
-          case ('show_output_as_text'):
-            req = IdeMsgService.msgShowOutputAsText();
-            $rootScope.$broadcast(req.msg);
             break;
           case ('compile'):
             if(!($scope.disabledActions.compile)) {
@@ -1359,13 +1323,6 @@ app.controller('IdeCtrl',
         }
       });
 
-
-      /** Handles the event that output should be rendered as HTML or not. */
-      $scope.$on(IdeMsgService.msgShowOutputAsText().msg, function() {
-        $scope.uiSettings.showOutputAsText = !($scope.uiSettings.showOutputAsText);
-      });
-
-
       /** Handles a "compileReqeusted" event */
       $scope.$on(IdeMsgService.msgCompileRequest().msg, function () {
         $log.debug('Compile request received');
@@ -1660,7 +1617,6 @@ app.controller('IdeCtrl',
         return ProjectFactory.getProject().language ==='Eiffel';
       };
 
-
       /**
        * Function to send the input of a user to her program.
        * @param {string} aUserInput the input to send to the program
@@ -1669,6 +1625,9 @@ app.controller('IdeCtrl',
       $scope.sendUserInputClick = function(aUserInput, aElementIdToSetFocus) {
         // append a newline to the userInput. Otherwise, the users program won't continue execution but
         // wait for the user to hit the enter key
+
+        // reset user input data
+        this.userInputData = "";
 
         if (!(aUserInput)) {
           // aUserInput might be undefined if the ng-model never gets instanciated because the user doesn't enter

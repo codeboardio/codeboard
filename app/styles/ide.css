@@ -3,9 +3,7 @@ body {
     overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box !important;
-}
+
 
 /** - - - - - - - IDE Header - - - - - - - */
 .ideHeader {
@@ -55,7 +53,8 @@ body {
 
 /** - - - - - - - Main Content of IDE - - - - - - - */
 #ideTabArea {
-  overflow-y: auto; /* if we have too many tabs, a scroll bar appears */
+  overflow-y: hidden;
+  overflow-x: hidden;/* if we have too many tabs, a scroll bar appears */
   padding: 0;
   height: 30px;
   margin-top: 20px;
@@ -236,6 +235,7 @@ body {
   color: #aaa;
   padding: 10px;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .ideOutputText {
@@ -434,6 +434,7 @@ body {
   border-bottom: #aaa 2px solid;
   line-height: initial;
   opacity: 0.8;
+  box-sizing: border-box;
 }
 .btn.active,
 .btn.focus,

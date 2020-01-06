@@ -69,15 +69,11 @@ angular.module('codeboardApp')
      * @param {string} aInputData - the data to send
      */
     var sendData = function(aInputData) {
-      console.log(aInputData);
-
       if (ws && ws.readyState === 1) {
         // readyState 1 is: connection is open and ready to communicate
         // (see: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket#Ready_state_constants)
         $log.debug('WebsocketSrvjs.sendData: sending data ' + aInputData);
-        ws.send(aInputData).then(function() {
-            console.log("test");
-        });
+        ws.send(aInputData);
       }
       else {
         $log.debug('WebsocketSrvjs.sendData: not sending data; WS not initialized or readyState not 1');

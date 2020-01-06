@@ -297,18 +297,6 @@ angular.module('codeboardApp')
 
 
     /**
-     * Returns msg object used to signal that the program output should be displayed or text (or not).
-     * By default, the program output is displayed as HTML.
-     * @return {{msg: string}}
-     */
-    this.msgShowOutputAsText = function () {
-      return {
-        msg: 'ide.showOutputAsText'
-      };
-    };
-
-
-    /**
      * Returns msg object used to signal that the tree model should updated with respect to the ProjectFactory.
      * @return {{msg: string}}
      */
