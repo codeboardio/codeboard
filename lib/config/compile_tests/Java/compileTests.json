@@ -8,6 +8,11 @@
         "placeholders": []
       },
       {
+        "error": ".+cannot find symbol.*import.*",
+        "note": "Du versuchst wahrscheinlich eine Library zu importieren, die es nicht gibt. Kontrolliere, ob du deren Namen richtig geschrieben hast.",
+        "placeholders": []
+      },
+      {
         "error": ".+cannot find symbol.*variable.*",
         "note": "Du verwendest eine Variable ohne diese zuvor deklariert zu haben",
         "placeholders": []
@@ -20,6 +25,16 @@
       {
         "error": "expected",
         "note": "Dieser Fehler tritt auf, wenn im Code etwas fehlt. Oftmals wird dies durch ein fehlendes Semikolon oder durch schliessende Klammern verursacht.\n",
+        "placeholders": []
+      },
+      {
+        "error": "variable.+is already defined",
+        "note": "Du kannst nicht mehrere Variablen mit dem gleichen Namen anlegen, auch wenn sich die Datentypen unterscheiden\n",
+        "placeholders": []
+      },
+      {
+        "error": "method.+is already defined",
+        "note": "Du kannst nicht mehrere Methoden den selben Namen geben.\n",
         "placeholders": []
       }
     ]
