@@ -14,15 +14,15 @@
         "useCompileTests": true,
         "ioTests": [
             {
-                "name": "Test 1",
+                "name": "Ausgabe Hallo Welt",
                 "input": [
                     "i1",
                     "i2"
                 ],
-                "expectedOutput": "Die Summe aus i1 und i2",
+                "expectedOutput": "Hallo Welt",
                 "tests": [
                     {
-                        "matching": "i1: .* i2: .* Summe: .* 0",
+                        "matching": "Hallo Welt",
                         "pass": true,
                         "note": "Super",
                         "type": "flexible"
@@ -40,8 +40,8 @@
     "Help": {
         "tips": [
             {
-                "name": "Verwende eine Schleife",
-                "note": "Wiederhole die Schleife so oft wie es Elemente im Array hat"
+                "name": "Passe den String an",
+                "note": "Versuche System.out.println(); so anzupassen, dass 'Hallo Welt' ausgegeben wird"
             }
         ]
     }
