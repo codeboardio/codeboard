@@ -836,6 +836,8 @@ app.controller('IdeCtrl',
         stop: true
       };
 
+      // state variable to indicate if a programm is running or not
+      $scope.programmIsRunning = false;
 
       /**
        * Default settings of the editor
@@ -1486,6 +1488,8 @@ app.controller('IdeCtrl',
         $scope.hiddenActions.run = true;
         $scope.hiddenActions.compileAndRun = true;
         $scope.hiddenActions.stop = false;
+
+        $scope.programmIsRunning = true;
       });
 
 
@@ -1501,6 +1505,8 @@ app.controller('IdeCtrl',
 
         // reset that a stoppable action is available
         ideState.actionAllowsForStopping = false;
+
+        $scope.programmIsRunning = false;
       });
 
 

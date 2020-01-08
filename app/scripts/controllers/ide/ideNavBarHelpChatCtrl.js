@@ -42,17 +42,6 @@ angular.module('codeboardApp')
        * init this tab
        */
       $scope.init = function() {
-
-
-        // todo akuellen/alle hilferequest laden!
-
-        // todo ok cool so können wir in der laufenden Session überprüfen ob Änderungen vorhanden sind..
-        //    aber was wenn neue Session
-        console.log(ProjectFactory.isProjectModified());
-
-        console.log(ProjectFactory.getProject().updatedAt);
-
-
         // load all chat lines for this user and project
         ChatSrv.getChatHistory()
           .then(function(result) {

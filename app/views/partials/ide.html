@@ -237,6 +237,11 @@
                               <input type="text" id="idFooterUserInput" ng-select-on-focus [ng-value]="userInputData" ng-model="userInputData" ng-enter="sendUserInputClick(userInputData, 'idFooterUserInput')" class="ideOutputText ideOutputBorder" autocomplete="off"/>
                               <i></i>
                             </div>
+                            <div ng-show="programmIsRunning" class="console-spinner">
+                              <div class="text-center">
+                                <span class="spinner-grow"></span>
+                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>

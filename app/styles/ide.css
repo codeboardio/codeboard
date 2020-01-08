@@ -221,6 +221,30 @@ body {
   margin: 25px auto 0;
 }
 
+.console-spinner {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+}
+.spinner-grow {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  vertical-align: text-bottom;
+  background-color: #666;
+  border-radius: 50%;
+  opacity: 0;
+  animation: spinner-grow 1s linear infinite;
+}
+/* - - Growing Spinner -- */
+@keyframes spinner-grow {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+  }
+}
 
 
 
@@ -341,34 +365,6 @@ body {
   background-color: #f5f5f5;
 }
 
-
-
-
-
-
-
-/** todo alle CSS-Angaben zu Buttons und Spinners in main.css */
-
-/* - - Growing Spinner -- */
-@keyframes spinner-grow {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.spinner-grow {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  vertical-align: text-bottom;
-  background-color: #0064a6;
-  border-radius: 50%;
-  opacity: 0;
-  animation: spinner-grow .9s linear infinite;
-}
 
 /** Spinninc Glyphicons **/
 .gly-spin {
