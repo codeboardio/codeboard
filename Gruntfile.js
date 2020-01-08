@@ -387,7 +387,8 @@ module.exports = function (grunt) {
             }
           ]
         ],
-        compact: true
+        compact: true,
+        plugins: ['angularjs-annotate'] // replaces ng-annotate (Janick Michot, 07.01.2020)
       },
       dist: {
         files: {
@@ -524,7 +525,7 @@ module.exports = function (grunt) {
     'useminPrepare',
     'autoprefixer',
     'concat',
-    'ngAnnotate',
+    // 'ngAnnotate',
     'copy:dist',
     'cssmin',
     'babel',

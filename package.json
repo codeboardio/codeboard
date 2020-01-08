@@ -35,7 +35,7 @@
     "express-session": "^1.17.0",
     "express-validator": "^6.2.0",
     "gm": "^1.23.1",
-    "grunt-babel": "^8.0.0",
+    "grunt-babel": "8.0.0",
     "http-proxy": "1.18.0",
     "lodash": "^4.17.15",
     "mongoose": "5.7.0",
@@ -46,17 +46,17 @@
     "passport": "0.2.0",
     "passport-local": "0.1.6",
     "request": "^2.88.0",
-    "sequelize": "^6.0.0"
+    "sequelize": "5.21.3"
   },
   "devDependencies": {
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
+    "babel-plugin-angularjs-annotate": "^0.10.0",
     "chai": "3.4.1",
     "connect-livereload": "0.3.0",
     "expect.js": "0.3.1",
     "grunt": "^1.0.4",
     "grunt-autoprefixer": "3.0.3",
-    "grunt-babel": "8.0.0",
     "grunt-concurrent": "2.1.0",
     "grunt-contrib-clean": "0.7.0",
     "grunt-contrib-coffee": "^2.1.0",

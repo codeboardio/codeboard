@@ -1,21 +1,41 @@
 
 <div id="ide-tab-test" class="tab-body" ng-controller="ideTabTestCtrl">
 
-    <h1 class="ide-tab-title ide-tab-title-test" ng-bind="title"></h1>
+    <h1 class="ide-tab-title ide-tab-title-test pb-3" ng-bind="title"></h1>
 
-    <p class="ide-tab-test-description">{{textBefore}}</p>
+    <p class="ide-tab-test-description py-2">{{textBefore}}</p>
+
+    <!-- Avatar with successMessage -->
+    <div ng-show="(correctSolution)">
+        <div class="chat row py-4">
+            <div class="col-md-3">
+                <div class="test-result-avatar">
+                    <img src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="64" width="64"/>
+                </div>
+            </div>
+            <div class="col-md-9 px-4">
+                <ul class="chat p-0">
+                    <li class="chat-line test-succeed">
+                        <div class="chat-line-item chat-line-avatar left mb-3 float-left w-100">
+                            <div class="message pb-1 mb-0 text-gray-700">Alles richtig</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <!-- Accordion with ioTests -->
     <div class="panel-group modalAccordion" id="ioTestsAccordion">
-        <div ng-repeat="test in tests" class="panel panel-default {{test.method}}">
+        <div ng-repeat="test in tests" class="panel panel-default {{test.method}}" ng-hide="(test.method === 'compileTest' && test.status === 'success')">
             <div class="panel-heading {{test.status}}">
-                <a data-target="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion">
+                <a data-target="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion" ng-class="{'collapsed': (test.open)}">
                     <span class="title" title="{{test.name}}">{{test.name}}</span>
                     <span ng-class="{'gly-spin': (test.status === 'processing')}" class="pull-right flag glyphicon {{test.status}}" aria-hidden="true"></span>
                 </a>
             </div>
 
-            <div id="ioTest{{$index}}" class="panel-collapse collapse">
+            <div id="ioTest{{$index}}" class="panel-collapse collapse" ng-class="{'in': (test.open)}">
                 <div ng-include="getTestMethodOutput(test.method)"></div>
             </div>
         </div>
@@ -30,8 +50,12 @@
         <span ng-bind="ioTestButtonText"></span>
     </button>
 
-    <button ng-show="(testResult !== 1)" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="closeModal(); helpAfterTest()" title="Hilfe anfordern">
+    <button ng-show="(!correctSolution)" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
         <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
+    </button>
+
+    <button ng-show="(correctSolution && uiSettings.showSubmissionBtn)" class="btn btn-info btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
+        <span class="glyphicon glyphicon-send"></span> Lösung abgeben
     </button>
 </div>
 
@@ -44,10 +68,25 @@
 <div>
     <script type="text/ng-template" id="ideIoTestResult.html">
         <div class="panel-body">
-            <p ng-show="!test.result.pass" class="failureReason text-danger"><b>Fehler:</b> {{test.result.note}}</p>
-            <p ng-show="test.result.pass" class="successNote text-success"><b>Erfolgreich:</b> {{test.result.note}}</p>
 
-            <div class="form-group">
+            <div class="chat row pb-4">
+                <div class="col-md-3">
+                    <div class="test-result-avatar">
+                        <img src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="56" width="56"/>
+                    </div>
+                </div>
+                <div class="col-md-9 px-4">
+                    <ul class="chat p-0" ng-class="{ 'test-succeed': (test.status === 'success') , 'test-failed': (test.status === 'fail')  }">
+                        <li class="chat-line">
+                            <div class="chat-line-item chat-line-avatar left mb-3 float-left w-100">
+                                <div class="message pb-1 mb-0 text-gray-700">{{test.result.note}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group" ng-hide="(!test.input || 0 === test.input.trim.length)">
                 <label class="areaLabel">Input:</label>
                 <textarea class="inputOutputArea teachersInput" disabled>{{test.input}}</textarea>
             </div>
@@ -55,13 +94,13 @@
             <div class="row">
                 <div class="col-xs-12 col-md-6">
                     <div class="form-group">
-                        <label class="areaLabel">Erwarteter Output:</label>
-                        <textarea class="inputOutputArea expectedOutput" disabled>{{test.result.outputText ? test.result.outputText : test.result.output}}</textarea>
+                        <label class="areaLabel">Erwartetes Verhalten:</label>
+                        <textarea class="inputOutputArea expectedOutput" disabled>{{test.expectedOutput}}</textarea>
                     </div>
                 </div>
                 <div class="col-xs-12 col-md-6">
                     <div class="form-group">
-                        <label class="areaLabel">Effektiver Output:</label>
+                        <label class="areaLabel">Effektives Verhalten:</label>
                         <textarea class="inputOutputArea actualOutput" disabled>{{test.output}}</textarea>
                     </div>
                 </div>
@@ -75,15 +114,21 @@
     <script type="text/ng-template" id="ideCompileTestResult.html">
         <div class="panel-body">
 
-            <p ng-show="(test.status === 'success')" class="successNote text-success"><b>Keine Fehler aufgetreten: </b>Dein Code konnte erfolgreich kompiliert werden</p>
-
-            <div ng-show="(test.status === 'fail')">
-                <p class="failureReason text-danger"><b>Fehler aufgetreten: </b></p>
-                <ul class="failureReason text-danger">
-                    <li ng-repeat="res in test.result">
-                        {{res.note}}
-                    </li>
-                </ul>
+            <div class="chat row pb-4">
+                <div class="col-md-3">
+                    <div class="test-result-avatar">
+                        <img src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="56" width="56"/>
+                    </div>
+                </div>
+                <div class="col-md-9 px-4">
+                    <ul class="chat p-0" ng-class="{ 'test-succeed': (test.status === 'success') , 'test-failed': (test.status === 'fail')  }">
+                        <li class="chat-line">
+                            <div class="chat-line-item chat-line-avatar left mb-3 float-left w-100">
+                                <div class="message pb-1 mb-0 text-gray-700">{{test.result[0].note || "Dei Code besitzt leider noch Komprimierungs-Fehler. Versuche die untenstehende Fehlermeldung zu verstehen. Wenn du nicht mehr weiterkommst, nutze die Chat-Funkion, um Hilfe zu verlangen."}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <div class="form-group" ng-hide="(test.status === 'success')">

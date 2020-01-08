@@ -2,26 +2,61 @@
 
     <h1 class="modal-title">Wie kann ich dir helfen?</h1>
 
-    <div class="chat">
-        <ul class="conversation">
-            <li ng-repeat="chatLine in chatLines" ng-include="getChatLine((chatLine.authorId === chatLine.userId))"></li>
+    <p>Falls du Probleme bei dieser Aufgabe hast, schau dir zunächst die Tipps für diese Aufgabe an.</p>
+    <p>Falls du noch immer Schwierigkeiten hast, kannst du die nachfolgende Chat-Funktion verwenden.</p>
+
+    <div class="row conversation">
+        <ul class="chat py-4">
+            <li ng-repeat="chatLine in chatLines" class="clear chat-line {{chatLine.type}}">
+
+                <div class="chat-line-posted-at text-{{chatLine.alignment}}">
+                    <small>{{chatLinePostedAt(chatLine.createdAt)}}</small>
+                </div>
+
+                <div ng-include="getChatLine(chatLine)"></div>
+
+                <div ng-show="showChatLineActions(chatLine)" class="chatActions">
+                    <button class="btn btn-sm btn-circle chat-line-action-button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                    <button class="btn btn-sm btn-circle chat-line-action-button"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>
+                </div>
+            </li>
         </ul>
+    </div>
+
+
+    <div class="sendRequest">
+        <form id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
+            <div class="form-group">
+                <textarea class="topic" ng-model="note" name="note" placeholder="Dein Anliegen"></textarea>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary">Hilfe Anfordern</button>
+            </div>
+        </form>
+
     </div>
 </div>
 
 
 
-
-<script type="text/ng-template" id="chatLineQuestion.html">
-    <div class="chat-line left mb-3 float-left" ng-class="chatLine.type">
-        <p class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</p>
-        <span class="date float-right"><small>{{chatLine.createdAt}}</small></span>
+<!-- Template for chat lines "Text" -->
+<script type="text/ng-template" id="chatLineText.html">
+    <div class="chat-line-item {{chatLine.alignment}} mb-3 float-left w-75">
+        <div class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</div>
     </div>
 </script>
 
-<script type="text/ng-template" id="chatLineAnswer.html">
-    <div class="chat-line right mb-3 float-left" ng-class="chatLine.type">
-        <p class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</p>
-        <span class="date float-right"><small>{{chatLine.createdAt}}</small></span>
+<!-- Template for chat lines "HTML" -->
+<script type="text/ng-template" id="chatLineHtml.html">
+    <div class="chat-line-item {{chatLine.alignment}} mb-3 float-left w-75">
+        <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="chatLine.message"></div>
+    </div>
+</script>
+
+<!-- Template for chat lines "Card" -->
+<script type="text/ng-template" id="chatLineCard.html">
+    <div class="chat-line-card {{chatLine.alignment}} {{chatLine.message.cardType}} mb-3 float-left w-75">
+        <div class="card-header" ng-bind-html="chatLine.message.cardHeader"></div>
+        <div class="card-body" ng-bind-html="chatLine.message.cardBody"></div>
     </div>
 </script>

@@ -18,10 +18,14 @@ angular.module('codeboardApp')
             $scope.textBefore = "Damit du deine Lösung abgeben kannst, muss dein Programm alle Tests bestehen.";
             $scope.ioTestButtonText = "Lösung überprüfen";
             $scope.inProgress = false;
+            $scope.correctSolution = false;
+            $scope.compileError = false;
 
             // test related variables
             $scope.compilationResult = { 'inProgress': true };
             $scope.tests = [];
+
+
 
             /**
              * todo was muss die init-funktion machen?
@@ -38,10 +42,9 @@ angular.module('codeboardApp')
             $scope.doTheIoTesting = function() {
                 $log.debug('Test request received');
 
-                console.log("DoTheIOThing");
+                let hasErrors = false;
 
                 // replace title during testing
-                let _title = $scope.title;
                 $scope.title = "Deine Lösung wird überprüft";
                 $scope.inProgress = true;
 
@@ -82,13 +85,31 @@ angular.module('codeboardApp')
 
                                 return ProjectFactory.testProject(test)
                                     .then(function(testResult) {
-                                        // update testData
-                                        $scope.tests[i] = testResult; i++;
 
-                                        if(testResult.stopOnFailure && testResult.status === 'fail') {
-                                            return 0;
+                                        // prepare the variable to be returned
+                                        let ret = testResult.id;
+
+                                        // update testData
+                                        $scope.tests[i] = testResult;
+
+                                        // expand the first error
+                                        $scope.tests[i].open = false;
+                                        if(testResult.status === 'fail' && !hasErrors) {
+                                            $scope.tests[i].open = true;
+                                            hasErrors = true;
                                         }
-                                        return testResult.id;
+
+                                        // stop further tests if `stopOnFailure` is set
+                                        if(testResult.stopOnFailure && testResult.status === 'fail') {
+                                            if(testResult.method === "compileTest") {
+                                                $scope.tests[i].name = "Fehler beim Kompilieren";
+                                                $scope.compileError = true;
+                                            }
+                                            ret = 0;
+                                        }
+
+                                        // count and return either id of testResult or 0 if stopOnFailure
+                                        i++; return ret;
                                     });
                                 });
                         }, Promise.resolve() )
@@ -99,9 +120,20 @@ angular.module('codeboardApp')
                             $scope.numTestsPassed = $scope.tests.filter(test => { return (test.status === 'success'); }).length;
                             $scope.numTestsFailed = $scope.tests.filter(test => { return (test.status !== 'success'); }).length;
                             $scope.testResult = (1 / $scope.tests.length * $scope.numTestsPassed);
+                            $scope.correctSolution = ($scope.testResult === 1);
 
-                            // change title back
-                            $scope.title = _title;
+                            // define title
+                            let title = "";
+                            if($scope.correctSolution) {
+                                title = "Deine Lösung ist richtig";
+                            } else if ($scope.compileError) {
+                                title = "Fehler bei der Kompilierung";
+                            } else {
+                                title = "Überprüfung abgeschlossen";
+                            }
+
+                            // change scope variables
+                            $scope.title = title;
                             $scope.inProgress = false;
                             $scope.ioTestButtonText = "Lösung erneut überprüfen?";
 

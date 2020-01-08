@@ -93,10 +93,6 @@ body {
   /* width: 50px !important;  static width */
   border-right: 0 !important;
 }
-.ace_gutter,
-.ace_content {
-  padding: 10px 0;
-}
 
 #ace_editor {
   border-top: 0 !important;
@@ -425,7 +421,7 @@ body {
 
 
 .btn {
-  border-radius: 0;
+  border-radius: 5px;
   border: 0;
   font-weight: 400;
   padding: 4px 6px;
@@ -435,6 +431,7 @@ body {
   line-height: initial;
   opacity: 0.8;
   box-sizing: border-box;
+  outline: 0;
 }
 .btn.active,
 .btn.focus,
@@ -443,6 +440,7 @@ body {
 .btn:hover,
 .open > .dropdown-toggle.btn{
   opacity: 1;
+  outline: 0 !important;
 }
 .btn .glyphicon {
   padding: 0 4px;
@@ -642,6 +640,7 @@ fieldset[disabled] .btn:hover {
   padding: 8px;
   color: #aaa;
   border-radius: 0;
+  box-sizing: border-box;
 }
 
 .modalAccordion .inputOutputArea.actualOutput {

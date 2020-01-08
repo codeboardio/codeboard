@@ -1,45 +1,43 @@
-.brand_logo_chat_container {
-    width: 60px;
-    height: 60px
-}
-.brand_logo_chat_container .brand_logo {
-    max-height: 80%;
-    max-width: 80%
-}
 
 .chat {
-    background-color: #fafafa;
-}
-
-.chat .user_card {
-    height: 400px;
-    position: relative;
-    padding-bottom: 100px !important;
-}
-
-.chat ul.conversation {
     width:100%;
-    list-style-type: none;
+    box-sizing: border-box;
+    list-style: none;
 }
 
-.chat .chat-line {
+.chat-line {
+    position: relative;
+    clear: both;
+}
+
+.chat-line-posted-at {
+    color: #ccc;
+    margin-bottom: 4px;
+}
+
+.chat-line-item,
+.chat-line-card {
     border-radius:5px;
-    padding:5px;
+    padding: 15px;
     margin-bottom: 8px;
     box-shadow: 1px 1px 6px #4487;
     -webkit-box-shadow: 1px 1px 2px #4487;
     width: 85%;
     position: relative;
 }
-.chat .chat-line.left {
+.chat-line-item.left,
+.chat-line-card.left {
     background: #fff;
 }
-.chat .chat-line.right {
+.chat-line-item.right,
+.chat-line-card.right {
     background: #e1e6ed;
+    float: right;
 }
-
-.chat .chat-line.left:before,
-.chat .chat-line.right:after {
+.chat-line-item.left:before,
+.chat-line-item.right:after,
+.chat-line-card.left:before,
+.chat-line-card.right:after {
     width: 0;
     height: 0;
     content: "";
@@ -47,23 +45,122 @@
     position: absolute;
     border-style: solid;
 }
-.chat .chat-line.left:before {
+.chat-line-item.left:before,
+.chat-line-card.left:before {
     left: -10px;
     border-width: 0 13px 13px 0;
     border-color: transparent #fff transparent transparent;
 }
-.chat .chat-line.right:after {
+.chat-line-item.right:after,
+.chat-line-card.right:after {
     right: -10px;
     border-width: 13px 13px 0 0;
     border-color: #e1e6ed transparent transparent transparent;
 }
 
-.chat .chat-line .text{
+.chat-line-item .text {
     border:0;
     color: #333;
     font-size: 0.85em;
     font-weight: 500;
 }
+
+
+/* Card Header */
+.chat-line-card {
+    padding: 0;
+}
+.chat-line-card .card-header  {
+    display: flex;
+    align-items: center;
+    white-space: pre;
+    padding: 10px 20px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1em;
+}
+.chat-line-card.left .card-header {
+    border-top-right-radius: 5px;
+}
+.chat-line-card.right .card-header {
+    border-top-left-radius: 5px;
+}
+.chat-line-card .card-header a {
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.9);
+}
+.chat-line-card .card-body {
+    padding: 15px;
+}
+
+/* Card Help */
+.chat-line-card.help .card-header {
+    border-bottom: 1px solid #94b397;
+    background-color: #009788;
+}
+.chat-line-card.help.right:after {
+    border-top-color: #009788 !important;
+}
+.chat-line-card.help.left:before {
+    border-right-color: #009788 !important;
+}
+.chat-line-card.help .card-header:before {
+    content:"\e085";
+    font-family: "Glyphicons Halflings";
+    display: inline-block;
+    width: 36px;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Card Submission */
+.chat-line-card.submission .card-header {
+    border-bottom: 1px solid #ea4d1b;
+    background-color: #fe5722;
+}
+.chat-line-card.submission .card-header:before {
+    content:"\e206";
+    font-family: "Glyphicons Halflings";
+    display: inline-block;
+    width: 36px;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.chat-line-card.submission.right:after {
+    border-top-color: #fe5722 !important;
+}
+.chat-line-card.submission.left:before {
+    border-right-color: #fe5722 !important;
+}
+
+
+/** - - - Colors - - - */
+.chat-line-item.chat-line-avatar {
+    background-color: #23c6c8;
+    background-image: linear-gradient(90deg, #23c6c8 0%, #0eafb1 75%);
+    min-height: 24px;
+    color: #ffffffde;
+}
+.chat-line-item.chat-line-avatar.left:before {
+    border-right-color: #23c6c8;
+    left: -15px;
+    top: 16px;
+    border-width: 12px 20px 12px 0;
+}
+
+.test-succeed .chat-line-item.chat-line-avatar {
+    background-color: #1ab394;
+    background-image: linear-gradient(90deg, #1ab394 0%, #0aa283 75%);
+}
+.test-succeed .chat-line-item.chat-line-avatar.left:before {
+    border-right-color: #1ab394;
+}
+
+
+
+
+
+
 
 
 .chat .send-message {
@@ -115,4 +212,21 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.23921568627450981);
     position: relative;
     top: -.6em;
+}
+
+
+.chat .chatActions {
+    position: absolute;
+    right: 54px;
+    top: 24px;
+    display: none;
+}
+.chat .chat-line:hover .chatActions {
+    display: block;
+}
+
+.chat .chat-line-action-button {
+    background-color: #fff;
+    border-bottom: 0;
+    line-height: normal !important;
 }

@@ -708,14 +708,6 @@ app.controller('IdeCtrl',
 
             // enable compilation and submission (not running, because what the submission compiles might differ from the last compilation if the user changed something; that could be confusing for the user)
             setEnabledActions(1,0,1,1,1);
-
-            console.log("Nun sende eine ChatLine");
-            // add chat line card
-            ChatSrv.addChatLine({
-              cardHeader: "Aufgabe Abgegeben #wieId",
-              cardBody: "So viele Tests passed.. So viele failed",
-              cardType: "submission"
-            }, 'card');
           },
           function(reason) {
             $log.debug('Submission failed.' + reason.data.msg);
@@ -833,7 +825,7 @@ app.controller('IdeCtrl',
         stop: true,
         test: false,
         tool: false,
-        submit: true
+        submit: false
       };
 
       // state variables to indicate which actions in the IDE are hidden
