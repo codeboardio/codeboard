@@ -1,4 +1,95 @@
-/* - - - Buttons - - - */
+/** - - - Buttons - - - **/
+
+
+.btn {
+    border-radius: 5px;
+    border: 0;
+    font-weight: 400;
+    padding: 4px 6px;
+    background-color: #ddd;
+    color: #444;
+    border-bottom: #aaa 2px solid;
+    line-height: initial;
+    opacity: 0.8;
+    box-sizing: border-box;
+    outline: 0;
+}
+.btn.active,
+.btn.focus,
+.btn:active,
+.btn:focus,
+.btn:hover,
+.open > .dropdown-toggle.btn{
+    opacity: 1;
+    outline: 0 !important;
+}
+.btn .glyphicon {
+    padding: 0 4px;
+}
+
+
+/* Button Primary */
+.btn-primary {
+    background: #0064a6 !important;
+    border-bottom: 2px solid #003f69 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Button Info */
+.btn-info {
+    background: #17a2b8 !important;
+    border-bottom: 2px solid #096d7d !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Button Success */
+.btn-success {
+    background: #3da956 !important;
+    border-bottom: 2px solid #116524 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Button Warning */
+.btn-warning {
+    color: #fff !important;
+    background-color: #f0ad4e !important;
+    border-color: #eea236 !important;
+}
+
+/* :disabled */
+.btn.disabled,
+.btn.disabled.active,
+.btn.disabled.focus,
+.btn.disabled:active,
+.btn.disabled:focus,
+.btn.disabled:hover,
+.btn[disabled],
+.btn[disabled].active,
+.btn[disabled].focus,
+.btn[disabled]:active,
+.btn[disabled]:focus,
+.btn[disabled]:hover,
+fieldset[disabled] .btn,
+fieldset[disabled] .btn.active,
+fieldset[disabled] .btn.focus,
+fieldset[disabled] .btn:active,
+fieldset[disabled] .btn:focus,
+fieldset[disabled] .btn:hover {
+    opacity: 0.5;
+}
+
+/* Button small */
+.btn-group-sm > .btn,
+.btn-sm {
+    font-size: 11px;
+}
+
+.btn-100 {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+
 .btn-circle {
     width: 30px;
     height: 30px;
@@ -1395,4 +1486,12 @@
     .mx-xl-auto {
         margin-left: auto !important;
     }
+}
+
+
+
+/** Makes Row vertical centered  */
+.row-vertical-centered {
+    display: flex;
+    align-items: center;
 }

@@ -1,9 +1,133 @@
+/* - - Color Schema - - - */
+
+/* - - Primary Colors - - - */
+.color-blue {
+  color: #0064a6;
+}
+.color-blue-80 {
+  color: #3384b8;
+}
+.color-blue-60 {
+  color: #66a2ca;
+}
+.color-blue-40 {
+  color: #99c1dc;
+}
+.color-blue-20 {
+  color: #cce0ed;
+}
+
+.bg-color-blue {
+  background-color: #0064a6;
+}
+.bg-color-blue-80 {
+  background-color: #3384b8;
+}
+.bg-color-blue-60 {
+  background-color: #66a2ca;
+}
+.bg-color-blue-40 {
+  background-color: #99c1dc;
+}
+.bg-color-blue-20 {
+  background-color: #cce0ed;
+}
+
+.color-black {
+  color: #000000;
+}
+.color-black-80 {
+  color: #585858;
+}
+.color-black-60 {
+  color: #87888a;
+}
+.color-black-40 {
+  color: #b1b3b4;
+}
+.color-black-20 {
+  color: #d9dadb;
+}
+
+.bg-color-black {
+  background-color: #000000;
+}
+.bg-color-black-80 {
+  background-color: #585858;
+}
+.bg-color-black-60 {
+  background-color: #87888a;
+}
+.bg-color-black-40 {
+  background-color: #b1b3b4;
+}
+.bg-color-black-20 {
+  background-color: #d9dadb;
+}
+
+/** - - - Secondary Colors - - - **/
+.color-green {
+  color: #006633;
+}
+.color-green-80 {
+  color: #33845c;
+}
+.color-green-60 {
+  color: #66a385;
+}
+.color-green-40 {
+  color: #99c2ad;
+}
+.color-green-20 {
+  color: #cce0d6;
+}
+
+
+
+.color-dark-blue {
+  color: #4a5d68;
+}
+.color-dark-blue-80 {
+  color: #6f7d86;
+}
+.color-dark-blue-60 {
+  color: #939ea4;
+}
+.color-dark-blue-40 {
+  color: #b7bec3;
+}
+.color-dark-blue-20 {
+  color: #dbdfe1;
+}
+
+
+.color-yellow-blue {
+  color: #f0b600;
+}
+.color-yellow-blue-80 {
+  color: #f3c533;
+}
+.color-yellow-blue-60 {
+  color: #f6d366;
+}
+.color-yellow-blue-40 {
+  color: #f9e299;
+}
+.color-yellow-blue-20 {
+  color: #fcf0cc;
+}
+
+
+
+
+
+
+
+
 body {
     border-left: 5px solid #0064a6;
     overflow-x: hidden;
 }
-
-
 
 /** - - - - - - - IDE Header - - - - - - - */
 .ideHeader {
@@ -304,7 +428,7 @@ body {
 .ideAdditionalTabs .tab {
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  padding-bottom: 5px;
+  padding-bottom: 10px;
   margin-bottom: 5px;
   color: #eee;
   display: inline-block;
@@ -312,12 +436,12 @@ body {
   line-height: 26px;
   font-weight: 300;
   cursor: pointer;
-  font-size: 0.75em;
+  font-size: 0.9em;
   border-bottom: 4px solid #d0d0d0;
 }
 
 .ideAdditionalTabs .tab .glyphicon {
-  margin-bottom: 3px;
+  margin-bottom: 8px;
 }
 
 /** todo nachfolgenden css-Angaben in separates File **/
@@ -406,102 +530,6 @@ body {
         -webkit-transform: rotate(359deg);
         transform: rotate(359deg);
     }
-}
-
-
-
-
-
-
-/** - - - Buttons - - - */
-
-
-.btn {
-  border-radius: 5px;
-  border: 0;
-  font-weight: 400;
-  padding: 4px 6px;
-  background-color: #ddd;
-  color: #444;
-  border-bottom: #aaa 2px solid;
-  line-height: initial;
-  opacity: 0.8;
-  box-sizing: border-box;
-  outline: 0;
-}
-.btn.active,
-.btn.focus,
-.btn:active,
-.btn:focus,
-.btn:hover,
-.open > .dropdown-toggle.btn{
-  opacity: 1;
-  outline: 0 !important;
-}
-.btn .glyphicon {
-  padding: 0 4px;
-}
-
-
-/* Button Primary */
-.btn-primary {
-  background: #0064a6 !important;
-  border-bottom: 2px solid #003f69 !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Button Info */
-.btn-info {
-  background: #17a2b8 !important;
-  border-bottom: 2px solid #096d7d !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Button Success */
-.btn-success {
-  background: #3da956 !important;
-  border-bottom: 2px solid #116524 !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Button Warning */
-.btn-warning {
-  color: #fff !important;
-  background-color: #f0ad4e !important;
-  border-color: #eea236 !important;
-}
-
-/* :disabled */
-.btn.disabled,
-.btn.disabled.active,
-.btn.disabled.focus,
-.btn.disabled:active,
-.btn.disabled:focus,
-.btn.disabled:hover,
-.btn[disabled],
-.btn[disabled].active,
-.btn[disabled].focus,
-.btn[disabled]:active,
-.btn[disabled]:focus,
-.btn[disabled]:hover,
-fieldset[disabled] .btn,
-fieldset[disabled] .btn.active,
-fieldset[disabled] .btn.focus,
-fieldset[disabled] .btn:active,
-fieldset[disabled] .btn:focus,
-fieldset[disabled] .btn:hover {
-  opacity: 0.5;
-}
-
-/* Button small */
-.btn-group-sm > .btn,
-.btn-sm {
-  font-size: 11px;
-}
-
-.btn-100 {
-  width: 100%;
-  margin-bottom: 8px;
 }
 
 
@@ -656,4 +684,30 @@ fieldset[disabled] .btn:hover {
 .list-group-item,
 .list-group-item:hover{
   z-index: auto !important;
+}
+
+
+
+/* - - - Avatare - - - */
+.test-result-avatar {
+  max-width: 80px;
+  display: block;
+  margin: 0 auto;
+}
+
+
+
+
+/** Avatar und Chat Effects **/
+
+.fadeIn {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.6s linear;
+}
+
+.fadeOut{
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 0.6s, opacity 0.6s linear;
 }

@@ -2093,24 +2093,16 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     // tab for project description
     $scope.rightBarTabs.description = {
       slug: "description",
-      title: "Aufgabenbeschreibung",
+      title: "Aufgabe",
       disabled: false,
       icon: "glyphicon-education",
       contentURL: "partials/navBarRight/navBarRightDescription"
     };
 
-    // tab for tips related to this project
-    $scope.rightBarTabs.tips = {
-      slug: "tips",
-      title: "Tipps",
-      icon: "glyphicon-list-alt",
-      contentURL: "partials/navBarRight/navBarRightTips"
-    };
-
     // tab for test result
     $scope.rightBarTabs.test = {
       slug: "test",
-      title: "Testresulat",
+      title: "Test",
       icon: "glyphicon-list-alt",
       contentURL: "partials/navBarRight/navBarRightTestResult"
     };

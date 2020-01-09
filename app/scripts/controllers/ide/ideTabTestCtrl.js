@@ -15,7 +15,6 @@ angular.module('codeboardApp')
 
             // title and description
             $scope.title = "Lass deine Lösung überprüfen";
-            $scope.textBefore = "Damit du deine Lösung abgeben kannst, muss dein Programm alle Tests bestehen.";
             $scope.ioTestButtonText = "Lösung überprüfen";
             $scope.inProgress = false;
             $scope.correctSolution = false;
@@ -25,16 +24,35 @@ angular.module('codeboardApp')
             $scope.compilationResult = { 'inProgress': true };
             $scope.tests = [];
 
-
+            // show/hide avatar and avatars text
+            $scope.showAvatar = true;
+            $scope.avatarSays = "Damit du deine Lösung abgeben kannst, muss dein Programm alle Tests bestehen.";
 
             /**
-             * todo was muss die init-funktion machen?
+             *  todo avatar mit fade effect ersetzen
              */
-            $scope.init = function() {
-                //
+            let changeAvatar = function() {
+                $scope.avatarFade = true;
+                setTimeout(function() {
+                    $scope.avatarFade = false;
+                    $scope.$apply();
+                },1000);
             };
-            $scope.init();
 
+            /**
+             * Shows text with a short delay and ...
+             *
+             * todo typing effect einbauen
+             *
+             * @param text
+             */
+            let changeAvatarText = function(text) {
+                $scope.avatarSays = "...";
+                setTimeout(function(){
+                    $scope.avatarSays = text;
+                    $scope.$apply();
+                },600);
+            };
 
             /**
              * Test Project
@@ -46,7 +64,12 @@ angular.module('codeboardApp')
 
                 // replace title during testing
                 $scope.title = "Deine Lösung wird überprüft";
+                $scope.correctSolution = false;
                 $scope.inProgress = true;
+
+                // change avatar
+                $scope.showAvatar = true;
+                changeAvatarText("Ich bearbeite nun deinen Code.");
 
                 // get all tests related to this project
                 ProjectFactory.getTests()
@@ -58,6 +81,7 @@ angular.module('codeboardApp')
 
                         // store data/tests to scope and stop spinning
                         $scope.tests = data.tests;
+                        $scope.onSuccessMessage = data.onSuccess;
                         $scope.compilationResult.inProgress = false;
                         return data;
                     })
@@ -92,20 +116,27 @@ angular.module('codeboardApp')
                                         // update testData
                                         $scope.tests[i] = testResult;
 
-                                        // expand the first error
-                                        $scope.tests[i].open = false;
-                                        if(testResult.status === 'fail' && !hasErrors) {
-                                            $scope.tests[i].open = true;
-                                            hasErrors = true;
-                                        }
+                                        // check if test failed
+                                        if(testResult.status === 'fail') {
 
-                                        // stop further tests if `stopOnFailure` is set
-                                        if(testResult.stopOnFailure && testResult.status === 'fail') {
-                                            if(testResult.method === "compileTest") {
-                                                $scope.tests[i].name = "Fehler beim Kompilieren";
-                                                $scope.compileError = true;
+                                            // we dont want to show avatar when an error occurred
+                                            $scope.showAvatar = false;
+
+                                            // expand the first error
+                                            $scope.tests[i].open = false;
+                                            if(!hasErrors) {
+                                                $scope.tests[i].open = true;
+                                                hasErrors = true;
                                             }
-                                            ret = 0;
+
+                                            // stop further tests if `stopOnFailure` is set
+                                            if(testResult.stopOnFailure) {
+                                                if(testResult.method === "compileTest") {
+                                                    $scope.tests[i].name = "Fehler beim Kompilieren";
+                                                    $scope.compileError = true;
+                                                }
+                                                ret = 0;
+                                            }
                                         }
 
                                         // count and return either id of testResult or 0 if stopOnFailure
@@ -134,8 +165,11 @@ angular.module('codeboardApp')
 
                             // change scope variables
                             $scope.title = title;
-                            $scope.inProgress = false;
                             $scope.ioTestButtonText = "Lösung erneut überprüfen?";
+                            $scope.inProgress = false;
+
+                            // change avatar
+                            changeAvatarText($scope.onSuccessMessage);
 
                             // force update of scope (used for status)
                             $scope.$apply();
@@ -159,23 +193,18 @@ angular.module('codeboardApp')
                 $scope.doTheIoTesting();
             });
 
-
-
-
-
             /**
-             * because we can not trigger navBarClick from within the modal, we need
-             * to define a separate functions
+             * Return avatar depending on current status
+             * @returns {string}
              */
-            $scope.submitAfterTest = function() {
-                let req = IdeMsgService.msgSubmitRequest();
-                $rootScope.$broadcast(req.msg);
-            };
-            $scope.helpAfterTest = function() {
-                let req = IdeMsgService.msgHelpRequest();
-                $rootScope.$broadcast(req.msg);
-            };
+            $scope.getAvatar = function() {
+                let avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
 
+                if($scope.correctSolution) {
+                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg";
+                }
+                return avatar;
+            };
 
             /**
              * because the html of different test methods can vary, this functions cis used to load the html for

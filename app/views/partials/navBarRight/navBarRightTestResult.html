@@ -2,21 +2,17 @@
 
     <h1 class="ide-tab-title ide-tab-title-test pb-3" ng-bind="title"></h1>
 
-    <p class="ide-tab-test-description py-2">{{textBefore}}</p>
-
     <!-- Avatar with successMessage -->
-    <div ng-show="(correctSolution)">
-        <div class="chat row py-4">
+    <div ng-show="(showAvatar)">
+        <div class="chat row py-4 row-vertical-centered">
             <div class="col-md-3">
-                <div class="test-result-avatar">
-                    <img src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="64" width="64"/>
-                </div>
+                <img class="test-result-avatar" ng-class="{'fadeOut': avatarFade, 'fadeIn': avatarFade}" ng-src="{{getAvatar()}}" alt="Kompilierungsfehler aufgetreten"/>
             </div>
             <div class="col-md-9 px-4">
-                <ul class="chat p-0">
-                    <li class="chat-line test-succeed">
-                        <div class="chat-line-item chat-line-avatar left mb-3 float-left w-100">
-                            <div class="message pb-1 mb-0 text-gray-700">Alles richtig</div>
+                <ul class="chat p-0 m-0">
+                    <li class="chat-line">
+                        <div class="chat-line-item chat-line-avatar chat-line-success left w-100">
+                            <div class="message pb-1 mb-0 text-gray-700">{{avatarSays}}</div>
                         </div>
                     </li>
                 </ul>
@@ -53,7 +49,7 @@
         <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
     </button>
 
-    <button ng-show="(correctSolution && uiSettings.showSubmissionBtn)" class="btn btn-info btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
+    <button ng-show="(correctSolution && uiSettings.showSubmissionBtn)" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
         <span class="glyphicon glyphicon-send"></span> Lösung abgeben
     </button>
 </div>
@@ -68,16 +64,15 @@
     <script type="text/ng-template" id="ideIoTestResult.html">
         <div class="panel-body">
 
-            <div class="chat row pb-4">
+            <div class="chat row pb-4 row-vertical-centered">
                 <div class="col-md-3">
-                    <div class="test-result-avatar">
-                        <img src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="56" width="56"/>
-                    </div>
+                    <img class="test-result-avatar" ng-show="(test.status === 'success')" src="../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg" alt="Test erfolgreich bestanden" />
+                    <img class="test-result-avatar" ng-show="(test.status === 'fail')" src="../../../images/avatars/Avatar_RobyCoder_RZ_worried.svg" alt="Deine Lösung stimmt noch nicht ganz" />
                 </div>
                 <div class="col-md-9 px-4">
-                    <ul class="chat p-0" ng-class="{ 'test-succeed': (test.status === 'success') , 'test-failed': (test.status === 'fail')  }">
+                    <ul class="chat p-0">
                         <li class="chat-line">
-                            <div class="chat-line-item chat-line-avatar left mb-3 float-left w-100">
+                            <div class="chat-line-item chat-line-avatar left float-left w-100" ng-class="{ 'chat-line-fail': (test.status === 'fail')  }">
                                 <div class="message pb-1 mb-0 text-gray-700">{{test.result.note}}</div>
                             </div>
                         </li>
@@ -113,16 +108,14 @@
     <script type="text/ng-template" id="ideCompileTestResult.html">
         <div class="panel-body">
 
-            <div class="chat row pb-4">
-                <div class="col-md-3">
-                    <div class="test-result-avatar">
-                        <img src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="56" width="56"/>
-                    </div>
+            <div class="chat row pb-4 row-vertical-centered">
+                <div class="col-md-3 vcenter">
+                    <img class="test-result-avatar" src="../../../images/avatars/avatar_wondering.png" alt="Kompilierungsfehler aufgetreten" height="56" width="56"/>
                 </div>
-                <div class="col-md-9 px-4">
+                <div class="col-md-9 px-4 vcenter">
                     <ul class="chat p-0" ng-class="{ 'test-succeed': (test.status === 'success') , 'test-failed': (test.status === 'fail')  }">
                         <li class="chat-line">
-                            <div class="chat-line-item chat-line-avatar left mb-3 float-left w-100">
+                            <div class="chat-line-item chat-line-avatar chat-line-fail left w-100">
                                 <div class="message pb-1 mb-0 text-gray-700">{{test.result[0].note || "Dein Code besitzt leider noch Komprimierungs-Fehler. Versuche die untenstehende Fehlermeldung zu verstehen. Wenn du nicht mehr weiterkommst, nutze die Chat-Funkion, um Hilfe zu verlangen."}}</div>
                             </div>
                         </li>
