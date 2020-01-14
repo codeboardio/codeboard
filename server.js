@@ -146,7 +146,7 @@ require('./lib/routes')(app);
 
 var db = require('./lib/models');
 
-if (env == 'development') {
+if (env === 'development') {
   // Disable the foreign key constraints before trying to sync the models.
   // Otherwise, we're likely to violate a constraint while dropping a table.
   db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
@@ -166,6 +166,10 @@ if (env == 'development') {
           var templateProjects = require('./lib/config/dbTemplateProjects.js');
           templateProjects.addAllTemplateProjects();
 
+          // add all system users
+          var templateUsers = require('./lib/config/dbTemplateUsers.js');
+          templateUsers.addAllUsers();
+
           console.log('Codeboard server listening on port %d in %s mode', config.port, app.get('env'));
         });
       }
@@ -173,10 +177,14 @@ if (env == 'development') {
   }
 
 
-if(env == 'production') {
+if(env === 'production') {
 
   var templateProjects = require('./lib/config/dbTemplateProjects.js');
   templateProjects.addAllTemplateProjects();
+
+  // add all system users
+  var templateUsers = require('./lib/config/dbTemplateUsers.js');
+  templateUsers.addAllUsers();
 
   // start the server
   server.listen(config.port, function () {
