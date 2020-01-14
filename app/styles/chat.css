@@ -23,6 +23,7 @@
     -webkit-box-shadow: 1px 1px 2px #4487;
     width: 85%;
     position: relative;
+    box-sizing: border-box;
 }
 .chat-line-item.left,
 .chat-line-card.left {
@@ -112,23 +113,22 @@
 }
 
 /* Card Submission */
-.chat-line-card.submission .card-header {
+.chat-line-card.tip .card-header {
     border-bottom: 1px solid #ea4d1b;
     background-color: #fe5722;
 }
-.chat-line-card.submission .card-header:before {
-    content:"\e206";
+.chat-line-card.tip .card-header:before {
+    content:"\e086";
     font-family: "Glyphicons Halflings";
     display: inline-block;
     width: 36px;
     font-size: 20px;
     color: rgba(255, 255, 255, 0.6);
 }
-
-.chat-line-card.submission.right:after {
+.chat-line-card.tip.right:after {
     border-top-color: #fe5722 !important;
 }
-.chat-line-card.submission.left:before {
+.chat-line-card.tip.left:before {
     border-right-color: #fe5722 !important;
 }
 
@@ -217,21 +217,4 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.23921568627450981);
     position: relative;
     top: -.6em;
-}
-
-
-.chat .chatActions {
-    position: absolute;
-    right: 54px;
-    top: 24px;
-    display: none;
-}
-.chat .chat-line:hover .chatActions {
-    display: block;
-}
-
-.chat .chat-line-action-button {
-    background-color: #fff;
-    border-bottom: 0;
-    line-height: normal !important;
 }

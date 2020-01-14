@@ -1,23 +1,25 @@
-<div class="tab-body ide-tab-help ide-tab-chat" ng-controller="ideNavBarHelpChatCtrl">
+<div class="tab-body ide-tab-help ide-tab-chat" ng-controller="ideNavBarHelpCtrl">
 
     <h1 class="modal-title">Wie kann ich dir helfen?</h1>
 
-    <p>Falls du Probleme bei dieser Aufgabe hast, schau dir zunächst die Tipps für diese Aufgabe an.</p>
-    <p>Falls du noch immer Schwierigkeiten hast, kannst du die nachfolgende Chat-Funktion verwenden.</p>
+    <p>Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.</p>
 
     <div class="row conversation">
-        <ul class="chat py-4">
-            <li ng-repeat="chatLine in chatLines" class="clear chat-line {{chatLine.type}}">
+        <ul class="chat px-4">
+            <li ng-repeat="chatLine in chatLines" class="clear chat-line my-4 clearfix {{chatLine.type}}">
 
-                <div class="chat-line-posted-at text-{{chatLine.alignment}}">
-                    <small>{{chatLinePostedAt(chatLine.createdAt)}}</small>
+                <div class="chat-avatar" style="float: {{chatLine.alignment}}; width: 62px;">
+                    <div style="float: {{chatLine.alignment}}">
+                        <img src="{{getUserAvatar(chatLine)}}" width="50px" height="50px" />
+                    </div>
                 </div>
 
-                <div ng-include="getChatLine(chatLine)"></div>
+                <div class="mt-3 w-75" style="float: {{chatLine.alignment}};">
+                    <div class="chat-line-posted-at text-{{chatLine.alignment}}">
+                        <small>{{chatLinePostedAt(chatLine.createdAt)}} | {{chatLine.author.username}}</small>
+                    </div>
 
-                <div ng-show="showChatLineActions(chatLine)" class="chatActions">
-                    <button class="btn btn-sm btn-circle chat-line-action-button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
-                    <button class="btn btn-sm btn-circle chat-line-action-button"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>
+                    <div ng-include="getChatLine(chatLine)"></div>
                 </div>
             </li>
         </ul>
@@ -34,6 +36,9 @@
             </div>
         </form>
 
+
+        <button class="btn btn-primary" ng-click="sendTipRequest()">Tipp anfordern</button>
+
     </div>
 </div>
 
@@ -41,21 +46,21 @@
 
 <!-- Template for chat lines "Text" -->
 <script type="text/ng-template" id="chatLineText.html">
-    <div class="chat-line-item {{chatLine.alignment}} mb-3 float-left w-75">
+    <div class="chat-line-item {{chatLine.alignment}} float-left w-100">
         <div class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</div>
     </div>
 </script>
 
 <!-- Template for chat lines "HTML" -->
 <script type="text/ng-template" id="chatLineHtml.html">
-    <div class="chat-line-item {{chatLine.alignment}} mb-3 float-left w-75">
+    <div class="chat-line-item {{chatLine.alignment}} float-left w-100">
         <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="chatLine.message"></div>
     </div>
 </script>
 
 <!-- Template for chat lines "Card" -->
 <script type="text/ng-template" id="chatLineCard.html">
-    <div class="chat-line-card {{chatLine.alignment}} {{chatLine.message.cardType}} mb-3 float-left w-75">
+    <div class="chat-line-card {{chatLine.alignment}} {{chatLine.message.cardType}} float-left w-100">
         <div class="card-header" ng-bind-html="chatLine.message.cardHeader"></div>
         <div class="card-body" ng-bind-html="chatLine.message.cardBody"></div>
     </div>
