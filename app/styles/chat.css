@@ -27,11 +27,11 @@
 }
 .chat-line-item.left,
 .chat-line-card.left {
-    background: #fff;
+    background: #e1e6ed;
 }
 .chat-line-item.right,
 .chat-line-card.right {
-    background: #e1e6ed;
+    background: #fff;
     float: right;
 }
 .chat-line-item.left:before,
@@ -49,13 +49,13 @@
 .chat-line-card.left:before {
     left: -10px;
     border-width: 0 13px 13px 0;
-    border-color: transparent #fff transparent transparent;
+    border-color: transparent #e1e6ed transparent transparent;
 }
 .chat-line-item.right:after,
 .chat-line-card.right:after {
     right: -10px;
     border-width: 13px 13px 0 0;
-    border-color: #e1e6ed transparent transparent transparent;
+    border-color: #fff transparent transparent transparent;
 }
 
 .chat-line-item .text {
@@ -163,58 +163,11 @@
 
 
 
-
-
-
-
-
-.chat .send-message {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background: #fff;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+.sendRequest {
+    border-top: 3px solid #ddd;
 }
 
-.chat .send-message input.ask {
-    height: 50px;
-}
-.chat .send-message input.ask::placeholder {
-    color: #ddd;
-}
-.chat .send-message input.ask:focus {
-    box-shadow: none !important;
-    border-color: #0064a6 !important;
-}
-
-.chat .send-message .send {
-    height: 50px;
-    background: #0064a6 !important;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-}
-.chat .send-message .send i {
-    font-size: 1.4em;
-    color: #ffffffba;
-}
-
-
-.new-conversation .group {
-    display: table;
-    margin: 0 auto;
-}
-.new-conversation .item {
-    display: table-cell;
-}
-.new-conversation .text {
-    white-space: nowrap;
-    width: 1%;
-    padding: 0 10px;
-}
-.new-conversation .line {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.23921568627450981);
-    position: relative;
-    top: -.6em;
+.sendRequest .topic {
+    height: 120px;
+    border-radius: 5px;
 }

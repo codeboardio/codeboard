@@ -136,6 +136,11 @@ fieldset[disabled] .btn:hover {
 
 
 /** - - - Bootstrap 4 Spacing + Sizing - - - */
+
+[class^="w-"], [class*=" w-"] {
+    box-sizing: border-box;
+}
+
 .w-25 {
     width: 25% !important;
 }

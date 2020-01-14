@@ -16,57 +16,16 @@ angular.module('codeboardApp')
     .controller('ideNavBarHelpCtrl', ['$scope', '$rootScope', '$sce', 'IdeMsgService', 'ProjectFactory', 'ChatSrv',
     function ($scope, $rootScope, $sce, IdeMsgService, ProjectFactory, ChatSrv) {
 
-        let slug = 'help';
+        let slug = 'help',
+            defaultMessage  = "Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.",
+            avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
 
         // scope defaults
         $scope.content = "Hilfe-Funktion ist für diese Aufgabe deaktiviert!";
         $scope.chatLines = [];
         $scope.tips = [];
-        $scope.numTip = 0;
         $scope.numTips = 0;
-
-
-        /**
-         * Functiont thats loads the chathistory
-         */
-        let reloadChatHistory = function() {
-
-            let chatHistory = [];
-            return ChatSrv.getChatHistory()
-                .then(function(result) {
-                    result.data.forEach(function(chatLine) {
-
-                        // todo alignment abhängig davon machen, ob user oder owner?
-                        //  sodass eigene Nachrichten immer rechts angezeigt werden..
-
-                        // set alignment
-                        chatLine.alignment = 'left';
-                        if(chatLine.authorId !== chatLine.userId) {
-                            chatLine.alignment = 'right';
-                        }
-
-                        // if chatLine type card, parse the message
-                        if(chatLine.type === 'card') {
-                            chatLine.message = JSON.parse(chatLine.message);
-
-                            // count number of tips, in order to find out what tip to show next
-                            if(chatLine.message.cardType === "tip") {
-                                $scope.numTip++;
-                            }
-                        }
-                        chatHistory.push(chatLine);
-                    });
-
-                    console.log(chatHistory);
-
-                    // set the chatLines to display
-                    $scope.chatLines = chatHistory;
-                    return chatHistory;
-                })
-                .catch(function() {
-                    console.log("Fehler beim Laden des Chatverlaufs");
-                });
-        };
+        $scope.sendRequestFormVisible = false;
 
 
         /**
@@ -81,21 +40,63 @@ angular.module('codeboardApp')
         };
 
         /**
+         *
+         * @param chatLine
+         * @returns {*}
+         */
+        let addChatLine = function(chatLine) {
+            chatLine.alignment = 'right';
+            if(chatLine.authorId !== chatLine.userId) {
+                chatLine.alignment = 'left';
+            }
+
+            // if chatLine type card, parse the message
+            if(chatLine.type === 'card') {
+                chatLine.message = JSON.parse(chatLine.message);
+            }
+            $scope.chatLines.push(chatLine);
+        };
+
+        /**
          * init this tab by loading chat history and read tips
          */
         $scope.init = function() {
 
-            reloadChatHistory();
+            $scope.sendRequestFormVisible = !$scope.currentRoleIsUser();
 
-            // read all tips for this project
-            let config = ProjectFactory.getConfig();
-            if("Help" in config && "tips" in config.Help) {
-                $scope.tips = config.Help.tips;
-                $scope.numTips = $scope.tips.length;
-                $scope.helpIntro = config.Help.helpIntro;
-            }
+            // load chat history
+            ChatSrv.getChatHistory()
+                .then(function(result) {
+
+                    // default message
+                    addChatLine({
+                        id: -1,
+                        authorId: -1,
+                        type: "text",
+                        message: defaultMessage,
+                        author: {username: avatarName}
+                    });
+
+                    // loop trough chatlines
+                    result.data.forEach(function(chatLine) {
+                        addChatLine(chatLine);
+                    });
+                })
+                .then(function() {
+                    // read all tips for this project
+                    let config = ProjectFactory.getConfig();
+                    if("Help" in config && "tips" in config.Help) {
+                        $scope.tips = config.Help.tips;
+                        $scope.numTips = $scope.tips.length;
+                        $scope.helpIntro = config.Help.helpIntro;
+                    }
+                })
+                .catch(function() {
+                    console.log("Fehler beim Laden des Chatverlaufs");
+                });
         };
         $scope.init();
+
 
         /**
          * Returns formatted posted at
@@ -104,7 +105,10 @@ angular.module('codeboardApp')
          */
         $scope.chatLinePostedAt = function(date) {
             let postedAt = new Date(date);
-            return postedAt.toLocaleString("de-DE");
+            if(postedAt instanceof Date && !isNaN(postedAt)) {
+                return postedAt.toLocaleString("de-DE");
+            }
+            return "todo";
         };
 
         /**
@@ -125,8 +129,8 @@ angular.module('codeboardApp')
 
                 // add chatline and reload chat history
                 ChatSrv.addChatLine(chatLine, 'card', 'avatar')
-                    .then(function() {
-                        reloadChatHistory();
+                    .then(function(chatLine) {
+                        addChatLine(chatLine);
                     });
             }
         };
@@ -152,8 +156,8 @@ angular.module('codeboardApp')
                     if(ProjectFactory.getProject().userBeingInspected) {
                         // add chatLine as html and reload chat history
                         ChatSrv.addChatLine(helpRequest.userNote, 'html')
-                            .then(function() {
-                                reloadChatHistory();
+                            .then(function(chatLine) {
+                                addChatLine(chatLine);
                             });
                     } else {
                         // when storing a card, we need to define card header and body
@@ -165,8 +169,8 @@ angular.module('codeboardApp')
 
                         // add chatline and reload chat history
                         ChatSrv.addChatLine(chatLine, 'card')
-                            .then(function() {
-                                reloadChatHistory();
+                            .then(function(chatLine) {
+                                addChatLine(chatLine);
                             });
                     }
 
@@ -198,10 +202,18 @@ angular.module('codeboardApp')
          * @returns {string}
          */
         $scope.getUserAvatar = function(chatLine) {
-            if(chatLine.author.username === 'Roby') { // todo dieser Benutzername ist eingetlich nicht statisch ...
+            if(chatLine.author.username === avatarName) {
                 return "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg";
             }
             return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+        };
+
+
+        /**
+         * Show send request form on click
+         */
+        $scope.showSendRequestForm = function() {
+            $scope.sendRequestFormVisible = true;
         };
 
     }]);

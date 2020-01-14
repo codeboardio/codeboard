@@ -2,10 +2,9 @@
 
     <h1 class="modal-title">Wie kann ich dir helfen?</h1>
 
-    <p>Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.</p>
-
     <div class="row conversation">
         <ul class="chat px-4">
+
             <li ng-repeat="chatLine in chatLines" class="clear chat-line my-4 clearfix {{chatLine.type}}">
 
                 <div class="chat-avatar" style="float: {{chatLine.alignment}}; width: 62px;">
@@ -26,18 +25,27 @@
     </div>
 
 
-    <div class="sendRequest">
-        <form id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
-            <div class="form-group">
-                <textarea class="topic" ng-model="note" name="note" placeholder="Dein Anliegen"></textarea>
+    <div class="sendRequest mt-4 pt-4">
+
+        <button ng-show="currentRoleIsUser()" class="btn btn-success btn-100" ng-click="sendTipRequest()">
+            <span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern
+        </button>
+
+        <button ng-show="!sendRequestFormVisible" class="btn btn-info btn-100" ng-click="showSendRequestForm()">
+            <span class="glyphicon glyphicon-question-sign"></span>Frage stellen
+        </button>
+
+        <form ng-show="sendRequestFormVisible" id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
+            <div class="form-group w-100 mb-2">
+                <textarea class="topic w-100 border-box p-4" ng-model="note" name="note" placeholder="Dein Anliegen"></textarea>
             </div>
-            <div class="form-group">
-                <button class="btn btn-primary">Hilfe Anfordern</button>
+            <div class="form-group w-100">
+                <button ng-show="currentRoleIsUser()" class="btn btn-info btn-100">
+                    <span class="glyphicon glyphicon-question-sign"></span>Frage senden
+                </button>
+                <button ng-hide="currentRoleIsUser()" class="btn btn-info btn-100">Nachricht an den Studenten</button>
             </div>
         </form>
-
-
-        <button class="btn btn-primary" ng-click="sendTipRequest()">Tipp anfordern</button>
 
     </div>
 </div>
