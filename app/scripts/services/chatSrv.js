@@ -12,13 +12,14 @@ angular.module('codeboardApp')
         /**
          * add chat line
          */
-        let addChatLine = function(aMessage, type = 'text') {
+        let addChatLine = function(aMessage, type = 'text', user = null) {
+
             // data used for this call
             let username = ProjectFactory.getProject().userBeingInspected || UserSrv.getUsername(),
                 projectId = $routeParams.projectId,
                 payload = {
                     aMessage: (typeof aMessage === 'object') ? JSON.stringify(aMessage) : aMessage,
-                    author: UserSrv.getUsername(),
+                    author: user || UserSrv.getUsername(),
                     type: type
                 };
 
