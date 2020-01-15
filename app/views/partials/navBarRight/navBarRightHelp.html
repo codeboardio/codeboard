@@ -1,4 +1,4 @@
-<div class="tab-body ide-tab-help ide-tab-chat" ng-controller="ideNavBarHelpCtrl">
+<div class="tab-body ide-tab-help ide-tab-chat" ng-controller="ideNavBarHelpCtrl" id="chat-wrapper">
 
     <h1 class="modal-title">Wie kann ich dir helfen?</h1>
 
@@ -6,28 +6,25 @@
         <ul class="chat px-4">
 
             <li ng-repeat="chatLine in chatLines" class="clear chat-line my-4 clearfix {{chatLine.type}}">
-
-                <div class="chat-avatar" style="float: {{chatLine.alignment}}; width: 62px;">
+                <div class="chat-avatar" style="float: {{chatLine.alignment}};">
                     <div style="float: {{chatLine.alignment}}">
-                        <img src="{{getUserAvatar(chatLine)}}" width="50px" height="50px" />
+                        <img src="{{getUserAvatar(chatLine)}}" width="55px" height="55px" />
                     </div>
                 </div>
-
-                <div class="mt-3 w-75" style="float: {{chatLine.alignment}};">
+                <div class="mt-3 chat-message" style="float: {{chatLine.alignment}};">
                     <div class="chat-line-posted-at text-{{chatLine.alignment}}">
                         <small>{{chatLinePostedAt(chatLine.createdAt)}} | {{chatLine.author.username}}</small>
                     </div>
-
                     <div ng-include="getChatLine(chatLine)"></div>
                 </div>
             </li>
         </ul>
     </div>
 
-
+    <!-- User Actions -->
     <div class="sendRequest mt-4 pt-4">
 
-        <button ng-show="currentRoleIsUser()" class="btn btn-success btn-100" ng-click="sendTipRequest()">
+        <button ng-show="currentRoleIsUser()" ng-disabled="requestTipDisabled" class="btn btn-success btn-100" ng-click="sendTipRequest()">
             <span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern
         </button>
 
@@ -35,7 +32,11 @@
             <span class="glyphicon glyphicon-question-sign"></span>Frage stellen
         </button>
 
+        <!-- Add Message Form -->
         <form ng-show="sendRequestFormVisible" id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
+
+            <p class="text-danger">{{sendHelpFormErrors}}</p>
+
             <div class="form-group w-100 mb-2">
                 <textarea class="topic w-100 border-box p-4" ng-model="note" name="note" placeholder="Dein Anliegen"></textarea>
             </div>
@@ -46,8 +47,9 @@
                 <button ng-hide="currentRoleIsUser()" class="btn btn-info btn-100">Nachricht an den Studenten</button>
             </div>
         </form>
-
     </div>
+
+    <div id="targetinto" style="height: 1px; width: 100%"></div>
 </div>
 
 
@@ -59,6 +61,7 @@
     </div>
 </script>
 
+
 <!-- Template for chat lines "HTML" -->
 <script type="text/ng-template" id="chatLineHtml.html">
     <div class="chat-line-item {{chatLine.alignment}} float-left w-100">
@@ -66,10 +69,14 @@
     </div>
 </script>
 
+
 <!-- Template for chat lines "Card" -->
 <script type="text/ng-template" id="chatLineCard.html">
     <div class="chat-line-card {{chatLine.alignment}} {{chatLine.message.cardType}} float-left w-100">
-        <div class="card-header" ng-bind-html="chatLine.message.cardHeader"></div>
+        <div class="card-header">
+            <span ng-show="currentRoleIsUser() || !chatLine.message.cardReference">{{chatLine.message.cardHeader}}</span>
+            <a ng-hide="currentRoleIsUser() || !chatLine.message.cardReference" href="{{chatLine.message.cardReference}}">{{chatLine.message.cardHeader}}</a>
+        </div>
         <div class="card-body" ng-bind-html="chatLine.message.cardBody"></div>
     </div>
 </script>

@@ -1,4 +1,44 @@
+#ideRighterPartOfMiddlePart {
+    overflow: hidden;
+}
 
+.ide-tabs {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.ide-tabs .tab-body {
+    padding: 12px;
+    font-size: 0.8em;
+}
+.ide-tabs .tab-body h1 {
+    font-size: 20px;
+}
+.ide-tabs .tab-body h2 {
+    font-size: 16px;
+}
+.ide-tabs .tab-body h3 {
+    font-size: 13px;
+}
+.ide-tabs .tab-body h4 {
+    font-size: 11px;
+}
+.ide-tabs .tab-body h1,
+.ide-tabs .tab-body h2,
+.ide-tabs .tab-body h3,
+.ide-tabs .tab-body h4 {
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+.ide-tabs .tab-body pre {
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+
+/* - - - Chat - - - */
 .chat {
     width:100%;
     box-sizing: border-box;
@@ -8,6 +48,14 @@
 .chat-line {
     position: relative;
     clear: both;
+}
+
+.chat-line .chat-avatar {
+    width: 65px;
+}
+.chat-line .chat-message {
+    width: 75%; /* fallback */
+    width: calc(100% - 130px); /* double the width of the .chat-avatar */
 }
 
 .chat-line-posted-at {
@@ -20,14 +68,14 @@
     border-radius:5px;
     padding: 15px;
     box-shadow: 1px 1px 6px #4487;
-    -webkit-box-shadow: 1px 1px 2px #4487;
+    -webkit-box-shadow: 0px 1px 4px #4487;
     width: 85%;
     position: relative;
     box-sizing: border-box;
 }
 .chat-line-item.left,
 .chat-line-card.left {
-    background: #e1e6ed;
+    background: #f1f5f9;
 }
 .chat-line-item.right,
 .chat-line-card.right {
@@ -49,7 +97,7 @@
 .chat-line-card.left:before {
     left: -10px;
     border-width: 0 13px 13px 0;
-    border-color: transparent #e1e6ed transparent transparent;
+    border-color: transparent #f1f5f9 transparent transparent;
 }
 .chat-line-item.right:after,
 .chat-line-card.right:after {

@@ -446,36 +446,6 @@ body {
 
 /** todo nachfolgenden css-Angaben in separates File **/
 
-.ide-tabs .tab-body {
-  padding: 20px;
-  font-size: 0.8em;
-}
-.ide-tabs .tab-body h1 {
-  font-size: 20px;
-}
-.ide-tabs .tab-body h2 {
-  font-size: 16px;
-}
-.ide-tabs .tab-body h3 {
-  font-size: 13px;
-}
-.ide-tabs .tab-body h4 {
-  font-size: 11px;
-}
-.ide-tabs .tab-body h1,
-.ide-tabs .tab-body h2,
-.ide-tabs .tab-body h3,
-.ide-tabs .tab-body h4 {
-  margin-top: 14px;
-  margin-bottom: 6px;
-}
-
-.ide-tabs .tab-body pre {
-  font-size: 11px;
-  line-height: 1.2;
-}
-
-
 /* - - - Footer Status Bar - - - */
 .ideFooterStatusBar {
   height: 18px;

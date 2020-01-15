@@ -248,7 +248,7 @@
 
             </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
 
-            <div id="ideRighterPartOfMiddlePart" class="ideSplitterFullHeight">
+            <div id="ideRighterPartOfMiddlePart" class="ideSplitterFullHeight" style="overflow: hidden">
                 <div class="ide-tabs" ng-repeat="tab in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(tab.slug)"></div>
             </div>
 
