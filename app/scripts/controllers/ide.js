@@ -857,8 +857,11 @@ app.controller('IdeCtrl',
             return _toolIsSupported;
         };
 
-
-
+      // prepare panes depending on hidden actions
+      $scope.kPanes = ($scope.isActionHidden("tree-view")) ? "[" : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
+      $scope.kPanes += " {collapsible: false} ";
+      $scope.kPanes += (!angular.equals({}, $scope.rightBarTabs)) ? ", { collapsible: true, resizable: true, collapsed: true, size: '35%' }" : "";
+      $scope.kPanes += (!angular.equals({}, $scope.rightBarTabs)) ? ", { collapsible: false, resizable: false, collapsed: false, size: '26px' } ]" : "]";
 
       /**
        * Opens a nav bar right tab
