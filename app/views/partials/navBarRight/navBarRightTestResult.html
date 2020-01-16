@@ -45,11 +45,11 @@
         <span ng-bind="ioTestButtonText"></span>
     </button>
 
-    <button ng-show="(!correctSolution)" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+    <button ng-if="!isActionHidden('help')" ng-show="(!correctSolution)" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
         <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
     </button>
 
-    <button ng-show="(correctSolution && uiSettings.showSubmissionBtn)" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
+    <button ng-if="!isActionHidden('submit')" ng-show="(correctSolution && uiSettings.showSubmissionBtn)" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
         <span class="glyphicon glyphicon-send"></span> Lösung abgeben
     </button>
 </div>

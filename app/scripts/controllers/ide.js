@@ -37,8 +37,6 @@ app.controller('IdeCtrl',
             .get(_urlForUserProject)
             .success(function(result) {
 
-              console.log(result);
-
               /** The controller for the modal */
               var loadUserProjectModalInstanceCtrl =  ['$scope', '$uibModalInstance', 'UserSrv', function ($scope, $uibModalInstance, UserSrv) {
 
@@ -113,7 +111,6 @@ app.controller('IdeCtrl',
                   // the files of the user
                   fileSet: result.files
                 };
-
 
                 // update the project data in the ProjectFactory
                 ProjectFactory.setProjectFromJSONdata(userProjectData, ltiData);
@@ -249,11 +246,51 @@ app.controller('IdeCtrl',
        * @author Janick Michot
        */
       let processCollapsedQuery = function() {
-
         $scope.collapseTree = true;
         // check for the "view" query string
         if($routeParams.collapseTree) {
           $scope.collapseTree = ($routeParams.collapseTree);
+        }
+      };
+
+
+      /**
+       * Sets the output.
+       * @param outputToDisplay the value to display in the output
+       */
+      let setOutput = function(outputToDisplay) {
+        $scope.output = $sce.trustAsHtml(outputToDisplay);
+        $scope.htmlOutput = '';
+      };
+
+      // the output in the console of the ide
+      setOutput('This will display the output.', false);
+
+      /**
+       * Adds the given aOutputToAdd to the existing output
+       * @param aOutputToAdd the value to add to the output
+       * @return {number} the number of characters displayed in the output
+       */
+      let addToOutput = function(aOutputToAdd) {
+        $scope.$apply(function () {
+          let output = $scope.output + aOutputToAdd;
+          $scope.output = $sce.trustAsHtml(output);
+        });
+
+        // if there is an htmlOutput, we need to unwrap it before we can count it's length.
+        return $scope.output.length;
+      };
+
+      /**
+       * Calling this function will trigger a saving of the content that's currently
+       * displayed in the editor. This should e.g. be done before compiling or
+       * submitting a solution.
+       */
+      let saveCurrentlyDisplayedContent = function() {
+        // if the editor is currently displaying a file, we need to store the content first
+        if ($scope.ace.currentNodeId !== -1) {
+          // if the value is !== -1, then some tab is open
+          ProjectFactory.getNode($scope.ace.currentNodeId).content = $scope.ace.editor.getSession().getValue();
         }
       };
 
@@ -335,61 +372,9 @@ app.controller('IdeCtrl',
       };
 
 
-      /**
-       * Calling this function will trigger a saving of the content that's currently
-       * displayed in the editor. This should e.g. be done before compiling or
-       * submitting a solution.
-       */
-      var saveCurrentlyDisplayedContent = function() {
-        // if the editor is currently displaying a file, we need to store the content first
-        if ($scope.ace.currentNodeId !== -1) {
-          // if the value is !== -1, then some tab is open
-          ProjectFactory.getNode($scope.ace.currentNodeId).content = $scope.ace.editor.getSession().getValue();
-        }
-      };
-
-      /**
-       * Opens a nav bar right tab
-       * @author Janick Michot
-       * @date 30.12.2019
-       */
-      let openNavBarRightTab = function(tab) {
-        let req = IdeMsgService.msgNavBarRightOpenTab(tab);
-        $rootScope.$broadcast(req.msg, req.data);
-      };
-
-
-      /**
-       * Sets the output.
-       * @param outputToDisplay the value to display in the output
-       */
-      var setOutput = function(outputToDisplay) {
-        $scope.output = $sce.trustAsHtml(outputToDisplay);
-        $scope.htmlOutput = '';
-      };
-
-      // the output in the console of the ide
-      setOutput('This will display the output.', false);
-
-      /**
-       * Adds the given aOutputToAdd to the existing output
-       * @param aOutputToAdd the value to add to the output
-       * @return {number} the number of characters displayed in the output
-       */
-      var addToOutput = function(aOutputToAdd) {
-        $scope.$apply(function () {
-          let output = $scope.output + aOutputToAdd;
-          $scope.output = $sce.trustAsHtml(output);
-        });
-
-        // if there is an htmlOutput, we need to unwrap it before we can count it's length.
-        return $scope.output.length;
-      };
-
-
       // check if Websockets are supported; if not, show a warning message
       if ('WebSocket' in window && (typeof WebSocket === 'function' || typeof WebSocket === 'object')) {
-        $log.debug('Info: Browser supports WebSockets')
+        $log.debug('Info: Browser supports WebSockets');
       } else {
         setOutput('Warning: your browser does not support WebSockets.\n' +
           'This may cause Codeboard to not work properly.\n' +
@@ -444,7 +429,7 @@ app.controller('IdeCtrl',
       /**
        * Function that executes a "run" of the current project.
        */
-      var runProject = function () {
+      let runProject = function () {
 
         // remove previous output message
         setOutput('Waiting for results...', false);
@@ -521,131 +506,10 @@ app.controller('IdeCtrl',
             });
       };
 
-
-      /**
-       * Handles the event that the Modal for "Test Project" should be shown.
-       *
-       * @author Janick Michot
-       */
-      let testProject = function () {
-
-        $scope.testResult = 0;
-
-        // make sure we save the current content before submitting
-        saveCurrentlyDisplayedContent();
-
-        /** The controller for the modal */
-        let testProjectModalInstanceCtrl =  ['$rootScope','$scope', '$location', '$uibModalInstance', function ($rootScope, $scope, $location, $uibModalInstance) {
-
-          $scope.compilationResult = { 'inProgress': true };
-          $scope.tests = [];
-
-          // get all tests related to this project
-          ProjectFactory.getTests()
-            .then(function(data) {
-              if(data.fail) {
-                Promise.reject("Fehlgeschlagen: " + data.msg);
-              }
-              // store data/tests to scope and stop spinning
-              $scope.tests = data.tests;
-              $scope.compilationResult.inProgress = false;
-              return data;
-            })
-            .then(function(data) {
-              let i = 0;
-              // do io-test asynchronously one after another
-              return data.tests.reduce(function (promiseChain, test) {
-
-                // Note, Promise.resolve() resolve is our initial value
-                return promiseChain.then(function (id) {
-
-                  // dont make any further tests after `stopOnFailure`
-                  if(i > 0 && id === 0) {
-                    test.status = "unreachable";
-                    $scope.tests[i] = test; i++;
-                    return 0;
-                  }
-
-                  $scope.tests[i].status = 'processing';
-
-                  // set compilation/run id from last call
-                  test.id = id;
-
-                  return ProjectFactory.testProject(test)
-                    .then(function(testResult) {
-                      // update testData
-                      $scope.tests[i] = testResult; i++;
-
-                      if(testResult.stopOnFailure && testResult.status === 'fail') {
-                        return 0;
-                      }
-                      return testResult.id;
-                    });
-                  });
-                },
-                Promise.resolve()
-              )
-                .then(function(testResult) {
-
-                  // create summary
-                  $scope.numTestsPassed = $scope.tests.filter(test => { return (test.status === 'success'); }).length;
-                  $scope.numTestsFailed = $scope.tests.filter(test => { return (test.status !== 'success'); }).length;
-                  $scope.testResult = (1 / $scope.tests.length * $scope.numTestsPassed);
-
-                  // force update of scope (used for status)
-                  $scope.$apply();
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-            });
-
-
-          /**
-           * because we can not trigger navBarClick from within the modal, we need
-           * to define a separate functions
-           */
-          $scope.submitAfterTest = function() {
-            let req = IdeMsgService.msgSubmitRequest();
-            $rootScope.$broadcast(req.msg);
-          };
-          $scope.helpAfterTest = function() {
-            let req = IdeMsgService.msgHelpRequest();
-            $rootScope.$broadcast(req.msg);
-          };
-
-          /**
-           * because the html of different test methods can vary, this functions cis used to load the html for
-           * a certain test method
-           * @param method
-           * @returns {string}
-           */
-          $scope.getTestMethodOutput = function(method) {
-            switch (method) {
-              case 'ioTest':
-                return 'ideIoTestResult.html';
-              case 'compileTest':
-                return 'ideCompileTestResult.html';
-            }
-          };
-
-          $scope.closeModal = function () {
-            $uibModalInstance.close();
-          };
-        }];
-
-        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
-        $uibModal.open({
-          templateUrl: 'ideTestProjectModal.html',
-          controller: testProjectModalInstanceCtrl
-        });
-
-      };
-
       /**
        * Execute the "tool" action on the current project
        */
-      var toolAction = function() {
+      let toolAction = function() {
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
@@ -689,7 +553,7 @@ app.controller('IdeCtrl',
       /**
        * Submits the current project (e.g. for grading).
        */
-      var submitProject = function () {
+      let submitProject = function () {
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
@@ -717,11 +581,11 @@ app.controller('IdeCtrl',
             setEnabledActions(1,0,1,1,1);
           }
         );
-      }
+      };
 
 
       /** Function to stop an action (e.g. run); Requires that ideState.stopUrl is set */
-      var stopAction = function stopAction() {
+      let stopAction = function stopAction() {
         if (ideState.stopUrl) {
 
           $http.get(ideState.stopUrl)
@@ -836,6 +700,28 @@ app.controller('IdeCtrl',
         stop: true
       };
 
+      /**
+       * Enable or disable UI elements for actions.
+       * @param compile {number} if 1, compile action will be set enabled
+       * @param run {number} if 1, run action will be set enabled
+       * @param test {number} if 1, test action will be set enabled
+       * @param tool {number} if 1, tool action will be set enabled
+       * @param submit {number} if 1, submit action will be set enabled
+       */
+      var setEnabledActions = function(compile, run, test, tool, submit) {
+        $scope.disabledActions.compile = !(compile == 1);
+        $scope.disabledActions.run = !(run == 1);
+        $scope.disabledActions.test = !(test == 1);
+        $scope.disabledActions.tool = !(tool == 1);
+        $scope.disabledActions.submit = !(submit == 1);
+
+        // trigger a digest because when the WebSocket closes, the buttons sometimes don't get enabled
+        if(!$scope.$$phase) {
+           $scope.$digest();
+        }
+      };
+
+
       // state variable to indicate if a programm is running or not
       $scope.programmIsRunning = false;
 
@@ -875,56 +761,114 @@ app.controller('IdeCtrl',
         signinPathWithRedirect: function() {
           return '/signin?redirect=' + encodeURIComponent($location.url());
         }
-      }
-
-
-      /**
-       * Enable or disable UI elements for actions.
-       * @param compile {number} if 1, compile action will be set enabled
-       * @param run {number} if 1, run action will be set enabled
-       * @param test {number} if 1, test action will be set enabled
-       * @param tool {number} if 1, tool action will be set enabled
-       * @param submit {number} if 1, submit action will be set enabled
-       */
-      var setEnabledActions = function(compile, run, test, tool, submit) {
-        $scope.disabledActions.compile = (compile !== 1);
-        $scope.disabledActions.run = (run !== 1);
-        $scope.disabledActions.test = (test !== 1);
-        $scope.disabledActions.tool = (tool !== 1);
-        $scope.disabledActions.submit = (submit !== 1);
-
-        // trigger a digest because when the WebSocket closes, the buttons sometimes don't get enabled
-        if(!$scope.$$phase) {
-          $scope.$digest();
-        }
       };
 
 
-      /** Returns true if the user looking at the project in the ide is an owner of the project*/
-      // TODO: deprecated as we replaced it with currentRoleIsOwner
-      $scope.currentUserIsOwner = function() {
-        return ProjectFactory.getProject().userRole === 'owner';
-      }
+      /**
+       * Returns true if user is authentificated   todo was mit lti usern?
+       * @returns {Boolean|void|boolean}
+       */
+      $scope.userAllowedToSave = function() {
+        return UserSrv.isAuthenticated();
+      };
 
       /** Returns true if the current role is that of project 'owner' */
       $scope.currentRoleIsOwner = function() {
         return ProjectFactory.getProject().userRole === 'owner';
-      }
+      };
 
       /** Returns true if the current role is that of project 'user' */
       $scope.currentRoleIsUser = function() {
         return ProjectFactory.getProject().userRole === 'user';
-      }
+      };
 
       /** Returns true if the current role is that of project 'submission' */
       $scope.currentRoleIsSubmission = function() {
         return ProjectFactory.getProject().userRole === 'submission';
-      }
+      };
 
       /** Returns true if the current role is that of project 'userproject' */
       $scope.currentRoleIsUserProject = function() {
         return ProjectFactory.getProject().userRole === 'userproject';
-      }
+      };
+
+      /**
+       * returns true whether or not this project uses the `compileAndRun` button
+       **/
+      $scope.isCompileAndRun = function() {
+        return (ProjectFactory.getConfig().separateCompileAndRun !== true);
+      };
+
+      /**
+       * Returns true or false whether the action is disabled in codeboard.json or not
+       * @param action
+       * @returns {*}
+       */
+      $scope.isActionHidden = function(action) {
+        if ((ProjectFactory.getProject().userRole === 'owner' &&  UserSrv.isAuthenticated()) || !ProjectFactory.hasConfig('userDisabledActions')) {
+            return false;
+        }
+        return ProjectFactory.getConfig().userDisabledActions.includes(action);
+      };
+
+      /**
+       * Returns false if a language doesn't need compilation
+       * but can be run directly.
+       * @return {boolean}
+       */
+      $scope.isCompilationNeeded = function() {
+        var _dynamicLanguages = ['Python', 'Python-UnitTest'];
+        var _compilationIsNeeded = true;
+
+        if(_dynamicLanguages.indexOf(ProjectFactory.getProject().language) !== -1) {
+          _compilationIsNeeded = false;
+        }
+
+        // $log.debug('Project uses langguage that needs compilation: ' + result);
+          return _compilationIsNeeded;
+      };
+
+      /**
+       * Returns true if a language supports testing with some testing framework.
+       * @return {boolean}
+       */
+      $scope.isTestSupported = function() {
+        return ProjectFactory.hasConfig('Testing', 'ioTests');
+      };
+
+      /**
+       * Returns true if a language supports testing with some testing framework.
+       * @return {boolean}
+       */
+      $scope.isToolSupported = function() {
+
+            return false;
+
+            // todo check what we can use here (Janick)
+
+            var _toolProjects = ['Infer-Java'];
+            var _toolIsSupported = false;
+
+            if(_toolProjects.indexOf(ProjectFactory.getProject().language) !== -1) {
+                _toolIsSupported = true;
+            }
+
+            // $log.debug('Project uses testing framework: ' + result);
+            return _toolIsSupported;
+        };
+
+
+
+
+      /**
+       * Opens a nav bar right tab
+       * @author Janick Michot
+       * @date 30.12.2019
+       */
+      let openNavBarRightTab = function(tab) {
+        let req = IdeMsgService.msgNavBarRightOpenTab(tab);
+        $rootScope.$broadcast(req.msg, req.data);
+      };
 
 
       /**
@@ -1313,7 +1257,7 @@ app.controller('IdeCtrl',
           $scope.ace.editor.renderer.setShowGutter(true);
         }
         else {
-          $scope.ace.editor.renderer.setShowGutter(false)
+          $scope.ace.editor.renderer.setShowGutter(false);
         }
       });
 
@@ -1358,17 +1302,13 @@ app.controller('IdeCtrl',
       });
 
 
-
       /** Handles a "testRequested" event */
       $scope.$on(IdeMsgService.msgTestRequest().msg, function () {
         $log.debug('Test request received');
 
-        // the old way
-        // testProject();
-
-        // todo the new way
-        let req = IdeMsgService.msgTestRequestNew();
-        $rootScope.$broadcast(req.msg);
+        // open navbar right.. this also triggers the event to start testing
+        let req = IdeMsgService.msgNavBarRightOpenTab('test');
+        $rootScope.$broadcast(req.msg, req.data);
 
         // set the focus on the editor so user can start typing right away
         $scope.ace.editor.focus();
@@ -1526,94 +1466,6 @@ app.controller('IdeCtrl',
         });
       });
 
-
-      /**
-       * Returns false if a language doesn't need compilation
-       * but can be run directly.
-       * @return {boolean}
-       */
-      $scope.isCompilationNeeded = function() {
-
-        var _dynamicLanguages = ['Python', 'Python-UnitTest'];
-        var _compilationIsNeeded = true;
-
-        if(_dynamicLanguages.indexOf(ProjectFactory.getProject().language) !== -1) {
-          _compilationIsNeeded = false;
-        }
-
-        // $log.debug('Project uses langguage that needs compilation: ' + result);
-        return _compilationIsNeeded;
-      };
-
-
-      /**
-       * Returns true or false wheter actions `compile` and `run` should be combined or not
-       * @author Janick Michot
-       */
-      $scope.combineActionsCompileAndRun = function() {
-        let _combineActionsCompileAndRun= true;
-
-        // todo in welchem Fall nicht? Einstellungen?
-
-        return _combineActionsCompileAndRun;
-
-      };
-
-
-      /**
-       * Returns true if a language supports testing with some testing framework.
-       * @return {boolean}
-       */
-      $scope.isTestSupported = function() {
-
-        // todo hier umstellen, das Test angezeigt wird wenn io-test
-
-        // NOTE:  Was ist besser? Hier irgendwie Config auslesen, um herauszufinden, ob und welcher Test?
-        //        Oder Datenbank-Model um Feld 'isTestSupported' erweitern (0 = false, 1 = unit-test, 2 = io, 3 = manuel)
-
-        // vorerst einfacher immer true zurück
-        return true;
-
-
-
-        var _testingProjects = ['Haskell-HSpec', 'Java-JUnit', 'Python-UnitTest'];
-        var _testIsSupported = false;
-
-        if(_testingProjects.indexOf(ProjectFactory.getProject().language) !== -1) {
-          _testIsSupported = true;
-        }
-
-        // $log.debug('Project uses testing framework: ' + result);
-        return _testIsSupported;
-      };
-
-
-      /**
-       * Returns true if a language supports testing with some testing framework.
-       * @return {boolean}
-       */
-      $scope.isToolSupported = function() {
-
-        var _toolProjects = ['Infer-Java'];
-        var _toolIsSupported = false;
-
-        if(_toolProjects.indexOf(ProjectFactory.getProject().language) !== -1) {
-          _toolIsSupported = true;
-        }
-
-        // $log.debug('Project uses testing framework: ' + result);
-        return _toolIsSupported;
-      };
-
-
-      /**
-       * Returns true if the language of the current project is Eiffel.
-       * @return {boolean}
-       */
-      $scope.isEiffelLanguageCompatible = function() {
-        //console.log("Language "+ProjectFactory.getProject().language);
-        return ProjectFactory.getProject().language ==='Eiffel';
-      };
 
       /**
        * Function to send the input of a user to her program.
@@ -1834,8 +1686,6 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
       console.log("The root folder can't be uneditable.");
     }
   });
-
-
 }]);
 
 
@@ -2084,6 +1934,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     $scope.navBarRightContent = "";
     $scope.activeTab = "";
     $scope.rightBarTabs = {};
+    $scope.showRightBarTabs = true;
 
     // In the following all tabs are defined, which are displayed in the right bar. The definition consists of a title,
     // an icon and the ContentUrl. The ContentUrl specifies which template is to be loaded. These templates can in turn
@@ -2091,32 +1942,45 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     // can be adjusted in a controller via broadcast.
 
     // tab for project description
-    $scope.rightBarTabs.description = {
-      slug: "description",
-      title: "Aufgabe",
-      disabled: false,
-      icon: "glyphicon-education",
-      contentURL: "partials/navBarRight/navBarRightDescription"
-    };
+    if(ProjectFactory.getFile("projectDescription.html")) {
+      $scope.rightBarTabs.description = {
+        slug: "description",
+        title: "Aufgabe",
+        disabled: false,
+        icon: "glyphicon-education",
+        contentURL: "partials/navBarRight/navBarRightDescription"
+      };
+    }
 
     // tab for test result
-    $scope.rightBarTabs.test = {
-      slug: "test",
-      title: "Test",
-      icon: "glyphicon-list-alt",
-      contentURL: "partials/navBarRight/navBarRightTestResult"
-    };
+    if(!$scope.isActionHidden("test") && ProjectFactory.hasConfig("Testing", "ioTests")) {
+      $scope.rightBarTabs.test = {
+          slug: "test",
+          title: "Test",
+          icon: "glyphicon-list-alt",
+          contentURL: "partials/navBarRight/navBarRightTestResult"
+      };
+    }
 
     // tab for help / chat
-    $scope.rightBarTabs.help = {
-      slug: "help",
-      title: "Hilfe",
-      icon: "glyphicon-comment",
-      contentURL: "partials/navBarRight/navBarRightHelp"
-    };
+    if(!$scope.isActionHidden("help")) {
+      $scope.rightBarTabs.help = {
+          slug: "help",
+          title: "Hilfe",
+          icon: "glyphicon-comment",
+          contentURL: "partials/navBarRight/navBarRightHelp"
+      };
+    }
 
     // todo define other tabs
 
+    /**
+     * returns true when at least one tab is active
+     * @returns {boolean}
+     */
+    $scope.isNavBarRightActive = function() {
+      return (!angular.equals({}, $scope.rightBarTabs));
+    };
 
     /**
      * check is tab is active
@@ -2128,9 +1992,6 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
 
     /**
      * Change content of tab splitter
-     *
-     * todo Double-Click notwending, wenn Tab mit > geschlossen wird und gleicher Tab wieder geöffnet werden soll
-     *
      * @param slug
      */
     $scope.rightBarTabClick = function(slug) {
@@ -2210,6 +2071,6 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
   /** Returns 'true' is the project is using Lti for the submission */
   $scope.isUsingLti = function() {
     return ProjectFactory.getProject().hasLtiData;
-  }
+  };
 
 }]);

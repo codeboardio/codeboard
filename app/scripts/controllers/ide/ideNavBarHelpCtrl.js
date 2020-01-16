@@ -102,7 +102,7 @@ angular.module('codeboardApp')
 
                     // read all tips for this project
                     let config = ProjectFactory.getConfig();
-                    if("Help" in config && "tips" in config.Help) {
+                    if(config && "Help" in config && "tips" in config.Help) {
                         $scope.tips = config.Help.tips;
                         $scope.helpIntro = config.Help.helpIntro;
                     }

@@ -74,10 +74,8 @@ angular.module('codeboardApp')
                 // get all tests related to this project
                 ProjectFactory.getTests()
                     .then(function(data) {
-
-                        if(data.fail) {
-                            Promise.reject("Fehlgeschlagen: " + data.msg);
-                        }
+                        // break promise chain, when we dont receive any tests
+                        if(data.fail) Promise.reject( "Fehlgeschlagen: " + data.msg );
 
                         // store data/tests to scope and stop spinning
                         $scope.tests = data.tests;
@@ -87,9 +85,8 @@ angular.module('codeboardApp')
                     })
                     .then(function(data) {
 
-                        let i = 0;
-
                         // do io-test asynchronously one after another
+                        let i = 0;
                         return data.tests.reduce(function (promiseChain, test) {
 
                             // Note, Promise.resolve() resolve is our initial value
@@ -176,7 +173,7 @@ angular.module('codeboardApp')
                         });
                     })
                     .catch(function(error) {
-                        console.log(error);
+                        $log.debug(error);
                     });
             };
 
@@ -184,13 +181,10 @@ angular.module('codeboardApp')
             /**
              * listen to test project events
              */
-            $scope.$on(IdeMsgService.msgTestRequestNew().msg, function () {
-                // trigger open tab event
-                let req = IdeMsgService.msgNavBarRightOpenTab('test');
-                $rootScope.$broadcast(req.msg, req.data);
-
-                // start testing
-                $scope.doTheIoTesting();
+            $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
+                if(data.tab === 'test') {
+                    $scope.doTheIoTesting();
+                }
             });
 
             /**

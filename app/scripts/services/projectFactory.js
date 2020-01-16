@@ -6,14 +6,34 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
   function ($http, $routeParams, $q, $log, ProjectRes, ProjectSubmissionRes, ProjectRequestHelpRes) {
 
     // an object that represents a project
-    var project = {};
+    let project = {};
 
-    var getProject = function () {
+    let getProject = function () {
       return project;
     };
 
-    var setProject = function (aProject) {
+    let setProject = function (aProject) {
       project = aProject;
+    };
+
+    // an object that represents the configuration for this project
+    let configuration = {};
+
+    let getConfig = function() {
+      return configuration;
+    };
+    let setConfig = function(aConfiguration) {
+      configuration = aConfiguration;
+    };
+    let hasConfig= function (...keys) {
+      let res = configuration;
+      for (let i = 0; i < keys.length; i++) {
+        if(typeof res[keys[i]] === "undefined") {
+          return false;
+        }
+        res = configuration[keys[i]];
+      }
+      return true;
     };
 
 
@@ -566,6 +586,16 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         addNodeFromDB(files[i].parentUId, files[i]);
       }
 
+      // set configuration
+      if(projectDataFromServer.configFile) {
+        // by doing the parsing inside a try-catch block we check json-validity
+        try {
+          setConfig(JSON.parse(projectDataFromServer.configFile[0].content));
+        } catch (e) {
+          $log.debug('Fehler in der Konfigurations-Datei: ' + e);
+        }
+      }
+
       // make sure we create a hash of the original version of the project
       setHashOfProject();
     };
@@ -886,22 +916,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       return (file === undefined) ? false : file;
     };
 
-    /**
-     * Use this function to retrieves the configuration for the current project
-     * @author Janick Michot
-     */
-    let getConfig = function () {
-      // get the config file from the fileSet
-      let configFile = getFile('codeboard.json');
-
-      // by doing the parsing inside a try-catch block we check json-validity
-      try {
-        return JSON.parse(configFile.content);
-      } catch (e) {
-        return { };
-      }
-    };
-
 
     /**
      * Retrieves all test for this project in an array
@@ -918,6 +932,9 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       // make call to the server
       ProjectRes.save( { projectId: $routeParams.projectId }, payload,
           function success(data) {
+
+            console.log(data);
+
             deferred.resolve(data);
           },
           function error(response) {
@@ -1098,6 +1115,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     // Public API here
     return {
       getProject: getProject,
+      getConfig: getConfig,
+      hasConfig: hasConfig,
       addFile: addFile,
       addFolder: addFolder,
       renameNode: renameNode,
@@ -1117,7 +1136,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       submitProject: submitProject,
       requestHelp: requestHelp,
       isProjectModified: isProjectModified,
-      getConfig: getConfig,
       getFile: getFile,
 
       // the following are only exported for testing

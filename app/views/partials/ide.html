@@ -73,45 +73,42 @@
 
 
 
-                      <a class="btn btn-default btn-sm" ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')" title="Undo">
+                      <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" title="Undo">
                         <span class="glyphicon glyphicon-floppy-disk"></span>
                       </a>
 
-                      <a class="btn btn-default btn-sm" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
+                      <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
                         <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
                       </a>
 
-                      <a class="btn btn-default btn-sm" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
+                      <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
                         <span class="glyphicon glyphicon-share-alt"></span>
                       </a>
                     </div>
                     <form class="navbar-form navbar-left">
 
-                      <!--<button id="compileButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="{{isCompilationNeeded()? 'Compile this project' : 'Run this project'}}">
-                        <span class="{{isCompilationNeeded() ? 'glyphicon glyphicon-cog' : 'glyphicon glyphicon-play-circle'}}"></span> {{isCompilationNeeded() ? "Compile" : "Run"}}
-                      </button>-->
-                      <button id="compileAndRunButton" class="btn btn-warning btn-sm" ng-show="isCompilationNeeded() && combineActionsCompileAndRun() && !(hiddenActions.compileAndRun)" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
+                      <button id="compileAndRunButton" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
                           <span class="glyphicon glyphicon-play-circle"></span> Run
                       </button>
-                      <button id="compileButton" class="btn btn-warning btn-sm" ng-show="isCompilationNeeded() && !combineActionsCompileAndRun()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
+                      <button id="compileButton" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
                         <span class="glyphicon glyphicon-cog"></span> Compile
                       </button>
-                      <button id="compileRunBtn" class="btn btn-warning btn-sm" ng-hide="isCompilationNeeded() || hiddenActions.compileDynamic" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
+                      <button id="compileRunBtn" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
                         <span class="glyphicon glyphicon-play-circle"></span> Run
                       </button>
-                      <button id="runButton" class="btn btn-default btn-sm" ng-show="isCompilationNeeded() && !combineActionsCompileAndRun() && !(hiddenActions.run)" ng-disabled="disabledActions.run" ng-click="navBarClick('run')" title="Run the last compiled program">
+                      <button id="runButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.run" ng-click="navBarClick('run')" title="Run the last compiled program">
                         <span class="glyphicon glyphicon-play-circle"></span> Run
                       </button>
-                      <button id="stopBtn" class="btn btn-default btn-sm" ng-hide="hiddenActions.stop" ng-click="navBarClick('stop')" title="Stop this program">
+                      <button id="stopBtn" class="btn btn-default btn-sm" ng-if="!isActionHidden('compile')" ng-hide="hiddenActions.stop" ng-click="navBarClick('stop')" title="Stop this program">
                         <span class="glyphicon glyphicon-remove-circle"></span> Stop
                       </button>
-                      <button id="ideTestButton" class="btn btn-success btn-sm" ng-disabled="disabledActions.test" ng-click="navBarClick('test')" ng-show="isTestSupported()" title="Run the tests of this project">
+                      <button id="ideTestButton" class="btn btn-success btn-sm" ng-if="!isActionHidden('test')" ng-disabled="disabledActions.test" ng-click="navBarClick('test')" ng-show="isTestSupported()" title="Run the tests of this project">
                         <span class="glyphicon glyphicon-check"></span> Test
                       </button>
-                      <button id="ideToolButton" class="btn btn-default btn-sm" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
+                      <button id="ideToolButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('tool')" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
                         <span class="glyphicon glyphicon-check"></span> Analyze
                       </button>
-                      <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project">
+                      <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project">
                         <span class="glyphicon glyphicon-send"></span> Submit
                       </button>
 
@@ -124,26 +121,26 @@
                       <ul class="nav navbar-nav">
 
                         <li class="nav-item">
-                          <button ng-hide="allTestsPassed" class="btn btn-info btn-sm nav-link" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+                          <button ng-hide="allTestsPassed" class="btn btn-info btn-sm nav-link" ng-if="!isActionHidden('help')" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
                             <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
                           </button>
                         </li>
 
                         <li class="nav-item">
-                          <button class="btn btn-default btn-sm nav-link" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
+                          <button class="btn btn-default btn-sm nav-link" ng-if="!isActionHidden('full-screen')" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
                             <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
                             <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
                           </button>
                         </li>
 
                         <li class="nav-item">
-                          <button ng-hide="currentRoleIsOwner()" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
+                          <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('edit')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
                             <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
                           </button>
                         </li>
 
                         <li class="nav-item">
-                          <div class="dropdown">
+                          <div class="dropdown" ng-if="!isActionHidden('edit')">
                             <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
                               <span class="glyphicon glyphicon-cog"></span>
                             </a>
@@ -248,11 +245,11 @@
 
             </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
 
-            <div id="ideRighterPartOfMiddlePart" class="ideSplitterFullHeight" style="overflow: hidden">
-                <div class="ide-tabs" ng-repeat="tab in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(tab.slug)"></div>
+            <div id="ideRighterPartOfMiddlePart" ng-if="isNavBarRightActive()" class="ideSplitterFullHeight" style="overflow: hidden">
+              <div class="ide-tabs" ng-repeat="tab in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(tab.slug)"></div>
             </div>
 
-            <div id="ideRightestPartOfMiddlePart" class="ideSplitterFullHeight">
+            <div id="ideRightestPartOfMiddlePart" ng-if="isNavBarRightActive()" class="ideSplitterFullHeight">
                 <div class="ideAdditionalTabs">
                     <a tab-click ng-repeat="tab in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(tab.slug)" class="tab tab-{{tab.slug}}" id="rightBarTabs{{tab.slug}}">
                         <span class="glyphicon {{tab.icon}}"></span>{{tab.title}}
