@@ -883,6 +883,10 @@ app.controller('IdeCtrl',
             req = IdeMsgService.msgNewNodeRequest('folder');
             $rootScope.$broadcast(req.msg, req.data);
             break;
+          case ('add_image'):
+            req = IdeMsgService.msgNewImageNodeRequest();
+            $rootScope.$broadcast(req.msg);
+            break;
           case ('rename_node'):
             req = IdeMsgService.msgRenameNodeRequest();
             $rootScope.$broadcast(req.msg);
@@ -998,22 +1002,36 @@ app.controller('IdeCtrl',
         }
 
 
+
+        // get the file
+        var lNode = ProjectFactory.getNode(aMsgData.nodeId);
+
+        // get the content of the node
+        var lFileContent = lNode.content;
+
+        // the mode that should be used in this session
+        var lAceMode = 'ace/mode/text';
+
+        // get the file type
+        var lFileType = lNode.filename.split('.').pop();
+
+
+        // image file types
+        let imageFileTypes = ["png", "svg", "jpg", "gif"];
+
+        // if file type `image` change editor behaviour
+        $scope.ace.isImage = false;
+        if(imageFileTypes.includes(lFileType)) {
+          $scope.ace.isImage = true;
+          let fileContent = JSON.parse(ProjectFactory.getNode(aMsgData.nodeId).content);
+          $scope.ace.image = fileContent.imagePath;
+        }
+
         // restore the session (if one had been persisted before)
         if (ProjectFactory.getNode(aMsgData.nodeId).session !== undefined && ProjectFactory.getNode(aMsgData.nodeId).session !== null) {
           $scope.ace.editor.setSession(ProjectFactory.getNode(aMsgData.nodeId).session);
         }
         else {
-          // get the file
-          var lNode = ProjectFactory.getNode(aMsgData.nodeId);
-
-          // get the content of the node
-          var lFileContent = lNode.content;
-
-          // the mode that should be used in this session
-          var lAceMode = 'ace/mode/text';
-
-          // get the file type
-          var lFileType = lNode.filename.split('.').pop();
 
           switch (lFileType) {
             case 'e':
@@ -1070,8 +1088,6 @@ app.controller('IdeCtrl',
               enableLiveAutocompletion: true
             });
           });
-
-          console.log(lNode.isStatic);
         }
 
         // if the currently displayed node is static set editor to ready only (Janick Michot)
@@ -1626,6 +1642,24 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
         ProjectFactory.addFolder(lSelectedNodeUId, aMsgData.nodeName);
         break;
     }
+  });
+
+
+  /**
+   * Listens for the event when a image should be stored
+   * @author Janick Michot
+   */
+  $scope.$on(IdeMsgService.msgSaveImageNodeRequest().msg, function (aEvent, aMsgData) {
+
+    let lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
+
+    let content = JSON.stringify({
+      imagePath: aMsgData.imagePath,
+      imageName: aMsgData.imageName
+    });
+
+    ProjectFactory.addFile(lSelectedNodeUId, aMsgData.imageName, {content: content });
+
   });
 
 

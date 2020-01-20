@@ -344,7 +344,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @param {boolean} aNewNodeIsFolder set to true if the node to add shall be a folder
      * @returns {object|null} returns the object that was created for a folder or file, or null is nothing was created
      */
-    var addNode = function (aParentNodeId, aName, aNewNodeIsFolder) {
+    var addNode = function (aParentNodeId, aName, options) {
 
       // the parentNodeId (we use a variable because it might be changed)
       var lParentNodeId = aParentNodeId;
@@ -371,15 +371,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         // note: the root node has path '', we add a separator '/' unless we have the root node
         var lPathPrefix = lParentNode.path === '' ? '' : lParentNode.path + '/';
 
-        var lNewNode = getNewNode(
-          aName,
-          lPathPrefix + getNode(lParentNodeId).filename,
-          getProject().lastUId,
-          lParentNodeId,
-          {
-            isFolder: aNewNodeIsFolder
-          }
-        )
+        var lNewNode = getNewNode( aName,lPathPrefix + getNode(lParentNodeId).filename, getProject().lastUId, lParentNodeId, options );
 
         // store a reference of the unique-id to the created node object
         getProject().idToNodeMap[lNewNode.uniqueId] = lNewNode;
@@ -403,10 +395,11 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      *
      * @param {integer} aParentNodeId id of the parent node to which a new file is added.
      * @param {string} aName the name fo the new file.
+     * @param options
      * @returns {object|null} the object that was created for the file; null if nothing was created.
      */
-    var addFile = function (aParentNodeId, aName) {
-      return addNode(aParentNodeId, aName, false);
+    var addFile = function (aParentNodeId, aName, options = {}) {
+      return addNode(aParentNodeId, aName, Object.assign(options, {isFolder: false}));
     };
 
     /**
@@ -418,7 +411,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @returns {object|null} the object that was created for the folder; null if nothing was created.
      */
     var addFolder = function (aParentNodeId, aName) {
-      return addNode(aParentNodeId, aName, true);
+      return addNode(aParentNodeId, aName, {isFolder: true});
     };
 
 

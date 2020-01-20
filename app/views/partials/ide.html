@@ -53,6 +53,7 @@
                            <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
                            <li><a ng-click="navBarClick('add_folder')">Add folder</a></li>
                            <li><a ng-click="navBarClick('rename_node')">Rename file/folder</a></li>
+                           <li><a ng-click="navBarClick('add_image')">Add Image</a></li>
                            <li class="divider"></li>
                            <li><a ng-click="navBarClick('remove_node')">Delete file/folder</a></li>
 
@@ -208,6 +209,12 @@
                 <div id="ideEditorAndConsole" kendo-splitter="splitter" k-orientation="'vertical'" k-panes="[{ collapsible: false }, { collapsible: false, size: '120px' }]">
 
                     <div class="ideEditorArea">
+
+                      <div class="ideEditorImage" ng-show="ace.isImage">
+                        <img alt="Bildschen" ng-src="{{ace.image}}" /><br>
+                        <input class="image-src-field" type="text" alt="Bildschen" value="{{ace.image}}" />
+                      </div>
+
                       <div ng-hide="ace.isVisible" id="ideAceNotVisible">
                         <div id="ideMsgNoFilesOpen">No files are open.<br>Click on a file from the project tree.</div>
                         <div id="ideMsgNotSignedIn" class="alert alert-warning" ng-hide="signinSettings.userIsAuthenticated()">
@@ -217,7 +224,7 @@
 
                       <!-- the ace editor -->
                       <!-- note: don't use ng-model as it updates too slowly. Access the session value directly instead. -->
-                      <div class="ideEditor" ng-show="ace.isVisible" id="ace_editor" ui-ace="{
+                      <div class="ideEditor" ng-show="ace.isVisible" ng-hide="ace.isImage" id="ace_editor" ui-ace="{
                         showGutter: true,
                         useWrapMode: false,
                         theme: 'eclipse',
@@ -294,6 +301,29 @@
         <div class="modal-footer">
           <button type="submit" id="okAddFileNameButton" class="btn btn-primary" ng-disabled="ideAddNodeForm.dataNodeName.$error.pattern">{{labels.btnOk}}</button>
           <button class="btn btn-warning" ng-click="cancel()">{{labels.btnCancel}}</button>
+        </div>
+      </form>
+    </script>
+  </div>
+  <!-- end of modal window -->
+
+  <!-- the modal window used to add a file or folder -->
+  <div ng-controller="IdeImageActionCtrl">
+    <script type="text/ng-template" id="ideNewImageModal.html">
+      <div class="modal-header">
+        <h3>Bild hinzufügen</h3>
+      </div>
+      <form class="form" name="ideAddImageForm" ng-submit="submit(data)">
+        <div class="modal-body">
+
+          <div class="form-group">
+            <p>Lorem Ipsum... </p>
+            <input type="file" name="dataImage" ng-model="data.image" ng-file-select="onFileSelect($files)" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="okAddImageNameButton" class="btn btn-primary">Bild hinzufügen</button>
+          <button class="btn btn-warning" ng-click="cancel()">Abbrechen</button>
         </div>
       </form>
     </script>

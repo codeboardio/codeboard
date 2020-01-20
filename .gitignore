@@ -13,6 +13,7 @@ app/bower_components
 
 # Ignore the profile pictures of users
 app/images/users/profiles
+app/images/projects/*
 
 # Ignore everything in folder test/coverage which has generated coverage reports
 test/coverage

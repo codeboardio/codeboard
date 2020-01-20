@@ -32,8 +32,8 @@ angular.module('codeboardApp')
 
   .factory('ProjectRes', ['$resource', function($resource) {
     return $resource(
-      '/api/projects/:projectId',
-      {projectId: '@id'},
-      {update: {method: 'PUT'}}
+        '/api/projects/:projectId',
+        {projectId: '@id'},
+        {update: {method: 'PUT'}}
     );
   }]);

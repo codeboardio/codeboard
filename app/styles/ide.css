@@ -311,6 +311,32 @@ body {
 
 
 /* - - - Main Area - - - */
+
+.ideEditorImage {
+  height: 100%; width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left: 47px solid #e7e7e7;
+  position: relative;
+}
+.ideEditorImage .image-src-field {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  max-width: none;
+  width: 320px;
+  text-align: center;
+  border: 1px solid #eee;
+  padding: 6px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+
 #ideEditorAndConsole {
   height: calc(100% - 50px);
   overflow: hidden;

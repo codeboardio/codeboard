@@ -210,3 +210,91 @@ app.controller('IdeNodeActionCtrl', ['$scope', '$rootScope', '$uibModal', '$log'
     });
 
   }]);
+
+
+/**
+ * Separate Controller for File Upload
+ *
+ * @author Janick Michot
+ * @date 20.01.20
+ */
+app.controller('IdeImageActionCtrl', ['$scope', '$rootScope', '$q', '$http', '$routeParams', '$uibModal', '$log', 'IdeMsgService', '$upload',
+  function($scope, $rootScope, $q, $http, $routeParams, $uibModal, $log, IdeMsgService, $upload) {
+
+    /**
+     * Call this method to trigger the displaying of the modal for adding a new node.
+     * @param aNodeId {integer} the unique id of the node (this is currently only used for renaming)
+     * @param aNodeName {String} name of the node that should be renamed (for adding a node, this argument is ignored)
+     * @param aNodeType {String} value of either 'file' or 'folder'
+     * @param aOperationType {String} value of either 'add' or 'rename' (determines the modal behavior and layout)
+     */
+    var openNodeModal = function() {
+
+
+      /**
+       * The controller for the logic of the model
+       */
+      let ideImageModalCtrl = ['$scope', '$uibModalInstance', function($scope, $uibModalInstance, data) {
+
+        // Please note that $uibModalInstance represents a modal window (instance) dependency.
+        // It is not the same as the $uibModal service used above.
+
+        $scope.data = {
+          file: false
+        };
+
+        $scope.ok = function() {
+          $uibModalInstance.close($scope.data);
+        };
+
+        // Close model when clicking on cancel
+        $scope.cancel = function() {
+          $uibModalInstance.dismiss('cancel');
+        };
+
+        // Function to close the modal when a user hits the Enter key.
+        $scope.submit = function(formData) {
+          $scope.ok();
+        };
+
+        // store file to variable on select
+        $scope.onFileSelect = function(file) {
+          $scope.data.file = file[0]; // for now only one images is passed
+        };
+      }];
+
+      // Defines the modal object
+      let modalInstance = $uibModal.open({
+        templateUrl: 'ideNewImageModal.html',  // Note: this is not an html file but the id property of the html that makes the modal
+        controller: ideImageModalCtrl,         // Note: the controller must be declared before this assignment is done
+        size: 'sm'
+      });
+
+      // defines what happens when the modal is closed
+      modalInstance.result
+        .then(
+          function(aData) {
+            $scope.upload = $upload.upload({
+              url: '/api/projects/' + $routeParams.projectId + '/projectImage',
+              file: aData.file
+            }).success(function(data, status, headers, config) {
+
+              // file is uploaded successfully
+              var req = IdeMsgService.msgSaveImageNodeRequest(data.imageUrl, aData.file.name);
+              $rootScope.$broadcast(req.msg, req.data);
+
+            });
+          },
+          function() {
+            $log.debug('Modal dismissed by user.');
+          });
+    };
+
+    /**
+     * Open modal on new image request
+     */
+    $scope.$on(IdeMsgService.msgNewImageNodeRequest().msg, function(aEvent, aMsgData) {
+      openNodeModal();
+    });
+
+  }]);
