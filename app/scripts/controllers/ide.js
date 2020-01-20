@@ -841,38 +841,28 @@ app.controller('IdeCtrl',
        * @return {boolean}
        */
       $scope.isToolSupported = function() {
+          return false;
 
-            return false;
+          // todo check what we can use here (Janick)
 
-            // todo check what we can use here (Janick)
+          var _toolProjects = ['Infer-Java'];
+          var _toolIsSupported = false;
 
-            var _toolProjects = ['Infer-Java'];
-            var _toolIsSupported = false;
+          if(_toolProjects.indexOf(ProjectFactory.getProject().language) !== -1) {
+              _toolIsSupported = true;
+          }
 
-            if(_toolProjects.indexOf(ProjectFactory.getProject().language) !== -1) {
-                _toolIsSupported = true;
-            }
+          // $log.debug('Project uses testing framework: ' + result);
+          return _toolIsSupported;
+      };
 
-            // $log.debug('Project uses testing framework: ' + result);
-            return _toolIsSupported;
-        };
-
-      // prepare panes depending on hidden actions
+      /**
+       * prepare panes depending on hidden actions (Janick Michot)
+       */
       $scope.kPanes = ($scope.isActionHidden("tree-view")) ? "[" : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
       $scope.kPanes += " {collapsible: false} ";
       $scope.kPanes += (!angular.equals({}, $scope.rightBarTabs)) ? ", { collapsible: true, resizable: true, collapsed: true, size: '35%' }" : "";
       $scope.kPanes += (!angular.equals({}, $scope.rightBarTabs)) ? ", { collapsible: false, resizable: false, collapsed: false, size: '26px' } ]" : "]";
-
-      /**
-       * Opens a nav bar right tab
-       * @author Janick Michot
-       * @date 30.12.2019
-       */
-      let openNavBarRightTab = function(tab) {
-        let req = IdeMsgService.msgNavBarRightOpenTab(tab);
-        $rootScope.$broadcast(req.msg, req.data);
-      };
-
 
       /**
        * Function that broadcasts messages when an element in the NavBar is clicked by the user.
@@ -977,9 +967,9 @@ app.controller('IdeCtrl',
             }
             break;
           case ('help'):
-            // todo getHelp in disabledActions definieren
-            if(!($scope.disabledActions.help)) {
-              openNavBarRightTab('help');
+            if(!($scope.disabledActions.help)) { // todo getHelp in disabledActions definieren
+              let req = IdeMsgService.msgNavBarRightOpenTab("help");
+              $rootScope.$broadcast(req.msg, req.data);
             }
             break;
           case ('reset'):
