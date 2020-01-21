@@ -40,7 +40,7 @@
         Test beenden (ToDo)
     </button>
 
-    <button ng-hide="inProgress" class="btn btn-success btn-100" ng-click="doTheIoTesting()">
+    <button ng-hide="inProgress" class="btn btn-success btn-100" ng-click="doTheIoTesting()" ng-disabled="disableTesting">
         <span class="glyphicon glyphicon-check"></span>
         <span ng-bind="ioTestButtonText"></span>
     </button>

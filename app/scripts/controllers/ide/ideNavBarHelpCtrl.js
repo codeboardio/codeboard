@@ -31,7 +31,7 @@ angular.module('codeboardApp')
          * Function to scroll to the bottom of the chat tab
          * todo probably not the best solution and not the angular way
          */
-        let chatScrollToButtom = function() {
+        let chatScrollToBottom = function() {
             setTimeout(function(){
                 document.getElementById("targetinto").scrollIntoView();
             }, 10);
@@ -42,7 +42,7 @@ angular.module('codeboardApp')
          */
         $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
             if(data.tab === slug) {
-                chatScrollToButtom();
+                chatScrollToBottom();
             }
         });
 
@@ -152,7 +152,7 @@ angular.module('codeboardApp')
                     .then(function(chatLine) {
                         addChatLine(chatLine);
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
-                        chatScrollToButtom();
+                        chatScrollToBottom();
                     });
             }
         };
@@ -195,7 +195,7 @@ angular.module('codeboardApp')
                         .then(function(chatLine) {
                             addChatLine(chatLine);
                             $scope.sendRequestFormVisible = false;
-                            chatScrollToButtom();
+                            chatScrollToBottom();
                         });
                 })
                 .catch(function(error) {

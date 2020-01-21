@@ -60,6 +60,9 @@ angular.module('codeboardApp')
             $scope.doTheIoTesting = function() {
                 $log.debug('Test request received');
 
+                // trigger a save of the currently displayed content
+                $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
+
                 let hasErrors = false;
 
                 // replace title during testing
@@ -75,7 +78,12 @@ angular.module('codeboardApp')
                 ProjectFactory.getTests()
                     .then(function(data) {
                         // break promise chain, when we dont receive any tests
-                        if(data.fail) Promise.reject( "Fehlgeschlagen: " + data.msg );
+                        if(data.fail) {
+                            changeAvatarText("Es ist ein Fehler aufgetreten. Bitte wende dich an den Kursleiter");
+                            $scope.inProgress = false;
+                            $scope.disableTesting = true;
+                            return Promise.reject( "Fehlgeschlagen: " + data.msg );
+                        }
 
                         // store data/tests to scope and stop spinning
                         $scope.tests = data.tests;
@@ -174,6 +182,7 @@ angular.module('codeboardApp')
                     })
                     .catch(function(error) {
                         $log.debug(error);
+                        console.log("aaa");
                     });
             };
 

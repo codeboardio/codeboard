@@ -925,9 +925,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       // make call to the server
       ProjectRes.save( { projectId: $routeParams.projectId }, payload,
           function success(data) {
-
-            console.log(data);
-
             deferred.resolve(data);
           },
           function error(response) {
