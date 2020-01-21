@@ -1990,7 +1990,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     }
 
     // tab for help / chat
-    if(!$scope.isActionHidden("help")) {
+    if(!$scope.isActionHidden("help") && !$scope.currentRoleIsOwner()) {
       $scope.rightBarTabs.help = {
           slug: "help",
           title: "Hilfe",
