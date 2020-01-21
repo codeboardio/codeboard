@@ -37,92 +37,26 @@ app.controller('IdeCtrl',
             .get(_urlForUserProject)
             .success(function(result) {
 
-              /** The controller for the modal */
-              var loadUserProjectModalInstanceCtrl =  ['$scope', '$uibModalInstance', 'UserSrv', function ($scope, $uibModalInstance, UserSrv) {
-
-                $scope.ok = function () {
-                  $uibModalInstance.close();
-                };
-
-                $scope.cancel = function () {
-                  $uibModalInstance.dismiss();
-                };
-
-                $scope.getUsername = function() {
-                  return UserSrv.getUsername();
-                };
-              }];
-
-
-              /** Function to open the modal where the user must confirm the loading of the project */
-              var openModal = function(closeAction, dismissAction) {
-
-                var modalInstance = $uibModal.open({
-                  templateUrl: 'ideLoadUserProjectModal.html',
-                  controller: loadUserProjectModalInstanceCtrl
-                });
-
-                modalInstance.result.then(
-                  function () {
-                    // the user clicked ok (i.e. the promise resolves successfully)
-                    $log.debug('User confirmed to load saved project.');
-
-                    // run the closeAction function if it's defined
-                    if (closeAction) {
-                      closeAction();
-                    }
-
-                    // we need to request that the URI is check for any "?view=..." query string
-                    // in order to display some files in the ace editor
-                    $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-                  },
-                  function () {
-                    // the user canceled (i.e. the promise is rejected)
-                    $log.debug('User canceled loading of the saved project.');
-
-                    // run the dissmissAction if it's defined
-                    if (dismissAction) {
-                      dismissAction();
-                    }
-
-                    // we need to request that the URI is check for any "?view=..." query string
-                    // in order to display some files in the ace editor
-                    $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-                  });
+              // this inner function will be called if the user agrees
+              // it will overwrite the default version of the project with the user's version
+              var userProjectData = {
+                // the name of the project
+                name: ProjectFactory.getProject().name,
+                // the last unique Id that was used to create a file
+                lastUId: result.project.lastUId,
+                // programming language of the project
+                language: ProjectFactory.getProject().language,
+                // the role of the user who is currently looking at the project in the browser
+                userRole: ProjectFactory.getProject().userRole,
+                // the files of the user
+                fileSet: result.files
               };
 
+              // update the project data in the ProjectFactory
+              ProjectFactory.setProjectFromJSONdata(userProjectData, ltiData);
 
-              // the http call to check if the user has a saved version was successful, thus
-              // we call the openModal() function; as a first arguement we provide a function
-              // that will load the user's version into the ProjectFactory
-              openModal(function() {
-
-                // this inner function will be called if the user agrees
-                // it will overwrite the default version of the project with the user's version
-                var userProjectData = {
-                  // the name of the project
-                  name: ProjectFactory.getProject().name,
-                  // the last unique Id that was used to create a file
-                  lastUId: result.project.lastUId,
-                  // programming language of the project
-                  language: ProjectFactory.getProject().language,
-                  // the role of the user who is currently looking at the project in the browser
-                  userRole: ProjectFactory.getProject().userRole,
-                  // the files of the user
-                  fileSet: result.files
-                };
-
-                // update the project data in the ProjectFactory
-                ProjectFactory.setProjectFromJSONdata(userProjectData, ltiData);
-
-
-                // make sure the Tree reloads and shows the user's version
-                $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
-
-              });
-            })
-            .error(function(err) {
-              $log.debug(err);
+              // make sure the Tree reloads and shows the user's version
+              $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
 
               // we need to request that the URI is check for any "?view=..." query string
               // in order to display some files in the ace editor
@@ -136,7 +70,6 @@ app.controller('IdeCtrl',
           $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
         }
       };
-
 
 
       // this function is called when closing or reloading the browser window
@@ -590,11 +523,11 @@ app.controller('IdeCtrl',
 
           $http.get(ideState.stopUrl)
             .success(function(data, status, headers, config){
-              addToOutput('\n\n--Program stopped--', true)
+              setOutput('\n\n--Program stopped--', true)
             })
             .error(function(data, status, headers, config) {
               $log.debug('An error occurred while trying to stop your program.');
-              addToOutput('\n\nAn error occurred while trying to stop your program.', true);
+              setOutput('\n\nAn error occurred while trying to stop your program.', true);
             });
         }
       };
