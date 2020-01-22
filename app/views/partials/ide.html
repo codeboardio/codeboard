@@ -12,150 +12,132 @@
         <div class="ideHeader">
           <nav class="navbar navbar-default navbar-static-top" role="navigation" id="ideNavBar">
             <div class="container-fluid">
-              <!-- Brand and toggle get grouped for better mobile display -->
-              <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                </button>
-                <!--<a class="navbar-brand" href="/">-->
-
-                <!-- todo brauchen wir überhaupt ein LOGO? wird je sowieso hauptsächlich eingebettet?
-                <div class="prov-logo" style="margin: 5px 25px 5px 5px; background: #0064a6; height: 36px; width: 36px"></div>
-                -->
-
-                <!-- <img class="logo" width="50px" style="padding-top: 5px;"  src=""/><!--</a>-->
-              </div>
 
               <!-- Collect the nav links, forms, and other content for toggling -->
-              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <div class="row">
+              <div class="row">
 
-                  <!-- todo col-xs-12 -->
-                  <div class="col-md-2 visible-md visible-lg col-md-push-5 text-center">
-                    <div class="projectTitle">
-                      <span title="{{projectName}}">{{projectName}}</span>
-                    </div>
-                  </div>
-
-                  <div class="col-xs-7 col-md-5 col-md-pull-2">
-                    <div class="navbar-form navbar-left" style="padding-left: 0">
-
-                       <div class="dropdown" ng-show="currentRoleIsOwner()" style="display: inline-block">
-
-                         <a id="projectButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
-                           <span class="glyphicon glyphicon-option-horizontal"></span>
-                         </a>
-
-                         <ul class="dropdown-menu" role="menu">
-                           <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
-                           <li><a ng-click="navBarClick('add_folder')">Add folder</a></li>
-                           <li><a ng-click="navBarClick('rename_node')">Rename file/folder</a></li>
-                           <li><a ng-click="navBarClick('add_image')">Add Image</a></li>
-                           <li class="divider"></li>
-                           <li><a ng-click="navBarClick('remove_node')">Delete file/folder</a></li>
-
-                           <li ng-show="currentRoleIsOwner()" class="divider"></li>
-                           <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
-                           <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('make_file_static')">Make file static or not</a></li>
-
-                           <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
-                           <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
-
-                           <li ng-show="currentRoleIsOwner()" class="divider"></li>
-                           <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
-
-                           <li class="divider"></li>
-                           <li><a href="/">Exit project</a></li>
-                         </ul>
-                       </div>
-
-
-
-                      <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" title="Undo">
-                        <span class="glyphicon glyphicon-floppy-disk"></span>
-                      </a>
-
-                      <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
-                        <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
-                      </a>
-
-                      <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
-                        <span class="glyphicon glyphicon-share-alt"></span>
-                      </a>
-                    </div>
-                    <form class="navbar-form navbar-left">
-
-                      <button id="compileAndRunButton" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
-                          <span class="glyphicon glyphicon-play-circle"></span> Run
-                      </button>
-                      <button id="compileButton" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
-                        <span class="glyphicon glyphicon-cog"></span> Compile
-                      </button>
-                      <button id="compileRunBtn" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
-                        <span class="glyphicon glyphicon-play-circle"></span> Run
-                      </button>
-                      <button id="runButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.run" ng-click="navBarClick('run')" title="Run the last compiled program">
-                        <span class="glyphicon glyphicon-play-circle"></span> Run
-                      </button>
-                      <button id="stopBtn" class="btn btn-default btn-sm" ng-if="!isActionHidden('compile')" ng-hide="hiddenActions.stop" ng-click="navBarClick('stop')" title="Stop this program">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Stop
-                      </button>
-                      <button id="ideTestButton" class="btn btn-success btn-sm" ng-if="!isActionHidden('test')" ng-disabled="disabledActions.test" ng-click="navBarClick('test')" ng-show="isTestSupported()" title="Run the tests of this project">
-                        <span class="glyphicon glyphicon-check"></span> Test
-                      </button>
-                      <button id="ideToolButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('tool')" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
-                        <span class="glyphicon glyphicon-check"></span> Analyze
-                      </button>
-                      <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project">
-                        <span class="glyphicon glyphicon-send"></span> Submit
-                      </button>
-
-                    </form>
-                  </div>
-
-                  <div class="col-xs-5 col-md-5">
-                    <div class="navbar-form navbar-right">
-
-                      <ul class="nav navbar-nav">
-
-                        <li class="nav-item">
-                          <button ng-hide="currentRoleIsOwner()" class="btn btn-info btn-sm nav-link" ng-if="!isActionHidden('help')" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
-                            <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
-                          </button>
-                        </li>
-
-                        <li class="nav-item">
-                          <button class="btn btn-default btn-sm nav-link" ng-if="!isActionHidden('full-screen')" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
-                            <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
-                            <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
-                          </button>
-                        </li>
-
-                        <li class="nav-item">
-                          <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('edit')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
-                            <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
-                          </button>
-                        </li>
-
-                        <li class="nav-item">
-                          <div class="dropdown" ng-if="!isActionHidden('edit')">
-                            <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
-                              <span class="glyphicon glyphicon-cog"></span>
-                            </a>
-
-                            <ul class="dropdown-menu">
-                              <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
-                            </ul>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
+                <!-- todo col-xs-12 -->
+                <div class="col-md-2 visible-md visible-lg col-md-push-5 text-center">
+                  <div class="projectTitle">
+                    <span title="{{projectName}}">{{projectName}}</span>
                   </div>
                 </div>
-              </div><!-- /.navbar-collapse -->
+
+                <div class="col-xs-7 col-md-5 col-md-pull-2">
+                  <div class="navbar-form navbar-left pull-left px-0 mr-3">
+
+                     <div class="dropdown" ng-show="currentRoleIsOwner()" style="display: inline-block">
+
+                       <a id="projectButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                         <span class="glyphicon glyphicon-option-horizontal"></span>
+                       </a>
+
+                       <ul class="dropdown-menu" role="menu">
+                         <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
+                         <li><a ng-click="navBarClick('add_folder')">Add folder</a></li>
+                         <li><a ng-click="navBarClick('rename_node')">Rename file/folder</a></li>
+                         <li><a ng-click="navBarClick('add_image')">Add Image</a></li>
+                         <li class="divider"></li>
+                         <li><a ng-click="navBarClick('remove_node')">Delete file/folder</a></li>
+
+                         <li ng-show="currentRoleIsOwner()" class="divider"></li>
+                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
+                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('make_file_static')">Make file static or not</a></li>
+
+                         <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
+                         <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
+
+                         <li ng-show="currentRoleIsOwner()" class="divider"></li>
+                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
+
+                         <li class="divider"></li>
+                         <li><a href="/">Exit project</a></li>
+                       </ul>
+                     </div>
+
+
+
+                    <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" title="Undo">
+                      <span class="glyphicon glyphicon-floppy-disk"></span>
+                    </a>
+
+                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
+                      <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                    </a>
+
+                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
+                      <span class="glyphicon glyphicon-share-alt"></span>
+                    </a>
+                  </div>
+                  <form class="navbar-form navbar-left pull-left">
+
+                    <button id="compileAndRunButton" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileAndRun')" title="Compile and Run this program">
+                        <span class="glyphicon glyphicon-play-circle"></span> <span class="hidden-xs">Run</span>
+                    </button>
+                    <button id="compileButton" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compile')" title="Compile this program">
+                      <span class="glyphicon glyphicon-cog"></span> <span class="hidden-xs">Compile</span>
+                    </button>
+                    <button id="compileRunBtn" class="btn btn-warning btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompilationNeeded()" ng-disabled="disabledActions.compile" ng-click="navBarClick('compileDynamic')" title="Run this program">
+                      <span class="glyphicon glyphicon-play-circle"></span> <span class="hidden-xs">Run</span>
+                    </button>
+                    <button id="runButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('compile')" ng-show="!isCompileAndRun() && isCompilationNeeded()" ng-disabled="disabledActions.run" ng-click="navBarClick('run')" title="Run the last compiled program">
+                      <span class="glyphicon glyphicon-play-circle"></span> <span class="hidden-xs">Run</span>
+                    </button>
+                    <button id="stopBtn" class="btn btn-default btn-sm" ng-if="!isActionHidden('compile')" ng-hide="hiddenActions.stop" ng-click="navBarClick('stop')" title="Stop this program">
+                      <span class="glyphicon glyphicon-remove-circle"></span> <span class="hidden-xs">Stop</span>
+                    </button>
+                    <button id="ideTestButton" class="btn btn-success btn-sm" ng-if="!isActionHidden('test')" ng-disabled="disabledActions.test" ng-click="navBarClick('test')" ng-show="isTestSupported()" title="Run the tests of this project">
+                      <span class="glyphicon glyphicon-check"></span> <span class="hidden-xs">Test</span>
+                    </button>
+                    <button id="ideToolButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('tool')" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
+                      <span class="glyphicon glyphicon-check"></span> <span class="hidden-xs">Analyze</span>
+                    </button>
+                    <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project">
+                      <span class="glyphicon glyphicon-send"></span> <span class="hidden-xs">Submit</span>
+                    </button>
+
+                  </form>
+                </div>
+
+                <div class="col-xs-5 col-md-5">
+                  <div class="navbar-form navbar-right">
+
+                    <ul class="nav navbar-nav m-0">
+
+                      <li class="nav-item pull-right">
+                        <button ng-hide="currentRoleIsOwner()" class="btn btn-info btn-sm nav-link" ng-if="!isActionHidden('help')" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+                          <span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Ich brauche Hilfe</span>
+                        </button>
+                      </li>
+
+                      <li class="nav-item pull-right">
+                        <button class="btn btn-default btn-sm nav-link" ng-if="!isActionHidden('full-screen')" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
+                          <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
+                          <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
+                        </button>
+                      </li>
+
+                      <li class="nav-item pull-right">
+                        <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('edit')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
+                          <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
+                        </button>
+                      </li>
+
+                      <li class="nav-item pull-right">
+                        <div class="dropdown" ng-if="!isActionHidden('edit')">
+                          <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                            <span class="glyphicon glyphicon-cog"></span>
+                          </a>
+
+                          <ul class="dropdown-menu">
+                            <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
+                          </ul>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div><!-- /.container-fluid -->
           </nav>
         </div>

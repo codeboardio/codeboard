@@ -137,8 +137,10 @@ body {
 }
 
 .ideHeader .navbar-form {
-  margin-top: 13px;
-  margin-bottom: 13px;
+  margin: 13px 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
 }
 
 .ideHeader .navbar-form .nav-item {
@@ -707,3 +709,7 @@ body {
   opacity: 0;
   transition: visibility 0s 0.6s, opacity 0.6s linear;
 }
+
+
+
+/** - - - Responsiveness - - - **/
