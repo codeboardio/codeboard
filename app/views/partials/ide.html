@@ -333,6 +333,23 @@
   </div>
   <!-- end of the modal window -->
 
+  <!-- the modal window for asking anonymous users if they really want to submit -->
+  <div>
+    <script type="text/ng-template" id="ideConfirmResetModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Original wiederherstellen?</h3>
+      </div>
+      <div class="modal-body">
+        <p class="lead">Bist du dir sicher, dass du deine Lösung mit der originalen Aufgabe überschreiben möchtest?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" ng-click="ok()">Ja, überschreibe meine Lösung</button>
+        <button class="btn btn-default" ng-click="cancel()">Nein, Wiederherstellung abbrechen</button>
+      </div>
+    </script>
+  </div>
+  <!-- end of the modal window -->
+
   <!-- the modal window for showing the "Share project" information -->
   <div>
     <script type="text/ng-template" id="ideShareProjectModal.html">

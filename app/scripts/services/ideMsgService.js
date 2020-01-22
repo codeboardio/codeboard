@@ -18,6 +18,16 @@ angular.module('codeboardApp')
     };
 
     /**
+     * Returns msg object for request that the current node should be forced to reload
+     * @return {{msg: string}}
+     */
+    this.msgForceReloadCurrentNode = function () {
+      return {
+        msg: 'ide.forceReloadCurrentNode'
+      };
+    };
+
+    /**
      * Returns msg object for requests of new nodes (files or folders).
      * @param {string} aNodeType which type of node was requested ('file' or 'folder')
      * @return {{msg: string, data: {nodeType: *}}}

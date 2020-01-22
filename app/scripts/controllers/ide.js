@@ -541,41 +541,67 @@ app.controller('IdeCtrl',
        */
       let resetSolution = function() {
 
-        // todo braucht es noch ein Bestätigungs-Modal?
+        let confirmResetModalInstanceCtrl =  ['$rootScope','$scope', '$uibModalInstance',
+          function ($rootScope, $scope, $uibModalInstance) {
 
-        // the url from which to get the files of the project
-        var _urlForProject = '/api/projects/' + $routeParams.projectId;
+          /**
+           * If user confirms modal, load original files and overwrite current
+           */
+          $scope.ok = function() {
 
-        // load original
-        $http.get(_urlForProject)
-          .success(function(result) {
+            // the url from which to get the files of the project
+            let _urlForProject = '/api/projects/' + $routeParams.projectId;
 
-            let userProjectData = {
-              // the name of the project
-              name: result.projectname,
-              // the last unique Id that was used to create a file
-              lastUId: result.lastUId,
-              // programming language of the project
-              language: ProjectFactory.getProject().language,
-              // the role of the user who is currently looking at the project in the browser
-              userRole: ProjectFactory.getProject().userRole,
-              // the files of the user
-              fileSet: result.fileSet
-            };
+            // load original
+            $http.get(_urlForProject)
+                .success(function(result) {
 
-            // update the project data in the ProjectFactory
-            ProjectFactory.setProjectFromJSONdata(result, ltiData);
+                  let userProjectData = {
+                    // the name of the project
+                    name: result.projectname,
+                    // the last unique Id that was used to create a file
+                    lastUId: result.lastUId,
+                    // programming language of the project
+                    language: ProjectFactory.getProject().language,
+                    // the role of the user who is currently looking at the project in the browser
+                    userRole: ProjectFactory.getProject().userRole,
+                    // the files of the user
+                    fileSet: result.fileSet
+                  };
 
-            // reload tree view
-            $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
+                  // update the project data in the ProjectFactory
+                  ProjectFactory.setProjectFromJSONdata(result, ltiData);
 
-            // reload current file in editor
-            let req = IdeMsgService.msgDisplayFileRequest($scope.ace.currentNodeId, true);
-            $rootScope.$broadcast(req.msg, req.data);
+                  // reload tree view
+                  $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
 
-            // todo kontrollieren, ob mehrere Files auch funktionieren. Bis jetzt scheint es zu stimmen
+                  // reload current file in editor
+                  $rootScope.$broadcast(IdeMsgService.msgForceReloadCurrentNode().msg);
 
-          });
+                  // close modal
+                  $uibModalInstance.close();
+                });
+          };
+
+          /**
+           * Close modal on cancle
+           */
+          $scope.cancel = function() {
+            $uibModalInstance.close();
+          };
+        }];
+
+        // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
+        $uibModal.open({
+          templateUrl: 'ideConfirmResetModal.html',
+          controller: confirmResetModalInstanceCtrl
+        });
+
+
+
+
+
+
       };
 
           // we need a way to hold some state of the IDE; this object contains the states that are required
@@ -917,6 +943,15 @@ app.controller('IdeCtrl',
             break;
         }
       };
+
+
+      /**
+       * Function to force an update of the current node displayed by the editor
+       */
+      $scope.$on(IdeMsgService.msgForceReloadCurrentNode().msg, function (aEvent, aMsgData) {
+        let req = IdeMsgService.msgDisplayFileRequest($scope.ace.currentNodeId, true);
+        $rootScope.$broadcast(req.msg, req.data);
+      })
 
 
       /**

@@ -56,6 +56,13 @@
     border-color: #eea236 !important;
 }
 
+/* Button Danger */
+.btn-danger {
+    color: #fff !important;
+    background-color: #dc3545 !important;
+    border-color: #dc2028 !important;
+}
+
 /* :disabled */
 .btn.disabled,
 .btn.disabled.active,
