@@ -1023,8 +1023,8 @@ app.controller('IdeCtrl',
           });
         }
 
-        // if the currently displayed node is static set editor to ready only (Janick Michot)
-        if(ProjectFactory.getNode(aMsgData.nodeId).isStatic && !$scope.currentRoleIsOwner()) {
+        // if the currently displayed node is static or action `edit` hidden set editor to ready only (Janick Michot)
+        if((ProjectFactory.getNode(aMsgData.nodeId).isStatic || $scope.isActionHidden("edit")) && !$scope.currentRoleIsOwner()) {
           $scope.ace.editor.setReadOnly(true);
         } else {
           $scope.ace.editor.setReadOnly(false);
