@@ -20,3 +20,16 @@
 .project-listing-description {
     max-width: 650px;
 }
+
+/** - - - Badges - - - */
+.badge {
+    font-weight: 400;
+}
+.badge.badge-unanswered {
+    color: #fff;
+    background-color: #17a2b8;
+}
+.badge.badge-answered{
+    color: #fff;
+    background-color: #28a745;
+}

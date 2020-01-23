@@ -24,7 +24,7 @@
     <!-- User Actions -->
     <div class="sendRequest mt-4 pt-4">
 
-        <button ng-show="currentRoleIsUser()" ng-disabled="requestTipDisabled" class="btn btn-success btn-100" ng-click="sendTipRequest()">
+        <button ng-show="currentRoleIsUser()" ng-disabled="requestTipDisabled" class="btn btn-success btn-100" ng-click="askForTip()">
             <span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern
         </button>
 
@@ -33,7 +33,7 @@
         </button>
 
         <!-- Add Message Form -->
-        <form ng-show="sendRequestFormVisible" id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
+        <form ng-show="sendRequestFormVisible" id="sendHelpRequest" class="form-inline" ng-submit="sendMessage()">
 
             <p class="text-danger">{{sendHelpFormErrors}}</p>
 

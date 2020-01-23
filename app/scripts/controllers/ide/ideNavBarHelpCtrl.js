@@ -13,8 +13,8 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarHelpCtrl', ['$scope', '$rootScope', '$sce', 'IdeMsgService', 'ProjectFactory', 'ChatSrv',
-    function ($scope, $rootScope, $sce, IdeMsgService, ProjectFactory, ChatSrv) {
+    .controller('ideNavBarHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
+    function ($scope, $rootScope, $sce, $routeParams, $http, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
 
         let slug = 'help',
             defaultMessage  = "Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.",
@@ -24,7 +24,7 @@ angular.module('codeboardApp')
         $scope.chatLines = [];
         $scope.tips = [];
         $scope.sendRequestFormVisible = false;
-        $scope.requestTipDisabled = false;
+        $scope.requestTipDisabled = true;
 
 
         /**
@@ -38,15 +38,6 @@ angular.module('codeboardApp')
         };
 
         /**
-         * On open help tab, scroll to the bottom
-         */
-        $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
-            if(data.tab === slug) {
-                chatScrollToBottom();
-            }
-        });
-
-        /**
          * Returns the number of already sent tips
          * @returns {*}
          */
@@ -58,21 +49,79 @@ angular.module('codeboardApp')
         };
 
         /**
+         * This functions adds a chat line into the view
+         * With the parameter `scrollToBottom` whether or not the conversation box should be
+         * scrolled to the bottom or not
          *
          * @param chatLine
-         * @returns {*}
+         * @param scrollToBottom
          */
-        let addChatLine = function(chatLine) {
-            chatLine.alignment = 'right';
-            if(chatLine.authorId !== chatLine.userId) {
-                chatLine.alignment = 'left';
-            }
+        let addChatLine = function(chatLine, scrollToBottom = false) {
+
+            // define chatline alignment depending on current visitor
+            chatLine.alignment = (chatLine.authorId !== chatLine.userId) ? 'left' : 'right';
 
             // if chatLine type card, parse the message
-            if(chatLine.type === 'card') {
-                chatLine.message = JSON.parse(chatLine.message);
-            }
+            if(chatLine.type === 'card') chatLine.message = JSON.parse(chatLine.message);
+
+            // add card to the list
             $scope.chatLines.push(chatLine);
+
+            if(scrollToBottom) {
+                chatScrollToBottom();
+            }
+        };
+
+
+        /**
+         * First create a new `helpRequest` and then add a new chatline with reference
+         * to the helpRequest.
+         *
+         * @param aMessage
+         * @returns {*}
+         */
+        let sendHelpRequest = function(aMessage) {
+
+            // trigger a save of the currently displayed content
+            $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
+
+            // call ProjectFactory to store the request
+            return ProjectFactory.createHelpRequest()
+                .then(function(helpRequest) {
+                    let reference = "/projects/" + helpRequest.projectId + "/version/help/" + helpRequest.id;
+                    return ChatSrv.addChatLineCard(aMessage,"Hilfe angefragt", 'help', reference, helpRequest.id);
+                })
+                .then(function(chatLine) {
+                    addChatLine(chatLine, true);
+                    $scope.sendRequestFormVisible = false;
+                });
+        };
+
+        /**
+         * First check for open helpRequests and get id of latest request.
+         * Then add new chatline with reference to this request.
+         *
+         * @param aMessage
+         * @returns {*}
+         */
+        let teacherAnswerHelpRequest = function(aMessage) {
+
+            // filter all chatlines with status unanswered
+            let chatLinesUnanswered = $scope.chatLines.filter(function(chatLine) {
+               return (chatLine.helprequest && chatLine.helprequest.status === 'unanswered');
+            });
+
+            // change status (update) of all unanswered helpRequests
+            return chatLinesUnanswered.reduce(function(previousHelpRequest, chatLine) {
+                return ProjectFactory.updateHelpRequest(chatLine.helprequestId);
+            }, Promise.resolve())
+                .then(function(helpRequest) {
+                    let id = (helpRequest !== undefined) ? helpRequest.id : -1;
+                    return ChatSrv.addChatLine(aMessage, id);
+                })
+                .then(function(chatLine) {
+                    addChatLine(chatLine, true);
+                });
         };
 
         /**
@@ -80,36 +129,26 @@ angular.module('codeboardApp')
          */
         $scope.init = function() {
 
+            $scope.sendRequestFormVisible = !$scope.currentRoleIsUser();
+
             // load chat history
             ChatSrv.getChatHistory()
                 .then(function(result) {
-
                     // default message
-                    addChatLine({
-                        id: -1,
-                        authorId: -1,
-                        type: "text",
-                        message: defaultMessage,
-                        author: {username: avatarName}
-                    });
+                    addChatLine({ id: -1, authorId: -1, type: "text", message: defaultMessage, author: {username: avatarName} });
 
-                    // loop trough chatlines
                     result.data.forEach(function(chatLine) {
                         addChatLine(chatLine);
                     });
                 })
                 .then(function() {
-
-                    // read all tips for this project
+                    // read all tips from codeboard.json
                     let config = ProjectFactory.getConfig();
                     if(config && "Help" in config && "tips" in config.Help) {
                         $scope.tips = config.Help.tips;
                         $scope.helpIntro = config.Help.helpIntro;
+                        $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
                     }
-
-                    // disable / enable actions
-                    $scope.sendRequestFormVisible = !$scope.currentRoleIsUser();
-                    $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
                 })
                 .catch(function() {
                     console.log("Fehler beim Laden des Chatverlaufs");
@@ -117,6 +156,14 @@ angular.module('codeboardApp')
         };
         $scope.init();
 
+        /**
+         * On open help tab, scroll to the bottom
+         */
+        $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
+            if(data.tab === slug) {
+                chatScrollToBottom();
+            }
+        });
 
         /**
          * Returns formatted posted at
@@ -128,79 +175,51 @@ angular.module('codeboardApp')
             if(postedAt instanceof Date && !isNaN(postedAt)) {
                 return postedAt.toLocaleString("de-DE");
             }
-            return "todo";
+            return "";
         };
 
         /**
          * This functions adds a chatline with a tip.
          */
-        $scope.sendTipRequest = function() {
-
-            let i = getNumTipsAlreadySent(),
-                tip = $scope.tips[i];
-
+        $scope.askForTip = function() {
+            let tip = $scope.tips[getNumTipsAlreadySent()];
             if(typeof tip !== "undefined") {
-                // when storing a card, we need to define card header and body
-                let chatLine = {
-                    cardHeader: tip.name,
-                    cardBody: tip.note,
-                    cardType: 'tip'
-                };
-
-                // add chatline and reload chat history
-                ChatSrv.addChatLine(chatLine, 'card', 'avatar')
+                ChatSrv.addChatLineCard(tip.note, tip.name, 'tip')
                     .then(function(chatLine) {
-                        addChatLine(chatLine);
+                        addChatLine(chatLine, true);
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
-                        chatScrollToBottom();
                     });
             }
         };
 
         /**
-         * Creates a new `helprequest` version of the current project.
-         * Afterwards a chatline is added which references this version.
+         * Each time a message should be sent, this functions determines
+         * which action is performed. This can be either the sending of a help request
+         * or the answering of a help request.
          */
-        $scope.sendHelpRequest = function() {
+        $scope.sendMessage = function() {
+
+            let aMessage = $scope.note;
 
             // check if note is present
-            if(!$scope.note || $scope.note === "" || typeof $scope.note === "undefined") {
+            if(!aMessage || aMessage === "" || typeof aMessage === "undefined") {
                 $scope.sendHelpFormErrors = "Versuche dein Anliegen, im folgenden Feld zu beschreiben.";
                 return false;
             }
 
-            // trigger a save of the currently displayed content
-            $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
+            // select action depending on userBeingInspected
+            let action = Promise.resolve();
+            if(ProjectFactory.getProject().userBeingInspected) {
+                action = teacherAnswerHelpRequest(aMessage);
+            } else if(ProjectFactory.getProject().userRole === 'user') {
+                action = sendHelpRequest(aMessage);
+            }
 
-            // call ProjectFactory to store the request
-            ProjectFactory.requestHelp($scope.note)
-                .then(function(helpRequest) {
-
-                    // define chat line
-                    let chatLineType = "html", chatLineContent = "";
-                    if(ProjectFactory.getProject().userBeingInspected) {
-                        chatLineContent = helpRequest.userNote;
-                    } else {
-                        chatLineType = 'card';
-                        chatLineContent = {
-                            cardHeader: "Hilfe angefragt",
-                            cardBody: helpRequest.userNote,
-                            cardType: 'help',
-                            cardReference: "/projects/" + helpRequest.projectId + "/version/help/" + helpRequest.id,
-                        };
-                    }
-
-                    // add chatline and reload chat history
-                    ChatSrv.addChatLine(chatLineContent, chatLineType)
-                        .then(function(chatLine) {
-                            addChatLine(chatLine);
-                            $scope.sendRequestFormVisible = false;
-                            chatScrollToBottom();
-                        });
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
+            // if no error occurs, add chatline into the view
+            action.catch(function (error) {
+                console.log(error);
+                $scope.sendHelpFormErrors = "Fehler beim Senden deiner Nachricht. Versuche es später noch einmal oder wende dich an den Systemadministrator.";
+            });
         };
 
         /**
@@ -221,6 +240,9 @@ angular.module('codeboardApp')
 
         /**
          * get the user icon depending on the author and message type
+         *
+         * todo neue Studentenavatare einbauen
+         *
          * @param chatLine
          * @returns {string}
          */
@@ -231,12 +253,10 @@ angular.module('codeboardApp')
             return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
         };
 
-
         /**
          * Show send request form on click
          */
         $scope.showSendRequestForm = function() {
             $scope.sendRequestFormVisible = true;
         };
-
     }]);

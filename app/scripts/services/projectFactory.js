@@ -940,7 +940,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
       var payload = getPayloadForCompilation(false);
       payload.action = 'test';
-      payload.testData = testData; // add our test object to the payload (Janick Michot)
+      payload.testData = testData; // add our test object to the payload
 
       // create the promise that is returned
       var deferred = $q.defer();
@@ -1073,11 +1073,10 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @returns a promise that resolves when a the request was completed
      * @author Janick Michot
      */
-    let requestHelp = function (note) {
+    let createHelpRequest = function () {
 
       // create payload
       let payload = {
-        note: note,
         hasLtiData: getProject().hasLtiData,
         ltiData: getProject().ltiData,
         filesInDefaultFormat: getNodeArray(getProject().files),
@@ -1093,6 +1092,36 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
             deferred.resolve(data); // resolve the promise
           },
           function error(response) {
+            deferred.reject(response); // reject the promise
+          }
+      );
+
+      // return the promise
+      return deferred.promise;
+    };
+    /**
+     * Request Help for the current project.
+     * @returns a promise that resolves when a the request was completed
+     * @author Janick Michot
+     */
+    let updateHelpRequest = function (helpRequestId, status = "answered") {
+
+      // create payload
+      let payload = {
+        status: status,
+        helpRequestId: helpRequestId
+      };
+
+      // create the promise that is returned
+      let deferred = $q.defer();
+
+      // make call to the server
+      ProjectRequestHelpRes.update( { projectId: $routeParams.projectId }, payload,
+          function success(data, status, header, config) {
+            deferred.resolve(data); // resolve the promise
+          },
+          function error(response) {
+        console.log(response);
             deferred.reject(response); // reject the promise
           }
       );
@@ -1124,7 +1153,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       testProject: testProject,
       toolAction: toolAction,
       submitProject: submitProject,
-      requestHelp: requestHelp,
+      createHelpRequest: createHelpRequest,
+      updateHelpRequest: updateHelpRequest,
       isProjectModified: isProjectModified,
       getFile: getFile,
 

@@ -26,7 +26,8 @@ angular.module('codeboardApp')
   .factory('ProjectRequestHelpRes', ['$resource', function($resource) {
     return $resource(
         '/api/projects/:projectId/helpRequests',
-        {projectId: '@id'}
+        {projectId: '@id'},
+        {update: {method: 'PUT'}}
     );
   }])
 
