@@ -11,8 +11,8 @@
  */
 
 angular.module('codeboardApp')
-  .controller('ProjectSettingsCtrl', ['$scope', '$http', '$log', '$routeParams', '$location', '$timeout', '$uibModal', 'ProjectRes', 'projectData',
-    function ($scope, $http, $log, $routeParams, $location, $timeout, $uibModal, ProjectRes, projectData) {
+  .controller('ProjectSettingsCtrl', ['$scope', '$http', '$log', '$routeParams', '$location', '$timeout', '$uibModal', 'ProjectRes', 'projectData', 'courseData',
+    function ($scope, $http, $log, $routeParams, $location, $timeout, $uibModal, ProjectRes, projectData, courseData) {
 
       // Object that holds the properties of a project and binds to the form
       $scope.data = {};
@@ -32,8 +32,16 @@ angular.module('codeboardApp')
        * Function gets the projects data from the server and sets it up for display
        */
       $scope.init = function () {
+
         angular.copy(projectData, $scope.originalData);
         $scope.data = projectData;
+
+        console.log(projectData);
+        console.log(courseData);
+
+        // set possible and selected courses
+        $scope.courses = courseData.data.ownerSet;
+        $scope.coursesSelected = (typeof projectData.Parent !== "undefined") ? projectData.Parent.map(function(c) { return c.id; }) : [];
 
         $scope.data.ltiUri = location.protocol + '//' + location.hostname + "/lti/projects/" + $scope.data.id;
 
@@ -44,6 +52,23 @@ angular.module('codeboardApp')
         if (!$scope.data.userSet)
           $scope.data.userSet = [];
       }();
+
+      /**
+       * Toggle selection for courses
+       * @param courseId
+       */
+      $scope.toggleSelection = function toggleSelection(courseId) {
+        let idx = $scope.coursesSelected.indexOf(courseId);
+
+        // Is currently selected
+        if (idx > -1) {
+          $scope.coursesSelected.splice(idx, 1);
+        }
+        // Is newly selected
+        else {
+          $scope.coursesSelected.push(courseId);
+        }
+      };
 
 
       $scope.addOwners = function (aListOfNewOwnerNames) {
@@ -138,7 +163,8 @@ angular.module('codeboardApp')
             isSubmissionAllowed: $scope.data.isSubmissionAllowed,
             isLtiAllowed: $scope.data.isLtiAllowed,
             ltiKey: $scope.data.ltiKey,
-            ltiSecret: $scope.data.ltiSecret
+            ltiSecret: $scope.data.ltiSecret,
+            courseSet: $scope.coursesSelected
           }
 
           // we iterate over ownerSet and userSet to make sure we only submit the usernames and no other data

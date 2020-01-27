@@ -82,7 +82,7 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         templateUrl: 'partials/userProjects',
         controller: 'UserProjectsCtrl'
       })
-      .when('/projects/new', {
+      .when('/:resource/new', {
         // user creates a new project
         templateUrl: 'partials/projectNew',
         controller: 'ProjectNewCtrl',
@@ -104,6 +104,9 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         resolve: {
           projectData: ['$route', 'ProjectSettingsRes', function($route, ProjectSettingsRes) {
             return ProjectSettingsRes.get({projectId: $route.current.params.projectId}).$promise;
+          }],
+          courseData: ['$route', '$http', 'UserSrv', function($route, $http, UserSrv) {
+            return $http.get('/api/users/' + UserSrv.getUsername() + '/courses');
           }]
         }
       })
