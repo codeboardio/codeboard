@@ -70,6 +70,9 @@ angular.module('codeboardApp')
             if(scrollToBottom) {
                 chatScrollToBottom();
             }
+
+            // re-empty note field
+            $scope.note = "";
         };
 
 
