@@ -61,11 +61,11 @@
                       <span class="glyphicon glyphicon-floppy-disk"></span>
                     </a>
 
-                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
+                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('unredo')" ng-click="ace.editor.getSession().getUndoManager().undo(false)" title="Undo">
                       <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
                     </a>
 
-                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('edit')" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
+                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('unredo')" ng-click="ace.editor.getSession().getUndoManager().redo(false)" title="Redo">
                       <span class="glyphicon glyphicon-share-alt"></span>
                     </a>
                   </div>
@@ -118,13 +118,13 @@
                       </li>
 
                       <li class="nav-item pull-right">
-                        <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('edit')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
+                        <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('reset')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
                           <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
                         </button>
                       </li>
 
                       <li class="nav-item pull-right">
-                        <div class="dropdown" ng-if="!isActionHidden('edit')">
+                        <div class="dropdown" ng-if="!isActionHidden('editor-settings')">
                           <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
                             <span class="glyphicon glyphicon-cog"></span>
                           </a>
