@@ -108,12 +108,12 @@ angular.module('codeboardApp')
 
             // filter all chatlines with status unanswered
             let chatLinesUnanswered = $scope.chatLines.filter(function(chatLine) {
-               return (chatLine.helprequest && chatLine.helprequest.status === 'unanswered');
+               return (chatLine.subject && chatLine.subject.status === 'unanswered');
             });
 
             // change status (update) of all unanswered helpRequests
             return chatLinesUnanswered.reduce(function(previousHelpRequest, chatLine) {
-                return ProjectFactory.updateHelpRequest(chatLine.helprequestId);
+                return ProjectFactory.updateHelpRequest(chatLine.subjectId);
             }, Promise.resolve())
                 .then(function(helpRequest) {
                     let id = (helpRequest !== undefined) ? helpRequest.id : -1;
@@ -217,7 +217,6 @@ angular.module('codeboardApp')
 
             // if no error occurs, add chatline into the view
             action.catch(function (error) {
-                console.log(error);
                 $scope.sendHelpFormErrors = "Fehler beim Senden deiner Nachricht. Versuche es später noch einmal oder wende dich an den Systemadministrator.";
             });
         };

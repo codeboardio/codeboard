@@ -1121,7 +1121,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
             deferred.resolve(data); // resolve the promise
           },
           function error(response) {
-        console.log(response);
             deferred.reject(response); // reject the promise
           }
       );
