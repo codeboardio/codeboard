@@ -1035,7 +1035,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      */
     var submitProject = function () {
 
-      var payload = getPayloadForCompilation(false);
+      var payload = getPayloadForCompilation(true);
 
       // the above payload contains the files in a form that's suited for Mantra compilation
       // however, we also want to store the files in the DB in format that we later load them
