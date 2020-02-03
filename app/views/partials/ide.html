@@ -26,36 +26,34 @@
                 <div class="col-xs-7 col-md-5 col-md-pull-2">
                   <div class="navbar-form navbar-left pull-left px-0 mr-3">
 
-                     <div class="dropdown" ng-show="currentRoleIsOwner()" style="display: inline-block">
+                    <div class="dropdown" ng-show="currentRoleIsOwner()" style="display: inline-block">
 
-                       <a id="projectButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
-                         <span class="glyphicon glyphicon-option-horizontal"></span>
-                       </a>
+                      <a id="projectButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                        <span class="glyphicon glyphicon-option-horizontal"></span>
+                      </a>
 
-                       <ul class="dropdown-menu" role="menu">
-                         <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
-                         <li><a ng-click="navBarClick('add_folder')">Add folder</a></li>
-                         <li><a ng-click="navBarClick('rename_node')">Rename file/folder</a></li>
-                         <li><a ng-click="navBarClick('add_image')">Add Image</a></li>
-                         <li class="divider"></li>
-                         <li><a ng-click="navBarClick('remove_node')">Delete file/folder</a></li>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a id="addFileButton" ng-click="navBarClick('add_file')">Add file</a></li>
+                        <li><a ng-click="navBarClick('add_folder')">Add folder</a></li>
+                        <li><a ng-click="navBarClick('rename_node')">Rename file/folder</a></li>
+                        <li><a ng-click="navBarClick('add_image')">Add Image</a></li>
+                        <li class="divider"></li>
+                        <li><a ng-click="navBarClick('remove_node')">Delete file/folder</a></li>
 
-                         <li ng-show="currentRoleIsOwner()" class="divider"></li>
-                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
-                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('make_file_static')">Make file static or not</a></li>
+                        <li ng-show="currentRoleIsOwner()" class="divider"></li>
+                        <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
+                        <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('make_file_static')">Make file static or not</a></li>
 
-                         <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
-                         <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
+                        <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
+                        <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
 
-                         <li ng-show="currentRoleIsOwner()" class="divider"></li>
-                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
+                        <li ng-show="currentRoleIsOwner()" class="divider"></li>
+                        <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
 
-                         <li class="divider"></li>
-                         <li><a href="/">Exit project</a></li>
-                       </ul>
-                     </div>
-
-
+                        <li class="divider"></li>
+                        <li><a href="/">Exit project</a></li>
+                      </ul>
+                    </div>
 
                     <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" title="Undo">
                       <span class="glyphicon glyphicon-floppy-disk"></span>

@@ -751,6 +751,11 @@ app.controller('IdeCtrl',
         return ProjectFactory.getProject().userRole === 'userproject';
       };
 
+      /** Returns true if the current role is that of project 'ltiUser' */
+      $scope.currentRoleIsLtiUser = function() {
+        return $scope.isUsingLti;
+      };
+
       /**
        * returns true whether or not this project uses the `compileAndRun` button
        **/
@@ -2037,7 +2042,11 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
 
   /* Returns a string that details the current user's role */
   $scope.getRole = function() {
-    if ($scope.currentRoleIsOwner()) {
+
+    if($scope.currentRoleIsLtiUser()) {
+      return 'LTI User';
+    }
+    else if ($scope.currentRoleIsOwner()) {
       return 'Project owner';
     }
     else if ($scope.currentRoleIsUser()) {
