@@ -1044,6 +1044,9 @@ app.controller('IdeCtrl',
               lAceMode = 'ace/mode/text';
           }
 
+          // set default font size
+          $scope.ace.editor.setFontSize(14);
+
           // create a new session, set the context and the mode
           $scope.ace.editor.setSession(ace.createEditSession(lFileContent, lAceMode));
 
