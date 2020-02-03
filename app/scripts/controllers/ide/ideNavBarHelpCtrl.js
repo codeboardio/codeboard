@@ -187,7 +187,7 @@ angular.module('codeboardApp')
         $scope.askForTip = function() {
             let tip = $scope.tips[getNumTipsAlreadySent()];
             if(typeof tip !== "undefined") {
-                ChatSrv.addChatLineCard(tip.note, tip.name, 'tip')
+                ChatSrv.addChatLineCard(tip.note, tip.name, 'tip', null, null, avatarName)
                     .then(function(chatLine) {
                         addChatLine(chatLine, true);
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
@@ -249,10 +249,25 @@ angular.module('codeboardApp')
          * @returns {string}
          */
         $scope.getUserAvatar = function(chatLine) {
+
+            // default avatar = teachers avatar .. todo default festlegen
+            let avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+
+            // avatar used for auto generated messages
             if(chatLine.author.username === avatarName) {
-                return "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg";
+                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+
+                if(chatLine.type === "card") {
+                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg";
+                }
             }
-            return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+
+            // students avatar
+            if(chatLine.author.username === chatLine.user.username) {
+                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg"; // todo
+            }
+
+            return avatar;
         };
 
         /**
