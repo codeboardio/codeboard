@@ -250,23 +250,27 @@ angular.module('codeboardApp')
          */
         $scope.getUserAvatar = function(chatLine) {
 
-            // default avatar = teachers avatar .. todo default festlegen
-            let avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+            let avatar;
 
             // avatar used for auto generated messages
             if(chatLine.author.username === avatarName) {
+
+                // default avatar
                 avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
 
                 if(chatLine.type === "card") {
                     avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg";
                 }
-            }
+            } else {
 
-            // students avatar
-            if(chatLine.author.username === chatLine.user.username) {
-                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg"; // todo
-            }
+                // default human avatar = teacher
+                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg";
 
+                // students avatar
+                if(chatLine.author.username === chatLine.user.username) {
+                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried.svg"; // todo
+                }
+            }
             return avatar;
         };
 
