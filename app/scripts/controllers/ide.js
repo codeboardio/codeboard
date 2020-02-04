@@ -503,6 +503,99 @@ app.controller('IdeCtrl',
             $log.debug('Submission successful.');
             setOutput(data.msg, false);
 
+            let testResult = data.data;
+
+            // todo hier müsste also ds neue Modal eingebaut werden..
+            //  zunächst überprüfen welche Informationen wir zurückerhalten
+            //  Wiederum Avatar einbauen! Aber bin mir nicht sicher was schöner ist.. Test
+            //
+            //  Gratuliere du hast alle Tests bestanden! Weiter so..
+            //  Deine Lösung ist noch nicht ganz korrekt. Damti du im Kurs fortfahren kannst, musst die mindestens
+            //  du alle Tests bestanden haben.
+
+
+            let submitModalInstanceCtrl =  ['$rootScope','$scope', '$uibModalInstance',
+              function ($rootScope, $scope, $uibModalInstance) {
+
+                // get test result
+                $scope.numTestsFailed = testResult.numTestsFailed;
+                $scope.numTestsPassed = testResult.numTestsPassed;
+                $scope.numTests = $scope.numTestsFailed + $scope.numTestsPassed;
+                $scope.progress = $scope.numTestsPassed  / ($scope.numTestsFailed + $scope.numTestsPassed) * 100;
+                $scope.submissionSuccesful = ($scope.numTestsPassed === $scope.numTests); // todo müssen immer alle Tests bestanden sein?
+
+                // define texts and avatar depending on test result
+                if($scope.submissionSuccesful) {
+                  $scope.title = "Deine Lösung wurde erfolgreich übermittelt";
+                  $scope.textBeforeResult = "Gratulation! Du hast mit deiner Lösung alle Tests bestanden!";
+                  $scope.textAfterResult = "Du kannst nun Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
+
+                } else {
+                  $scope.title = "Deine Lösung stimmt noch nicht ganz";
+                  $scope.textBeforeResult = "Gut gemacht! Deine Lösung erfüllt bereits " + $scope.numTestsPassed + " von " + $scope.numTests + " Tests.";
+                  $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du dein Code verbessern und alle Tests bestehen. Wenn du Probleme bei der Lösung hast, nutze den Hilfe-Tab. Weiterhin viel Erfolg!";
+                }
+
+                /**
+                 * Returns src to for avatar svg depending on test result
+                 * @returns {string}
+                 */
+                $scope.getAvatar = function() {
+                  if($scope.submissionSuccesful) {
+                    return "../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg";
+                  } else {
+                    return "../../../images/avatars/Avatar_RobyCoder_RZ_worried.svg";
+                  }
+                };
+
+                /**
+                 * Close Modal
+                 */
+                $scope.close = function() {
+                  $uibModalInstance.close();
+                };
+
+                /**
+                 * link to the course page
+                 * todo können wir einen link generieren, welcher zurück auf die Kursseite verweist
+                 */
+                $scope.goToCourse = function() {
+
+                  // todo
+                  //  1) Bei der LTI-Initialisierung `launch_presentation_return_url` auslesen (sollte eigentlich return url sein)
+                  //  2) Diesen Wert an Frotend (ProjectFactory übermitteln)
+                  //  3) ProjectFactory.getProject().ltiData.returnLink
+
+                };
+
+                /**
+                 * Open help tab
+                 */
+                $scope.requestHelp = function() {
+                  // first we close the modal
+                  $uibModalInstance.close();
+
+                  // trigger open help tab
+                  let req = IdeMsgService.msgNavBarRightOpenTab("help");
+                  $rootScope.$broadcast(req.msg, req.data);
+                };
+            }];
+
+            /**
+             * call the function to open the modal (we ignore the modalInstance returned by
+             * this call as we don't need to access any data from the modal)
+             */
+            $uibModal.open({
+              modalTemplate: '<div class="modal modal-width-override" ng-transclude></div>',
+              templateUrl: 'ideSubmitModalDue.html',
+              controller: submitModalInstanceCtrl,
+              windowTopClass: '',
+              windowClass: 'avatar-modal',
+              size: "md",
+            });
+
+
+
             // enable compilation and submission (not running, because what the submission compiles might differ from the last compilation if the user changed something; that could be confusing for the user)
             setEnabledActions(1,0,1,1,1);
           },
@@ -534,9 +627,6 @@ app.controller('IdeCtrl',
 
       /**
        * Reset project and restore original
-       *
-       * todo reset to version function
-       * todo wieso wird `userProjectData` nicht verwendet?
        * @author Janick Michot
        */
       let resetSolution = function() {
@@ -596,12 +686,6 @@ app.controller('IdeCtrl',
           templateUrl: 'ideConfirmResetModal.html',
           controller: confirmResetModalInstanceCtrl
         });
-
-
-
-
-
-
       };
 
           // we need a way to hold some state of the IDE; this object contains the states that are required

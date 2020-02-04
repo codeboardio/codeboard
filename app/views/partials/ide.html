@@ -331,7 +331,7 @@
   </div>
   <!-- end of the modal window -->
 
-  <!-- the modal window for asking anonymous users if they really want to submit -->
+  <!-- the modal window for asking if the user really wants to overwritte his/her code -->
   <div>
     <script type="text/ng-template" id="ideConfirmResetModal.html">
       <div class="modal-header">
@@ -347,6 +347,76 @@
     </script>
   </div>
   <!-- end of the modal window -->
+
+  <!-- the modal window for asking if the user really wants to overwritte his/her code -->
+  <div>
+    <script type="text/ng-template" id="ideSubmitModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">{{title}}</h3>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="lead">Hier Resultat anzaigen / Oder Text </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-show="!submissionSuccesful" ng-click="cancel()">Weiter an dieser Aufgabe arbeiten</button>
+        <button class="btn btn-success" ng-show="!submissionSuccesful" ng-click="ok()">Zurück zur Kursübersicht</button>
+
+        <button class="btn btn-default" ng-show="submissionSuccesful" ng-click="cancel()">Zurück zur Aufgabe</button>
+        <button class="btn btn-info" ng-show="submissionSuccesful" ng-click="ok()">Hilfe Anfordern</button>
+
+      </div>
+    </script>
+  </div>
+  <!-- end of the modal window -->
+
+
+  <div>
+    <script type="text/ng-template" id="ideSubmitModalDue.html">
+      <ul class="chat">
+        <li class="clear chat-line my-4 clearfix card">
+          <div class="chat-avatar" style="float: left;">
+            <div style="float: right">
+              <img src="{{getAvatar()}}" width="90px" height="90px">
+            </div>
+          </div>
+          <div class="chat-message" style="float: left;">
+            <div class="chat-line-card left submission float-right w-100">
+              <div class="card-header">
+                <span class="ng-binding">{{title}}</span>
+              </div>
+              <div class="card-body">
+
+                <p>{{textBeforeResult}}</p>
+
+                <div class="progress">
+                  <div class="progress-bar" style="background: #3da956" role="progressbar" ng-style="{'width': progress + '%'}" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+                    <span class="numTestsPassed"><b>{{numTestsPassed}}</b> &#10004;</span>
+                  </div>
+                  <div class="progress-bar" style="background: #ab5c5c" role="progressbar" ng-style="{'width': (100 - progress) + '%'}" aria-valuenow="{{(100 - progress)}}" aria-valuemin="0" aria-valuemax="100">
+                    <span class="numTestsFailed"><b>{{numTestsFailed}}</b> X</span>
+                  </div>
+                </div>
+
+                <p>{{textAfterResult}}</p>
+
+                <div class="chat-line-buttons text-right mt-4">
+                  <button class="btn btn-default" ng-click="close()">Zurück zur Aufgabe</button>
+                  <button class="btn btn-success" ng-show="!submissionSuccesful && isUsingLti" ng-click="goToCourse()">Zur Kursübersicht</button>
+                  <button class="btn btn-info" ng-if="!isActionHidden('help')" ng-show="!submissionSuccesful" ng-click="requestHelp()">Hilfe Anfordern</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </li>
+      </ul>
+    </script>
+  </div>
+
+
 
   <!-- the modal window for showing the "Share project" information -->
   <div>

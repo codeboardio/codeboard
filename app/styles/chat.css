@@ -160,7 +160,7 @@
     color: rgba(255, 255, 255, 0.6);
 }
 
-/* Card Submission */
+/* Card Tip */
 .chat-line-card.tip .card-header {
     border-bottom: 1px solid #ea4d1b;
     background-color: #fe5722;
@@ -179,9 +179,29 @@
 .chat-line-card.tip.left:before {
     border-right-color: #fe5722 !important;
 }
+/* Card Submission */
+.chat-line-card.submission .card-header {
+    border-bottom: 1px solid #ea4d1b;
+    background-color: #fe5722;
+}
+.chat-line-card.submission .card-header:before {
+    content: "\e233";
+    font-family: "Glyphicons Halflings";
+    display: inline-block;
+    width: 36px;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+.chat-line-card.submission.right:after {
+    border-top-color: #fe5722 !important;
+}
+.chat-line-card.submission.left:before {
+    border-right-color: #fe5722 !important;
+}
 
 
-/** - - - Colors - - - */
+
+/** - - - Colors => Tests - - - */
 .chat-line-item.chat-line-avatar {
     background-color: #b7bec3;
     min-height: 24px;
@@ -218,4 +238,29 @@
 .sendRequest .topic {
     height: 120px;
     border-radius: 5px;
+}
+
+
+
+/** - - - Chat Line Modal - - - **/
+.avatar-modal {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.avatar-modal .modal-content {
+    background: none;
+    border: none;
+    box-shadow: none; -moz-box-shadow: none; -webkit-box-shadow: none; -o-box-shadow: none;
+}
+.avatar-modal .chat-line .chat-avatar {
+    width: 100px;
+}
+.avatar-modal .chat-message {
+    margin-top: 40px !important;
+}
+.avatar-modal .chat-line-card.left {
+    margin-left: 20px !important;
+}
+.avatar-modal .chat-line-card.right {
+    margin-right: 20px !important;
 }
