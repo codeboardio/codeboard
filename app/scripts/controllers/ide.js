@@ -496,13 +496,12 @@ app.controller('IdeCtrl',
         setEnabledActions(0,0,0,0,0);
 
         // submit the project
-        var promise = ProjectFactory.submitProject();
-        promise.then(
-          function(data) {
-            $log.debug('Submission successful.');
-            setOutput(data.msg, false);
+        ProjectFactory.submitProject()
+          .then( function(data) {
 
-            console.log(data);
+            $log.debug('Submission successful.');
+
+            setOutput(data.msg, false);
 
             /**
              * Submit Modal Instance used to show submission result, back to course link etc.
@@ -546,7 +545,7 @@ app.controller('IdeCtrl',
                  * Close Modal
                  */
                 $scope.close = function() {
-                  $uibModalInstance.close();
+                  $uibModalInstance.close({});
                 };
 
                 /**
@@ -575,17 +574,12 @@ app.controller('IdeCtrl',
                 };
             }];
 
-
-            console.log("Open Modal Submission");
-
-            console.log(angular.element(document.querySelector("#testModal")));
-
             /**
              * call the function to open the modal (we ignore the modalInstance returned by
              * this call as we don't need to access any data from the modal)
              */
             $uibModal.open({
-              appendTo: angular.element(document).find('aside'),
+              appendTo: angular.element( document.querySelector('#modalAppendTo') ),
               templateUrl: 'ideSubmitModal.html',
               controller: submitModalInstanceCtrl,
               windowClass: 'avatar-modal',
@@ -1211,7 +1205,7 @@ app.controller('IdeCtrl',
                 'WARNING: Unable to save your changes.<br><br>' +
                 "What now: maybe you're currently not logged in.<br>" +
                 'Open a new browser tab for codeboard.io, login, and then come back to this tab and try to save your changes.<br>' +
-                'If the problem persists, contact us at: info@codeboard.io' +
+                'If the problem persists, contact the course admin' +
                 '</span>', true);
             }
           );

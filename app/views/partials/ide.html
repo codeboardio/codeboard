@@ -256,6 +256,9 @@
       <span style="margin-left: 20px;" ng-show="isUsingLti()">Info: Submissions are forwarded to external platform</span>
       <span class="pull-right"><a style="margin-left: 20px;" href="/">open.codeboard.io</a></span>
     </div>
+
+    <div id="modalAppendTo"></div>
+
   </div>
 
   <!-- End of Kendo splitter layout -->
@@ -348,33 +351,9 @@
   </div>
   <!-- end of the modal window -->
 
-  <!-- the modal window for asking if the user really wants to overwritte his/her code -->
+  <!-- the modal window that is shown after submitting a solution -->
   <div>
     <script type="text/ng-template" id="ideSubmitModal.html">
-      <div class="modal-header">
-        <h3 class="modal-title">{{title}}</h3>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p class="lead">Hier Resultat anzaigen / Oder Text </p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-show="!submissionSuccesful" ng-click="cancel()">Weiter an dieser Aufgabe arbeiten</button>
-        <button class="btn btn-success" ng-show="!submissionSuccesful" ng-click="ok()">Zurück zur Kursübersicht</button>
-
-        <button class="btn btn-default" ng-show="submissionSuccesful" ng-click="cancel()">Zurück zur Aufgabe</button>
-        <button class="btn btn-info" ng-show="submissionSuccesful" ng-click="ok()">Hilfe Anfordern</button>
-
-      </div>
-    </script>
-  </div>
-  <!-- end of the modal window -->
-
-
-  <div>
-    <script type="text/ng-template" id="ideSubmitModalDue.html">
       <ul class="chat">
         <li class="clear chat-line my-4 clearfix card">
           <div class="chat-avatar" style="float: left;">
@@ -609,8 +588,6 @@
     </script>
   </div>
   <!-- end of modal window -->
-
-
 
 </div>
 
