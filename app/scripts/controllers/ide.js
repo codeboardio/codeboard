@@ -550,15 +550,13 @@ app.controller('IdeCtrl',
 
                 /**
                  * link to the course page
-                 * todo können wir einen link generieren, welcher zurück auf die Kursseite verweist
                  */
                 $scope.goToCourse = function() {
+                    // get url from project
+                    let courseUrl = ProjectFactory.getProject().ltiData.ltiReturnUrl;
 
-                  // todo
-                  //  1) Bei der LTI-Initialisierung `launch_presentation_return_url` auslesen (sollte eigentlich return url sein)
-                  //  2) Diesen Wert an Frotend (ProjectFactory übermitteln)
-                  //  3) ProjectFactory.getProject().ltiData.returnLink
-
+                    // redirect
+                    $window.location.href = courseUrl;
                 };
 
                 /**

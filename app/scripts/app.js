@@ -176,6 +176,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
               _ltiData.ltiUserId = $route.current.params.ltiUserId;
             if($route.current.params.ltiNonce)
               _ltiData.ltiNonce = $route.current.params.ltiNonce;
+            if($route.current.params.ltiReturnUrl)
+              _ltiData.ltiReturnUrl = $route.current.params.ltiReturnUrl;
 
             deferred.resolve(_ltiData);
             return deferred.promise;
