@@ -30,10 +30,9 @@ angular.module('codeboardApp')
         let _projectId = $routeParams.projectId;
 
         $http.get('/api/projects/' + _projectId + '/helpRequests')
-          .success(function(data, status, headers, config) {
-            $scope.helpRequestData = data;
-          })
-          .error(function(data, status, headers, config) {
+          .then(function(result) {
+            $scope.helpRequestData = result.data;
+          }, function(error) {
             $log.debug('Can not get the submissions');
           });
       };

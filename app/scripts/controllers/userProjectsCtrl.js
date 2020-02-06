@@ -25,10 +25,9 @@ angular.module('codeboardApp')
       $http.get('/api/users/' + $routeParams.username + '/projects')
         .then( function(result) {
 
-            let data = result.data;
+          let data = result.data;
 
           $scope.user = {
-            // id
             username: data.username,
             name: data.name,
             email: data.emailPublic,
