@@ -556,7 +556,7 @@ app.controller('IdeCtrl',
                     let courseUrl = ProjectFactory.getProject().ltiData.ltiReturnUrl;
 
                     // redirect
-                    $window.location.href = courseUrl;
+                    $window.location.href = decodeURIComponent(courseUrl);
                 };
 
                 /**
