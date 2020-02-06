@@ -82,7 +82,22 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         templateUrl: 'partials/userProjects',
         controller: 'UserProjectsCtrl'
       })
-      .when('/:resource/new', {
+      .when('/courses/new', {
+        // user creates a new project
+        templateUrl: 'partials/courses/courseNew',
+        controller: 'CourseNewCtrl',
+        resolve: {
+          isAuth: ['$q', 'UserSrv', function($q, UserSrv){
+            var defer = $q.defer();
+            if(UserSrv.isAuthenticated())
+              defer.resolve();
+            else
+              defer.reject({status: 401});
+            return defer.promise;
+          }]
+        }
+      })
+      .when('/projects/new', {
         // user creates a new project
         templateUrl: 'partials/projectNew',
         controller: 'ProjectNewCtrl',
@@ -105,8 +120,11 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           projectData: ['$route', 'ProjectSettingsRes', function($route, ProjectSettingsRes) {
             return ProjectSettingsRes.get({projectId: $route.current.params.projectId}).$promise;
           }],
-          courseData: ['$route', '$http', 'UserSrv', function($route, $http, UserSrv) {
-            return $http.get('/api/users/' + UserSrv.getUsername() + '/courses');
+          courseSet: ['$route', '$http', 'UserSrv', function($route, $http, UserSrv) {
+            return $http.get('/api/users/' + UserSrv.getUsername() + '/courses/owner')
+                .then(function(result) {
+                  return result.data.courseOwnerSet;
+                });
           }]
         }
       })

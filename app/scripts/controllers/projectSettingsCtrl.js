@@ -11,8 +11,8 @@
  */
 
 angular.module('codeboardApp')
-  .controller('ProjectSettingsCtrl', ['$scope', '$http', '$log', '$routeParams', '$location', '$timeout', '$uibModal', 'ProjectRes', 'projectData', 'courseData',
-    function ($scope, $http, $log, $routeParams, $location, $timeout, $uibModal, ProjectRes, projectData, courseData) {
+  .controller('ProjectSettingsCtrl', ['$scope', '$http', '$log', '$routeParams', '$location', '$timeout', '$uibModal', 'ProjectRes', 'projectData', 'courseSet',
+    function ($scope, $http, $log, $routeParams, $location, $timeout, $uibModal, ProjectRes, projectData, courseSet) {
 
       // Object that holds the properties of a project and binds to the form
       $scope.data = {};
@@ -26,7 +26,7 @@ angular.module('codeboardApp')
       $scope.server = {
         saveSuccess: false,
         saveFailure: false
-      }
+      };
 
       /**
        * Function gets the projects data from the server and sets it up for display
@@ -37,11 +37,10 @@ angular.module('codeboardApp')
         $scope.data = projectData;
 
         console.log(projectData);
-        console.log(courseData);
 
         // set possible and selected courses
-        $scope.courses = courseData.data.ownerSet;
-        $scope.coursesSelected = (typeof projectData.Parent !== "undefined") ? projectData.Parent.map(function(c) { return c.id; }) : [];
+        $scope.courses = courseSet;
+        $scope.coursesSelected = (typeof projectData.courseSet !== "undefined") ? projectData.courseSet.map(function(c) { return c.id; }) : [];
 
         $scope.data.ltiUri = location.protocol + '//' + location.hostname + "/lti/projects/" + $scope.data.id;
 
@@ -51,7 +50,8 @@ angular.module('codeboardApp')
           $scope.data.ownerSet = [];
         if (!$scope.data.userSet)
           $scope.data.userSet = [];
-      }();
+      };
+      $scope.init();
 
       /**
        * Toggle selection for courses
@@ -165,7 +165,7 @@ angular.module('codeboardApp')
             ltiKey: $scope.data.ltiKey,
             ltiSecret: $scope.data.ltiSecret,
             courseSet: $scope.coursesSelected
-          }
+          };
 
           // we iterate over ownerSet and userSet to make sure we only submit the usernames and no other data
           for (var index in $scope.data.ownerSet)

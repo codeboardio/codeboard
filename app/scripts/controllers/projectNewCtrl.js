@@ -14,9 +14,6 @@ angular.module('codeboardApp')
   .controller('ProjectNewCtrl', ['$scope', '$http', '$routeParams', '$location', '$route', '$timeout',
     function ($scope, $http, $routeParams, $location, $route, $timeout) {
 
-    // get resource type / to get singular form remove last char (if s)
-    $scope.type = $routeParams.resource.replace(/s$/, "");
-
     // Object that holds the properties of a project and binds to the form
     $scope.data = {
       language: 'Java'
@@ -39,8 +36,7 @@ angular.module('codeboardApp')
           projectname: $scope.data.projectname,
           description: $scope.data.description,
           language: $scope.data.language,
-          isPrivate: $scope.data.isPrivate,
-          type: $scope.type
+          isPrivate: $scope.data.isPrivate
         };
 
         // hide user messages (in case they are displayed from a previous saving attempt)
@@ -55,12 +51,9 @@ angular.module('codeboardApp')
             // show the success message
             $scope.server.saveSuccess = true;
 
-            if(payload.type === "course") {
-                $location.path( "/");
-            } else {
-                // redirect to the summary page of the project
-                $location.path( "/projects/" + data.id + '/summary');
-            }
+            // redirect to the summary page of the project
+            $location.path( "/projects/" + data.id + '/summary');
+
           }, function(error) {
             // show the error message and remove it after 4 seconds
             $scope.server.saveFailure = true;
