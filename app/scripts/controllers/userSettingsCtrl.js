@@ -114,11 +114,8 @@ angular.module('codeboardApp')
             newPassword: data.newPassword
           };
 
-          $http
-            .put(
-            '/api/users/' + $routeParams.username + '/settings/password',
-            payload)
-            .success(function(data, status, header, config) {
+          $http.put('/api/users/' + $routeParams.username + '/settings/password', payload)
+            .then(function(result) {
               // show the success message and remove it after 4 seconds
               $scope.pserver.saveSuccess = true;
               // reset the ng-model to make the inputs empty
@@ -131,8 +128,7 @@ angular.module('codeboardApp')
                 // make the saveSuccess info dialog disappear
                 $scope.pserver.saveSuccess = false;
               }, 8000);
-            })
-            .error(function(data, status, header, config) {
+            }, function([data, status]) {
               $log.debug(status + " error:" + data.msg);
 
               // mae the saveFailure info dialog appear

@@ -18,8 +18,8 @@ angular.module('codeboardApp')
       }
 
       $http.post('/api/session', payload)
-        .success(function(data, status, header, config) {
-
+        .then(function(result) {
+          let data = result.data;
           if($routeParams.redirect) {
             // there's redirect information, so we redirect to that rather then the user's profile page
             $location.url($routeParams.redirect);
@@ -28,12 +28,11 @@ angular.module('codeboardApp')
             // redirect to the user page
             $location.path('/users/' + data.username);
           }
-        })
-        .error(function(data, status) {
+        }, function(error) {
 
           $scope.signinFailed = true;
 
-          if(status === 401) {
+          if(error.status === 401) {
             $scope.formData.error = 'Invalid username, email or password.';
           }
           else {

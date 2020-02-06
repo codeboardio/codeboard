@@ -47,20 +47,19 @@ angular.module('codeboardApp')
 
 
         $http.put('/api/passwordreset', payload)
-          .success(function (data, status, header, config) {
+          .then(function (result) {
 
             // show the confirmation that a new password was send via email
             $scope.server.resetSuccess = true;
             // enable the submit button
             $scope.isUnderSubmission = false;
 
-          })
-          .error(function (data, status) {
+          }, function (error) {
 
             // enable the submit button
             $scope.isUnderSubmission = false;
 
-            if (status === 403) {
+            if (error.status === 403) {
               $scope.server.errorEmailUnknown = true;
             }
             else {

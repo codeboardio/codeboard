@@ -30,5 +30,5 @@ angular.module('codeboardApp')
 //      ).error(function(err) {
 //          console.log(err);
 //        })
-    }
+    };
   }]);

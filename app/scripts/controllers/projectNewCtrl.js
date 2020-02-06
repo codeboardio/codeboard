@@ -47,9 +47,10 @@ angular.module('codeboardApp')
         $scope.server.saveSuccess = false;
         $scope.server.saveFailure = false;
 
-        $http
-          .post('/api/projects/', payload)
-          .success(function(data, status, headers, config) {
+        $http.post('/api/projects/', payload)
+          .then(function(result) {
+
+            let data = result.data;
 
             // show the success message
             $scope.server.saveSuccess = true;
@@ -60,8 +61,7 @@ angular.module('codeboardApp')
                 // redirect to the summary page of the project
                 $location.path( "/projects/" + data.id + '/summary');
             }
-          })
-          .error(function(data, status, headers, config) {
+          }, function(error) {
             // show the error message and remove it after 4 seconds
             $scope.server.saveFailure = true;
           });

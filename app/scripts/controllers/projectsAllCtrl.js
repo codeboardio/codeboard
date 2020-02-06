@@ -31,29 +31,21 @@ angular.module('codeboardApp')
       // the init function initally loads the first project data to display
       var init = function() {
 
-        $http
-          .get('/api/projects')
-          .success(function(result, status) {
-             $scope.data = result;
-          })
-          .error(function(reason) {
+        $http.get('/api/projects')
+          .then(function(result) {
+             $scope.data = result.data;
+          }, function(reason) {
             // what to do here?
           });
 
-        $http
-          .get('/api/projects/featured')
-          .success(function(result, status) {
-            $scope.featuredData = result;
-          })
-          .error(function(reason) {
+        $http.get('/api/projects/featured')
+          .then(function(result) {
+            $scope.featuredData = result.data;
+          }, function(reason) {
             // what to do here?
           });
-
-      }();
-
-
-
-
+      };
+      init();
 
       /**
        * Function to send a request for projects that match the given search string
@@ -67,21 +59,19 @@ angular.module('codeboardApp')
         // now remove any redundant spaces between words
         cleanedSearchString = cleanedSearchString.replace(/\s+/g, ' ');
 
-        $http
-          .get('/api/projects?search=' + encodeURIComponent(cleanedSearchString))
-          .success(function(result, status) {
+        $http.get('/api/projects?search=' + encodeURIComponent(cleanedSearchString))
+          .then(function(result) {
 
             // store the count and the projects' data
-            $scope.data.count = result.count;
-            $scope.data.projects = result.projects;
-            $scope.data.hasNext = result.hasNext;
-            $scope.data.next = result.next;
-          })
-          .error(function(reason) {
+            $scope.data.count = result.data.count;
+            $scope.data.projects = result.data.projects;
+            $scope.data.hasNext = result.data.hasNext;
+            $scope.data.next = result.data.next;
+          }, function(error) {
 
             // if we got a 422 and the user provided a search string,
             // we show an error message that says no projects exist that match the search terms
-            if(reason.status === "422" && cleanedSearchString !== '') {
+            if(error.status === "422" && cleanedSearchString !== '') {
               // there are no projects, so we set the total count to 0
               $scope.data.count = 0;
               // the array of projects is empty
@@ -92,7 +82,7 @@ angular.module('codeboardApp')
 
               // the response from the server contains the terms that where used in the search
               // we assign them to the scope for displaying them to the user
-              $scope.searchTerms = reason.searchTerms;
+              $scope.searchTerms = error.searchTerms;
             }
           });
       };
@@ -104,15 +94,14 @@ angular.module('codeboardApp')
       $scope.showMore = function() {
 
         if($scope.data.hasNext) {
-          $http
-            .get($scope.data.next)
-            .success(function(result, status) {
-              $scope.data.projects = $scope.data.projects.concat(result.projects);
-              $scope.data.hasNext = result.hasNext;
-              $scope.data.next = result.next;
-            })
-            .error(function(result, status) {
-            })
+          $http.get($scope.data.next)
+            .then(function(result) {
+              $scope.data.projects = $scope.data.projects.concat(result.data.projects);
+              $scope.data.hasNext = result.data.hasNext;
+              $scope.data.next = result.data.next;
+            }, function(result, status) {
+
+            });
         }
       };
 

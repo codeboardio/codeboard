@@ -7,15 +7,13 @@ angular.module('codeboardApp')
     $scope.users = [];
 
     var init = function() {
-      $http
-        .get('/api/users')
-        .success(function(data) {
+      $http.get('/api/users')
+        .then(function([data]) {
           $scope.users = data;
-
-        })
-        .error(function(err) {
+        }, function(err) {
 
         });
-    }();
+    };
+    init();
 
   }]);

@@ -32,16 +32,9 @@ angular.module('codeboardApp')
         console.log(_projectId);
 
         $http.get('/api/projects/' + _projectId + '/userprojects')
-          .success(function(data, status, headers, config) {
-
-            console.log(data);
-
-            $scope.userProjects = data;
-          })
-          .error(function(data, status, headers, config) {
-
-            console.log(data);
-
+          .then(function(result) {
+            $scope.userProjects = result.data;
+          }, function(error) {
             $log.debug('Can not get the userprojects');
 
           });

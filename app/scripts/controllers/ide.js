@@ -33,9 +33,8 @@ app.controller('IdeCtrl',
           }
 
           // check if the user has a saved version of a project
-          $http
-            .get(_urlForUserProject)
-            .success(function(result) {
+          $http.get(_urlForUserProject)
+            .then(function(result) {
 
               // this inner function will be called if the user agrees
               // it will overwrite the default version of the project with the user's version
@@ -43,13 +42,13 @@ app.controller('IdeCtrl',
                 // the name of the project
                 name: ProjectFactory.getProject().name,
                 // the last unique Id that was used to create a file
-                lastUId: result.project.lastUId,
+                lastUId: result.data.project.lastUId,
                 // programming language of the project
                 language: ProjectFactory.getProject().language,
                 // the role of the user who is currently looking at the project in the browser
                 userRole: ProjectFactory.getProject().userRole,
                 // the files of the user
-                fileSet: result.files
+                fileSet: result.data.files
               };
 
               // update the project data in the ProjectFactory
@@ -503,19 +502,14 @@ app.controller('IdeCtrl',
             $log.debug('Submission successful.');
             setOutput(data.msg, false);
 
-            let testResult = data.data;
+            console.log(data);
 
-            // todo hier müsste also ds neue Modal eingebaut werden..
-            //  zunächst überprüfen welche Informationen wir zurückerhalten
-            //  Wiederum Avatar einbauen! Aber bin mir nicht sicher was schöner ist.. Test
-            //
-            //  Gratuliere du hast alle Tests bestanden! Weiter so..
-            //  Deine Lösung ist noch nicht ganz korrekt. Damti du im Kurs fortfahren kannst, musst die mindestens
-            //  du alle Tests bestanden haben.
-
-
-            let submitModalInstanceCtrl =  ['$rootScope','$scope', '$uibModalInstance',
-              function ($rootScope, $scope, $uibModalInstance) {
+            /**
+             * Submit Modal Instance used to show submission result, back to course link etc.
+             * @type {*[]}
+             */
+            let submitModalInstanceCtrl =  ['$rootScope','$scope', '$uibModalInstance', 'testResult',
+              function ($rootScope, $scope, $uibModalInstance, testResult) {
 
                 // get test result
                 $scope.numTestsFailed = testResult.numTestsFailed;
@@ -581,20 +575,27 @@ app.controller('IdeCtrl',
                 };
             }];
 
+
+            console.log("Open Modal Submission");
+
+            console.log(angular.element(document.querySelector("#testModal")));
+
             /**
              * call the function to open the modal (we ignore the modalInstance returned by
              * this call as we don't need to access any data from the modal)
              */
             $uibModal.open({
-              modalTemplate: '<div class="modal modal-width-override" ng-transclude></div>',
-              templateUrl: 'ideSubmitModalDue.html',
+              appendTo: angular.element(document).find('aside'),
+              templateUrl: 'ideSubmitModal.html',
               controller: submitModalInstanceCtrl,
-              windowTopClass: '',
               windowClass: 'avatar-modal',
               size: "md",
+              resolve: {
+                testResult: function () {
+                  return data.data;
+                }
+              }
             });
-
-
 
             // enable compilation and submission (not running, because what the submission compiles might differ from the last compilation if the user changed something; that could be confusing for the user)
             setEnabledActions(1,0,1,1,1);
@@ -615,10 +616,9 @@ app.controller('IdeCtrl',
         if (ideState.stopUrl) {
 
           $http.get(ideState.stopUrl)
-            .success(function(data, status, headers, config){
-              setOutput('\n\n--Program stopped--', true)
-            })
-            .error(function(data, status, headers, config) {
+            .then(function(result){
+              setOutput('\n\n--Program stopped--', true);
+            }, function(error) {
               $log.debug('An error occurred while trying to stop your program.');
               setOutput('\n\nAn error occurred while trying to stop your program.', true);
             });
@@ -644,23 +644,10 @@ app.controller('IdeCtrl',
 
             // load original
             $http.get(_urlForProject)
-                .success(function(result) {
-
-                  let userProjectData = {
-                    // the name of the project
-                    name: result.projectname,
-                    // the last unique Id that was used to create a file
-                    lastUId: result.lastUId,
-                    // programming language of the project
-                    language: ProjectFactory.getProject().language,
-                    // the role of the user who is currently looking at the project in the browser
-                    userRole: ProjectFactory.getProject().userRole,
-                    // the files of the user
-                    fileSet: result.fileSet
-                  };
+                .then(function(result) {
 
                   // update the project data in the ProjectFactory
-                  ProjectFactory.setProjectFromJSONdata(result, ltiData);
+                  ProjectFactory.setProjectFromJSONdata(result.data, ltiData);
 
                   // reload tree view
                   $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
@@ -1058,8 +1045,6 @@ app.controller('IdeCtrl',
           ProjectFactory.getNode($scope.ace.currentNodeId).content = $scope.ace.editor.getSession().getValue();
         }
 
-
-
         // get the file
         var lNode = ProjectFactory.getNode(aMsgData.nodeId);
 
@@ -1072,7 +1057,6 @@ app.controller('IdeCtrl',
         // get the file type
         var lFileType = lNode.filename.split('.').pop();
 
-
         // image file types
         let imageFileTypes = ["png", "svg", "jpg", "gif"];
 
@@ -1081,6 +1065,9 @@ app.controller('IdeCtrl',
         if(imageFileTypes.includes(lFileType)) {
           $scope.ace.isImage = true;
           let fileContent = JSON.parse(ProjectFactory.getNode(aMsgData.nodeId).content);
+
+          console.log(fileContent);
+
           $scope.ace.image = fileContent.imagePath;
         }
 
@@ -1713,6 +1700,11 @@ app.controller('TreeCtrl', ['$scope', '$rootScope', '$log', 'ProjectFactory', 'I
 
     let lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
 
+    console.log({
+      imagePath: aMsgData.imagePath,
+      imageName: aMsgData.imageName
+    });
+
     let content = JSON.stringify({
       imagePath: aMsgData.imagePath,
       imageName: aMsgData.imageName
@@ -1873,8 +1865,6 @@ app.controller('TabCtrl', ['$scope', '$rootScope', '$log', '$uibModal', 'Project
 
       // get the node for which a tab should be added
       var lRequestedNode = ProjectFactory.getNode(aMsgData.nodeId);
-
-      console.log(lRequestedNode);
 
       // push a new tab to the list of tabs
       $scope.tabs.push(

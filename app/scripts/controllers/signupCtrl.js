@@ -24,7 +24,7 @@ angular.module('codeboardApp')
         $scope.submitted = true;
 
         // check to make sure the form is completely valid and we're not currently submitting
-        if (form.$valid & $scope.data.password === $scope.data.passwordConfirm && $scope.currentlySubmitting == false) {
+        if (form.$valid && $scope.data.password === $scope.data.passwordConfirm && $scope.currentlySubmitting === false) {
 
           $scope.currentlySubmitting = true;
 
@@ -32,12 +32,10 @@ angular.module('codeboardApp')
             username: $scope.data.username,
             password: $scope.data.password,
             email: $scope.data.email
-          }
+          };
 
-
-          $http
-            .post('/api/users', payload)
-            .success(function(data, status, header, config) {
+          $http.post('/api/users', payload)
+            .then(function(data) {
               $scope.serverError.userExists = false;
               $scope.serverError.emailExists = false;
 
@@ -49,29 +47,29 @@ angular.module('codeboardApp')
                   username: $scope.data.username,
                   password: $scope.data.password
                 })
-                .success(function(data, status, header, config) {
+                .then(function(data) {
                   $location.path('/users/' + data.username);
                 });
-            })
-            .error(function(data, status) {
-              if(status === 422) {
+            }, function(err) {
+
+              if(err.status === 422) {
                 // probably failed the server side validation
                 $scope.serverError.hasErrors = true;
-                $scope.serverError.errorMsg = data.msg;
+                $scope.serverError.errorMsg = err.msg;
               }
-              else if(status === 409) {
+              else if(err.status === 409) {
                 // username or email might already exist
-                if(data.error === 'UserExists') {
+                if(err.data.error === 'UserExists') {
                   $scope.serverError.userExists = true;
                 }
-                if(data.error === 'EmailExists') {
+                if(err.data.error === 'EmailExists') {
                   $scope.serverError.emailExists = true;
                 }
               }
               else {
                 // some other error occurred on the server
                 $scope.serverError.hasErrors = true;
-                $scope.serverError.errorMsg = data.msg;
+                $scope.serverError.errorMsg = err.data.msg;
               }
 
               $scope.currentlySubmitting = false;

@@ -41,15 +41,14 @@ angular.module('codeboardApp')
       }
 
       $http.put('/support/lti/debug/outcome', payload)
-        .success(function(data, status, header, config) {
+        .then(function(result) {
 
+          let data = result.data;
           $scope.data.responseStatusCode = data.statusCode;
           $scope.data.responseHeader = data.headers;
           $scope.data.responseBody = data.body;
 
-
-        })
-        .error(function(data, status, header, config) {
+        }, function(error) {
 
         });
     };

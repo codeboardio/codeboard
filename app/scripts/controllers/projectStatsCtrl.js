@@ -206,7 +206,7 @@ angular.module('codeboardApp')
             endDateLogs: $scope.untilDate
           }
         })
-          .success(function (aReply) {
+          .then(function (aReply) {
 
             $scope.compilerSummaryLogs = aReply.compilerLogs;
             $scope.compilerSummaryRunLogs = aReply.compilerRunLogs;
@@ -217,8 +217,7 @@ angular.module('codeboardApp')
             drawCompilationRunGraph();
             $scope.isLoadingCompilationRunGraphData = false;
 
-          })
-          .error(function (reply) {
+          }, function (reply) {
             $log.debug('Unable to get compile and run logs statistics (summary per day).');
           });
       };
@@ -237,14 +236,13 @@ angular.module('codeboardApp')
             endDateLogs: $scope.untilDate
           }
         })
-          .success(function (aReply) {
+          .then(function (aReply) {
             $scope.projectAccessPerDay = aReply.projectAccessPerDay;
             $scope.totalAccessPerDay = '(' + getTotal($scope.projectAccessPerDay, 'count') + ')';
             drawProjectAccessGraph();
             $scope.isLoadingUserAccessGraphData = false;
 
-          })
-          .error(function (reply) {
+          }, function (reply) {
           });
       };
 

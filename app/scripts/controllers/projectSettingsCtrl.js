@@ -179,9 +179,8 @@ angular.module('codeboardApp')
           $scope.server.saveSuccess = false;
           $scope.server.saveFailure = false;
 
-          $http
-            .put('/api/projects/' + projectId + '/settings', payload)
-            .success(function (data, status, headers, config) {
+          $http.put('/api/projects/' + projectId + '/settings', payload)
+            .then(function (result) {
 
               // show the success message and remove it after 4 seconds
               $scope.server.saveSuccess = true;
@@ -189,8 +188,7 @@ angular.module('codeboardApp')
                 $scope.server.saveSuccess = false;
               }, 4000);
 
-            })
-            .error(function (data, status, headers, config) {
+            }, function (error) {
               // show the error message and remove it after 4 seconds
               $scope.server.saveFailure = true;
             });

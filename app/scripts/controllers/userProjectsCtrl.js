@@ -23,7 +23,9 @@ angular.module('codeboardApp')
     $scope.init = function() {
 
       $http.get('/api/users/' + $routeParams.username + '/projects')
-        .success(function(data) {
+        .then( function(result) {
+
+            let data = result.data;
 
           $scope.user = {
             // id
@@ -34,18 +36,18 @@ angular.module('codeboardApp')
             location: data.location,
             institution: data.institution,
             imageUrl: data.imageUrl
-          }
+          };
 
           $scope.ownerSet = data.ownerSet;
 
           $scope.userSet= data.userSet;
 
           $scope.currentUserIsSelf = (UserSrv.isAuthenticated() && data.username === UserSrv.getUsername());
-        })
-        .error(function(err) {
+        }, function(err) {
           // there was an error, most likely we didn't find the user, so we redirect to the 404
           $location.path('/404').replace();
         });
-    }();
+    };
+    $scope.init();
 
   }]);

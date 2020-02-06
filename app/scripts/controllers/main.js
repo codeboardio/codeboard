@@ -12,10 +12,11 @@ angular.module('codeboardApp')
      * the user is redirected to their user page.
      */
     $scope.init = function() {
-      if(UserSrv.isAuthenticated())
-        $location.path('/users/' + UserSrv.getUsername());
-    }();
-
+      if(UserSrv.isAuthenticated()) {
+          $location.path('/users/' + UserSrv.getUsername());
+      }
+    };
+    $scope.init();
 
     /**
      * Function to login a user.
@@ -29,14 +30,12 @@ angular.module('codeboardApp')
       var payload = {
         username: formData.username,
         password: formData.password
-      }
+      };
 
-      $http
-        .post('/api/session', payload)
-        .success(function(data, status, header, config) {
+      $http.post('/api/session', payload)
+        .then(function(data) {
           $location.path('/users/' + data.username);
-        })
-        .error(function(data, status, header, config) {
+        }, function(data, status, header, config) {
           console.log('Auth failed');
           $scope.authFailed = true;
         });

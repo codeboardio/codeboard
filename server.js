@@ -74,11 +74,8 @@ app.set('view engine', 'html');
 // set configuration for settings
 if (env !== 'test') {
 
-  console.log(config.mongo.uri);
-  console.log(process.env.NODE_ENV);
-
   mongoose.connect(config.mongo.uri, config.mongo.options).then(() => {
-    // console.log("Connected to Mongo DB");
+    console.log("Connected to Mongo DB");
   });
 
   // by default we persist sessions using the Mongo database
