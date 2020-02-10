@@ -191,8 +191,8 @@
                     <div class="ideEditorArea">
 
                       <div class="ideEditorImage" ng-show="ace.isImage">
-                        <img alt="Bildschen" ng-src="{{ace.image}}" /><br>
-                        <input class="image-src-field" type="text" alt="Bildschen" value="{{ace.image}}" />
+                        <img alt="{{ace.image}}" ng-src="{{ace.image}}" /><br>
+                        <input class="image-src-field" type="text" value="{{ace.image}}" />
                       </div>
 
                       <div ng-hide="ace.isVisible" id="ideAceNotVisible">
@@ -300,7 +300,7 @@
         <div class="modal-body">
 
           <div class="form-group">
-            <p>Lorem Ipsum... </p>
+            <p>Bild auswählen und diesem Projekt hinzufügen.</p>
             <input type="file" name="dataImage" ng-model="data.image" ng-file-select="onFileSelect($files)" />
           </div>
         </div>
