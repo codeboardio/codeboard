@@ -33,9 +33,9 @@ angular.module('codeboardApp')
       };
 
       $http.post('/api/session', payload)
-        .then(function(data) {
-          $location.path('/users/' + data.username);
-        }, function(data, status, header, config) {
+        .then(function(response) {
+          $location.path('/users/' + response.data.username);
+        }, function(error) {
           console.log('Auth failed');
           $scope.authFailed = true;
         });
