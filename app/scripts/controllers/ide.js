@@ -524,10 +524,6 @@ app.controller('IdeCtrl',
                 $scope.title = "Deine Lösung stimmt noch nicht ganz";
                 $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
 
-                console.log($scope.score);
-                console.log($scope.passRate);
-                console.log(($scope.score >= $scope.passRate));
-
                 // switch depending on score
                 switch (true) {
 
