@@ -243,8 +243,6 @@ angular.module('codeboardApp')
         /**
          * get the user icon depending on the author and message type
          *
-         * todo neue Studentenavatare einbauen
-         *
          * @param chatLine
          * @returns {string}
          */
@@ -256,19 +254,19 @@ angular.module('codeboardApp')
             if(chatLine.author.username === avatarName) {
 
                 // default avatar
-                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
 
                 if(chatLine.type === "card") {
-                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea.svg";
+                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg";
                 }
             } else {
 
                 // default human avatar = teacher
-                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg";
+                avatar = "../../../images/avatars/Avatar_Teacher_RZ_2020.svg";
 
                 // students avatar
                 if(chatLine.author.username === chatLine.user.username) {
-                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried.svg"; // todo
+                    avatar = "../../../images/avatars/Avatar_Student_RZ_2020.svg";
                 }
             }
             return avatar;

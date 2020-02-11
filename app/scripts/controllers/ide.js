@@ -514,19 +514,42 @@ app.controller('IdeCtrl',
                 $scope.numTestsFailed = testResult.numTestsFailed;
                 $scope.numTestsPassed = testResult.numTestsPassed;
                 $scope.numTests = $scope.numTestsFailed + $scope.numTestsPassed;
-                $scope.progress = $scope.numTestsPassed  / ($scope.numTestsFailed + $scope.numTestsPassed) * 100;
-                $scope.submissionSuccesful = ($scope.numTestsPassed === $scope.numTests); // todo müssen immer alle Tests bestanden sein?
 
-                // define texts and avatar depending on test result
-                if($scope.submissionSuccesful) {
-                  $scope.title = "Deine Lösung wurde erfolgreich übermittelt";
-                  $scope.textBeforeResult = "Gratulation! Du hast mit deiner Lösung alle Tests bestanden!";
-                  $scope.textAfterResult = "Du kannst nun Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
+                $scope.score = $scope.numTestsPassed / $scope.numTests;
+                $scope.progress = $scope.score * 100;
+                $scope.passRate = 1; // todo retrieve passRate
+                $scope.passed = ($scope.passRate <= $scope.score);
 
-                } else {
-                  $scope.title = "Deine Lösung stimmt noch nicht ganz";
-                  $scope.textBeforeResult = "Gut gemacht! Deine Lösung erfüllt bereits " + $scope.numTestsPassed + " von " + $scope.numTests + " Tests.";
-                  $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du dein Code verbessern und alle Tests bestehen. Wenn du Probleme bei der Lösung hast, nutze den Hilfe-Tab. Weiterhin viel Erfolg!";
+                // default texts
+                $scope.title = "Deine Lösung stimmt noch nicht ganz";
+                $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
+
+                console.log($scope.score);
+                console.log($scope.passRate);
+                console.log(($scope.score >= $scope.passRate));
+
+                // switch depending on score
+                switch (true) {
+
+                  // if no tests passed -> probably compile error
+                  case ($scope.score === 0):
+                    $scope.textBeforeResult = "Sehr wahrscheinlich hat deine Lösung einen Kompilier-Fehler. Versuche diesen zu beheben, damit du deine Lösung erfolgreich abgeben kannst.";
+                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+                  break;
+
+                  // if at least on test is passed
+                  case ($scope.score < $scope.passRate):
+                    $scope.textBeforeResult = "Gut gemacht! Deine Lösung erfüllt bereits " + $scope.numTestsPassed + " von " + $scope.numTests + " Tests.";
+                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+                  break;
+
+                  // if the score is greater than the passRate
+                  default:
+                    $scope.title = "Deine Lösung wurde erfolgreich übermittelt";
+                    $scope.textBeforeResult = "Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!";
+                    $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
+                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
+                  break;
                 }
 
                 /**
@@ -534,11 +557,7 @@ app.controller('IdeCtrl',
                  * @returns {string}
                  */
                 $scope.getAvatar = function() {
-                  if($scope.submissionSuccesful) {
-                    return "../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg";
-                  } else {
-                    return "../../../images/avatars/Avatar_RobyCoder_RZ_worried.svg";
-                  }
+                  return $scope.avatar;
                 };
 
                 /**

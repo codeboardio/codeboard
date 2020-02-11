@@ -201,10 +201,10 @@ angular.module('codeboardApp')
              * @returns {string}
              */
             $scope.getAvatar = function() {
-                let avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral.svg";
+                let avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
 
                 if($scope.correctSolution) {
-                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb_up.svg";
+                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
                 }
                 return avatar;
             };

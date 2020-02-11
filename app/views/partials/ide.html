@@ -383,8 +383,8 @@
 
                 <div class="chat-line-buttons text-right mt-4">
                   <button class="btn btn-default" ng-click="close()">Zurück zur Aufgabe</button>
-                  <button class="btn btn-success" ng-show="submissionSuccesful && isUsingLti" ng-click="goToCourse()">Zur Kursübersicht</button>
-                  <button class="btn btn-info" ng-if="!isActionHidden('help')" ng-show="!submissionSuccesful" ng-click="requestHelp()">Hilfe Anfordern</button>
+                  <button class="btn btn-success" ng-show="passed && isUsingLti" ng-click="goToCourse()">Zur Kursübersicht</button>
+                  <button class="btn btn-info" ng-if="!isActionHidden('help')" ng-show="!passed" ng-click="requestHelp()">Hilfe Anfordern</button>
                 </div>
               </div>
             </div>
