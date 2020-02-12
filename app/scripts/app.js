@@ -54,14 +54,6 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         templateUrl: 'partials/signin',
         controller: 'SigninCtrl'
       })
-      .when('/signup', {
-        templateUrl: 'partials/signup',
-        controller: 'SignupCtrl'
-      })
-      .when('/passwordreset', {
-        templateUrl: 'partials/passwordReset',
-        controller: 'PasswordResetCtrl'
-      })
       .when('/users', {
         // shows a list of all users
         templateUrl: 'partials/usersAll',
