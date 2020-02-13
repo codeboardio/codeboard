@@ -60,6 +60,12 @@ app.controller('IdeCtrl',
               // we need to request that the URI is check for any "?view=..." query string
               // in order to display some files in the ace editor
               $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
+            },
+            function() {
+              // The current user doesn't have a version stored for current project
+              // but we need to request that the URI is check for any "?view=..." query string
+              // in order to display some files in the ace editor
+              $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
             });
         }
         else {
