@@ -62,6 +62,10 @@ app.controller('IdeCtrl',
               $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
             },
             function() {
+
+                console.log("Kein Projekt für diesen User gefunden");
+                console.log($routeParams.view);
+
               // The current user doesn't have a version stored for current project
               // but we need to request that the URI is check for any "?view=..." query string
               // in order to display some files in the ace editor
