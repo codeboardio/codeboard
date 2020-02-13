@@ -1,6 +1,6 @@
 /**
  * This is the controller for the navBarTab "Help".
- * It makes use of the `chatSrv` in order to request tips and help, as well as enabling the chat function.
+ * It makes use of the 'chatSrv' in order to request tips and help, as well as enabling the chat function.
  *
  * @author Janick Michot
  * @date 19.12.2019
@@ -50,7 +50,7 @@ angular.module('codeboardApp')
 
         /**
          * This functions adds a chat line into the view
-         * With the parameter `scrollToBottom` whether or not the conversation box should be
+         * With the parameter 'scrollToBottom' whether or not the conversation box should be
          * scrolled to the bottom or not
          *
          * @param chatLine
@@ -77,7 +77,7 @@ angular.module('codeboardApp')
 
 
         /**
-         * First create a new `helpRequest` and then add a new chatline with reference
+         * First create a new 'helpRequest' and then add a new chatline with reference
          * to the helpRequest.
          *
          * @param aMessage

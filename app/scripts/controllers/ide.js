@@ -62,10 +62,6 @@ app.controller('IdeCtrl',
               $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
             },
             function() {
-
-                console.log("Kein Projekt für diesen User gefunden");
-                console.log($routeParams.view);
-
               // The current user doesn't have a version stored for current project
               // but we need to request that the URI is check for any "?view=..." query string
               // in order to display some files in the ace editor
@@ -845,7 +841,7 @@ app.controller('IdeCtrl',
       };
 
       /**
-       * returns true whether or not this project uses the `compileAndRun` button
+       * returns true whether or not this project uses the 'compileAndRun' button
        **/
       $scope.isCompileAndRun = function() {
         return (ProjectFactory.getConfig().separateCompileAndRun !== true);
@@ -1077,7 +1073,7 @@ app.controller('IdeCtrl',
         // image file types
         let imageFileTypes = ["png", "svg", "jpg", "gif"];
 
-        // if file type `image` change editor behaviour
+        // if file type 'image' change editor behaviour
         $scope.ace.isImage = false;
         if(imageFileTypes.includes(lFileType)) {
           $scope.ace.isImage = true;
@@ -1154,7 +1150,7 @@ app.controller('IdeCtrl',
           });
         }
 
-        // if the currently displayed node is static or action `edit` hidden set editor to ready only (Janick Michot)
+        // if the currently displayed node is static or action 'edit' hidden set editor to ready only (Janick Michot)
         if((ProjectFactory.getNode(aMsgData.nodeId).isStatic || $scope.isActionHidden("edit")) && !$scope.currentRoleIsOwner()) {
           $scope.ace.editor.setReadOnly(true);
         } else {

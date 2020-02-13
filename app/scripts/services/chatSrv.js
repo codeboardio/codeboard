@@ -40,7 +40,7 @@ angular.module('codeboardApp')
         };
 
         /**
-         * Creates a chat line with type card used for `helprequests` and `tips`
+         * Creates a chat line with type card used for 'helprequests' and 'tips'
          *
          * @param aMessage
          * @param aHeader

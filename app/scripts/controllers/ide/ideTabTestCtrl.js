@@ -100,7 +100,7 @@ angular.module('codeboardApp')
                             // Note, Promise.resolve() resolve is our initial value
                             return promiseChain.then(function (id) {
 
-                                // dont make any further tests after `stopOnFailure`
+                                // dont make any further tests after 'stopOnFailure'
                                 if(i > 0 && id === 0) {
                                     test.status = "unreachable";
                                     $scope.tests[i] = test; i++;
@@ -134,7 +134,7 @@ angular.module('codeboardApp')
                                                 hasErrors = true;
                                             }
 
-                                            // stop further tests if `stopOnFailure` is set
+                                            // stop further tests if 'stopOnFailure' is set
                                             if(testResult.stopOnFailure) {
                                                 if(testResult.method === "compileTest") {
                                                     $scope.tests[i].name = "Fehler beim Kompilieren";

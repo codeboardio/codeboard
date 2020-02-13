@@ -16,7 +16,7 @@ angular.module('codeboardApp')
   })
 
   /**
-   * Sets focus on the child element defined in `ng-focus-child`
+   * Sets focus on the child element defined in 'ng-focus-child'
    * @author Janick Michot
    */
   .directive('ngFocusChild', function () {
