@@ -184,7 +184,7 @@ if(env === 'production') {
   templateUsers.addAllUsers();
 
   // start the server
-  server.listen(config.port, function () {
+  server.listen(config.port, config.host, function () {
     console.log('Codeboard server listening on port %d in %s mode', config.port, app.get('env'));
   });
 }
