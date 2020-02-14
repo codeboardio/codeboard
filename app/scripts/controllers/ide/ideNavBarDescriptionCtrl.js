@@ -33,6 +33,10 @@ angular.module('codeboardApp')
         } else {
           $scope.content = file.content;
         }
+
+        // make description default tab
+        let req = IdeMsgService.msgNavBarRightOpenTab('description');
+        $rootScope.$broadcast(req.msg, req.data);
       };
 
       $scope.init();
