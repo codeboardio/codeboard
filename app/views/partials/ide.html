@@ -250,7 +250,7 @@
 
     <!-- the status bar on the bottom of the page, showing username, role, info etc.-->
     <div style="height: 3px; background-color: #f5f5f5;"></div>
-    <div ng-controller="IdeFooterStatusBarCtrl" class="ideFooterStatusBar" ng-show="!isUsingLti()">
+    <div ng-controller="IdeFooterStatusBarCtrl" class="ideFooterStatusBar" ng-hide="isUsingLti() && !currentRoleIsOwner()">
       <span ng-bind-html="getUsername()"></span>
       <span style="margin-left: 20px;">Role: {{getRole()}}</span>
       <span style="margin-left: 20px;" ng-show="isUsingLti()">Info: Submissions are forwarded to external platform</span>
