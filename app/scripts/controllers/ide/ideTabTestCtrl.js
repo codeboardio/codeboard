@@ -182,7 +182,6 @@ angular.module('codeboardApp')
                     })
                     .catch(function(error) {
                         $log.debug(error);
-                        console.log("aaa");
                     });
             };
 
