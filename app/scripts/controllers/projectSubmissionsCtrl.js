@@ -30,9 +30,9 @@ angular.module('codeboardApp')
         var _projectId = $routeParams.projectId;
 
         $http.get('/api/projects/' + _projectId + '/submissions')
-          .then(function(data) {
+          .then(function(result) {
 
-            $scope.submissionData = data;
+            $scope.submissionData = result.data;
           }, function(error) {
 
             $log.debug('Can not get the submissions');
