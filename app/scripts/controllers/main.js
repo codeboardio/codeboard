@@ -5,6 +5,7 @@ angular.module('codeboardApp')
     function ($scope, $rootScope, $http, $location, UserSrv) {
 
     $scope.authFailed = false;
+    $scope.isAuth = UserSrv.isAuthenticated();
 
     /**
      * Function that runs immediately when the controller is loaded.
@@ -12,7 +13,11 @@ angular.module('codeboardApp')
      * the user is redirected to their user page.
      */
     $scope.init = function() {
-      if(UserSrv.isAuthenticated()) {
+
+        console.log(UserSrv.getUserRole() === 'user');
+        console.log(UserSrv.getUserRole());
+
+      if(UserSrv.isAuthenticated() && UserSrv.getUserRole() === 'user') {
           $location.path('/users/' + UserSrv.getUsername());
       }
     };
@@ -34,7 +39,7 @@ angular.module('codeboardApp')
 
       $http.post('/api/session', payload)
         .then(function(response) {
-          $location.path('/users/' + response.data.username);
+            $location.path('/users/' + response.data.username);
         }, function(error) {
           console.log('Auth failed');
           $scope.authFailed = true;

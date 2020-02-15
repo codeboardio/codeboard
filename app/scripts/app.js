@@ -54,11 +54,6 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         templateUrl: 'partials/signin',
         controller: 'SigninCtrl'
       })
-      .when('/users', {
-        // shows a list of all users
-        templateUrl: 'partials/usersAll',
-        controller: 'usersAllCtrl'
-      })
       .when('/users/:username/settings/', {
         // shows the settings for :userId
         templateUrl: 'partials/userSettings',
@@ -72,20 +67,20 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
       .when('/users/:username', {
         // shows the :userId page (non-public projects are included when user is authorized)
         templateUrl: 'partials/userProjects',
-        controller: 'UserProjectsCtrl'
+        controller: 'UserProjectsCtrl',
+        resolve: {
+          isAuth: ['UserSrv', function(UserSrv) {
+            return UserSrv.isUserAuthForAdmin();
+          }]
+        }
       })
       .when('/courses/new', {
         // user creates a new project
         templateUrl: 'partials/courses/courseNew',
         controller: 'CourseNewCtrl',
         resolve: {
-          isAuth: ['$q', 'UserSrv', function($q, UserSrv){
-            var defer = $q.defer();
-            if(UserSrv.isAuthenticated())
-              defer.resolve();
-            else
-              defer.reject({status: 401});
-            return defer.promise;
+          isAuth: ['UserSrv', function(UserSrv){
+            return UserSrv.isUserAuthForAdmin();
           }]
         }
       })
@@ -94,13 +89,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         templateUrl: 'partials/projectNew',
         controller: 'ProjectNewCtrl',
         resolve: {
-          isAuth: ['$q', 'UserSrv', function($q, UserSrv){
-            var defer = $q.defer();
-            if(UserSrv.isAuthenticated())
-              defer.resolve();
-            else
-              defer.reject({status: 401});
-            return defer.promise;
+          isAuth: ['UserSrv', function(UserSrv) {
+            return UserSrv.isUserAuthForAdmin();
           }]
         }
       })
@@ -349,11 +339,6 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }]
         }
       })
-      .when('/projects', {
-        // shows a list of all public projects
-        templateUrl: 'partials/projectsAll',
-        controller: 'projectsAllCtrl'
-      })
       .when('/support/lti/debug', {
         templateUrl: 'partials/supportLtiDebug',
         controller: 'SupportCtrl'
@@ -384,6 +369,8 @@ app.run(['$rootScope', '$route', '$location', 'UserSrv',
     // the ide controller sets a function on onbeforeunload; we only want the in the IDE, nowhere else
     // so we reset it to null if the route changes to something different than an IDE route
     window.onbeforeunload = null;
+
+    console.log("tryAuthenticateUser");
 
     if(!UserSrv.isAuthenticated()) {
       UserSrv.tryAuthenticateUser();

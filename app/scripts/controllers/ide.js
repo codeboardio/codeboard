@@ -526,6 +526,9 @@ app.controller('IdeCtrl',
                 $scope.passRate = 1; // todo retrieve passRate
                 $scope.passed = ($scope.passRate <= $scope.score);
 
+                console.log("$scope.passed: " + $scope.passed);
+                console.log("$scope.passed: " + ProjectFactory.getProject().hasLtiData);
+
                 // default texts
                 $scope.title = "Deine Lösung stimmt noch nicht ganz";
                 $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
@@ -552,6 +555,10 @@ app.controller('IdeCtrl',
                     $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
                     $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
                   break;
+                }
+
+                if(ProjectFactory.getProject().hasLtiData) {
+
                 }
 
                 /**
@@ -2164,6 +2171,7 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
 
   /** Returns 'true' is the project is using Lti for the submission */
   $scope.isUsingLti = function() {
+    console.log(ProjectFactory.getProject().hasLtiData);
     return ProjectFactory.getProject().hasLtiData;
   };
 
