@@ -691,7 +691,8 @@ app.controller('IdeCtrl',
         // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
         $uibModal.open({
           templateUrl: 'ideConfirmResetModal.html',
-          controller: confirmResetModalInstanceCtrl
+          controller: confirmResetModalInstanceCtrl,
+          appendTo: angular.element( document.querySelector('#modalAppendTo') )
         });
       };
 
