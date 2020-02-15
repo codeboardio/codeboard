@@ -665,6 +665,11 @@ app.controller('IdeCtrl',
             // the url from which to get the files of the project
             let _urlForProject = '/api/projects/' + $routeParams.projectId;
 
+            // if we have a Lti user, we need to attach the Lti parameters because the server checks if the user is an lti user and grants access accordingly
+            if($routeParams.ltiSessionId && $routeParams.ltiUserId && $routeParams.ltiNonce) {
+              _urlForProject += '?ltiSessionId=' + $routeParams.ltiSessionId + '&ltiUserId=' + $routeParams.ltiUserId + '&ltiNonce=' + $routeParams.ltiNonce;
+            }
+
             // load original
             $http.get(_urlForProject)
                 .then(function(result) {
