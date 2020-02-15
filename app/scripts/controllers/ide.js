@@ -2171,11 +2171,10 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
       }
       return _userProjectRole;
     }
-  }
+  };
 
   /** Returns 'true' is the project is using Lti for the submission */
   $scope.isUsingLti = function() {
-    console.log(ProjectFactory.getProject().hasLtiData);
     return ProjectFactory.getProject().hasLtiData;
   };
 

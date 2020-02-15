@@ -272,8 +272,10 @@ app.controller('IdeImageActionCtrl', ['$scope', '$rootScope', '$q', '$http', '$r
 
       // defines what happens when the modal is closed
       modalInstance.result
-        .then(
-          function(aData) {
+        .then(function(aData) {
+
+          if(aData && aData.file) {
+
             $scope.upload = $upload.upload({
               url: '/api/projects/' + $routeParams.projectId + '/projectImage',
               file: aData.file,
@@ -284,13 +286,13 @@ app.controller('IdeImageActionCtrl', ['$scope', '$rootScope', '$q', '$http', '$r
               $rootScope.$broadcast(req.msg, req.data);
 
             })
-              .catch(function(error) {
+              .catch(function (error) {
                 console.log(error);
               });
-          },
-          function() {
-            $log.debug('Modal dismissed by user.');
-          });
+          } else {
+            console.log("Kein Bild ausgewählt");
+          }
+        });
     };
 
     /**
