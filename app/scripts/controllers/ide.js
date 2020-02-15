@@ -495,6 +495,9 @@ app.controller('IdeCtrl',
         // make sure we save the current content before submitting
         saveCurrentlyDisplayedContent();
 
+        // and also save project to db
+        $rootScope.$broadcast(IdeMsgService.msgSaveProjectRequest().msg);
+
         // update the message in the console
         setOutput('Submitting your solution. This might take a few seconds. Please wait...', false);
 
