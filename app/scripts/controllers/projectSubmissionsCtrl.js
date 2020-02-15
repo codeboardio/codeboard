@@ -31,7 +31,6 @@ angular.module('codeboardApp')
 
         $http.get('/api/projects/' + _projectId + '/submissions')
           .then(function(result) {
-
             $scope.submissionData = result.data;
           }, function(error) {
 

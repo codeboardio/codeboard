@@ -10,7 +10,6 @@ var express = require('express'),
   MongoStore = require('connect-mongo')(session),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  busboy = require('connect-busboy'),
   httpProxy = require('http-proxy'),
   url = require('url'),
   config = require('./lib/config/config.js');
@@ -60,8 +59,6 @@ if(env === 'production') {
 }
 
 
-
-app.use(busboy());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(expressValidator());
