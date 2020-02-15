@@ -370,8 +370,6 @@ app.run(['$rootScope', '$route', '$location', 'UserSrv',
     // so we reset it to null if the route changes to something different than an IDE route
     window.onbeforeunload = null;
 
-    console.log("tryAuthenticateUser");
-
     if(!UserSrv.isAuthenticated()) {
       UserSrv.tryAuthenticateUser();
     }

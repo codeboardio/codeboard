@@ -29,8 +29,6 @@ angular.module('codeboardApp')
 
         var _projectId = $routeParams.projectId;
 
-        console.log(_projectId);
-
         $http.get('/api/projects/' + _projectId + '/userprojects')
           .then(function(result) {
             $scope.userProjects = result.data;
