@@ -275,17 +275,15 @@ app.controller('IdeImageActionCtrl', ['$scope', '$rootScope', '$q', '$http', '$r
         .then(function(aData) {
 
           if(aData && aData.file) {
-
             $scope.upload = $upload.upload({
               url: '/api/projects/' + $routeParams.projectId + '/projectImage',
-              file: aData.file,
-
+              file: aData.file
             }).then(function (result) {
               // file is uploaded successfully
               var req = IdeMsgService.msgSaveImageNodeRequest(result.data.imageUrl, aData.file.name);
               $rootScope.$broadcast(req.msg, req.data);
 
-            })
+              })
               .catch(function (error) {
                 console.log(error);
               });

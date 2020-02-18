@@ -224,11 +224,23 @@ app.controller('IdeCtrl',
        * displayed in the editor. This should e.g. be done before compiling or
        * submitting a solution.
        */
-      let saveCurrentlyDisplayedContent = function() {
+      let saveCurrentlyDisplayedContent = function(saveProjectToServer = false) {
         // if the editor is currently displaying a file, we need to store the content first
         if ($scope.ace.currentNodeId !== -1) {
           // if the value is !== -1, then some tab is open
           ProjectFactory.getNode($scope.ace.currentNodeId).content = $scope.ace.editor.getSession().getValue();
+        }
+
+        // send the entire project to the server
+        if(saveProjectToServer) {
+          ProjectFactory.saveProjectToServer()
+              .then(function(result) {
+                    console.log("Project saved");
+                  },
+                  function(reason) {
+                    console.log("Save project failed");
+                  }
+              );
         }
       };
 
@@ -327,7 +339,7 @@ app.controller('IdeCtrl',
       var compileProject = function (runCleanCompile) {
 
         // make sure we saved the content before compiling
-        saveCurrentlyDisplayedContent();
+        saveCurrentlyDisplayedContent(true);
 
         // remove previous compilation results
         setOutput('Waiting for (previous) results...', false);
@@ -379,8 +391,6 @@ app.controller('IdeCtrl',
           .runProject()
           .then(function (data) { // note: we only get the data because the resolution to 'then' indicates that the call was successful; thus no header information
 
-            console.log(data);
-
             // set the Url on how to stop the current run-action
             ideState.stopUrl = data.stopUrl;
 
@@ -415,7 +425,7 @@ app.controller('IdeCtrl',
       let compileAndRunProject = function (runCleanCompile) {
 
         // make sure we save the current content before submitting
-        saveCurrentlyDisplayedContent();
+        saveCurrentlyDisplayedContent(true);
 
         // remove previous compilation results
         setOutput('Waiting for (previous) results...', false);
@@ -449,7 +459,7 @@ app.controller('IdeCtrl',
        */
       let toolAction = function() {
         // make sure we save the current content before submitting
-        saveCurrentlyDisplayedContent();
+        saveCurrentlyDisplayedContent(true);
 
         // update the message in the console
         setOutput('Analyzing your project. This might take a few seconds. Please wait...', false);
@@ -493,10 +503,7 @@ app.controller('IdeCtrl',
        */
       let submitProject = function () {
         // make sure we save the current content before submitting
-        saveCurrentlyDisplayedContent();
-
-        // and also save project to db
-        $rootScope.$broadcast(IdeMsgService.msgSaveProjectRequest().msg);
+        saveCurrentlyDisplayedContent(true);
 
         // update the message in the console
         setOutput('Submitting your solution. This might take a few seconds. Please wait...', false);
@@ -1209,7 +1216,7 @@ app.controller('IdeCtrl',
         $log.debug('Save request received');
 
         //  we need to store the current content first
-        saveCurrentlyDisplayedContent();
+        saveCurrentlyDisplayedContent(true);
       });
 
 
