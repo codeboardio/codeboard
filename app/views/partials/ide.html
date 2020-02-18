@@ -254,7 +254,7 @@
       <span ng-bind-html="getUsername()"></span>
       <span style="margin-left: 20px;">Role: {{getRole()}}</span>
       <span style="margin-left: 20px;" ng-show="isUsingLti()">Info: Submissions are forwarded to external platform</span>
-      <span class="pull-right"><a style="margin-left: 20px;" href="/">open.codeboard.io</a></span>
+      <span class="pull-right"><a style="margin-left: 20px;" href="/">Codeboard</a></span>
     </div>
 
     <div id="modalAppendTo"></div>
@@ -296,7 +296,7 @@
       <div class="modal-header">
         <h3>Bild hinzufügen</h3>
       </div>
-      <form class="form" name="ideAddImageForm" ng-submit="submit(data)">
+      <form class="form" name="ideAddImageForm" ng-submit="submit(data)" enctype="multipart/form-data">
         <div class="modal-body">
 
           <div class="form-group">
