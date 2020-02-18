@@ -120,7 +120,7 @@ angular.module('codeboardApp')
             }, Promise.resolve())
                 .then(function(helpRequest) {
                     let id = (helpRequest !== undefined) ? helpRequest.id : -1;
-                    return ChatSrv.addChatLine(aMessage, id);
+                    return ChatSrv.addChatLine(aMessage, id, UserSrv.getUsername(), 'html');
                 })
                 .then(function(chatLine) {
                     addChatLine(chatLine, true);
