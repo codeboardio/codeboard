@@ -69,6 +69,7 @@ angular.module('codeboardApp')
                 $scope.title = "Deine Lösung wird überprüft";
                 $scope.correctSolution = false;
                 $scope.inProgress = true;
+                $scope.compileError = false;
 
                 // change avatar
                 $scope.showAvatar = true;
