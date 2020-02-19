@@ -1,6 +1,9 @@
 /**
  * @author Janick Michot
  * @date 19.12.2019
+ *
+ * todo create init function where we load tests. If an error occurs dont allow to do the ioTest. Instead
+ *  show an error message. So we dont have to load the tests each time.
  */
 
 'use strict';
