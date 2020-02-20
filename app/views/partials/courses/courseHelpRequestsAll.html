@@ -1,0 +1,56 @@
+<div class="navbar-border" ng-include="'partials/navbar.html'"></div>
+
+<div class="container" style="margin-top: 40px">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>{{userVersionType.charAt(0).toUpperCase() + userVersionType.slice(1)}} für Kurs: <a ng-href="/course/{{courseData.courseId}}/summary">{{courseData.coursename}}</a></h3>
+    </div>
+  </div>
+
+  <div class="row" ng-show="userVersionSet.length > 0">
+    <div class="col-md-4 pull-right">
+      <input type="text" placeholder="Filter by username" ng-model="usernameFilter" uib-typeahead="request.username as request.username for request in userVersionSet | filter:{username:$viewValue} | limitTo:8" class="form-control">
+    </div>
+  </div>
+
+  <div class="row" ng-show="userVersionSet.length == 0 || filteredData == 0" style="padding-top: 40px;">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="jumbotron">
+        <h3>No data found.</h3>
+        <p ng-show="usernameFilter == undefined || usernameFilter.length == 0">It looks like this project has no {{userVersionType}}.</p>
+        <p ng-show="usernameFilter !== undefined && usernameFilter.length > 0">It looks like user '{{usernameFilter}}' has no {{userVersionType}}.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row" ng-show="filteredData.length > 0">
+    <div class="col-md-12">
+      <table class="table table-condensed table-hover my-4">
+        <tr>
+          <th title="User">User</th>
+          <th title="Date when the version was created">Created</th>
+          <th title="Project">Project</th>
+          <th title="Status of the help request" ng-show="isType('helpRequest')">Status</th>
+
+          <th title="Result or grade that was given" ng-show="isType('submission')">Result</th>
+          <th title="Number of test cases the submission passed" ng-show="isType('submission')">Tests passed</th>
+          <th title="Number of test cases the submission failed" ng-show="isType('submission')">Tests failed</th>
+
+          <th></th>
+        </tr>
+        <tr ng-repeat="version in filteredData = (userVersionSet | filter: categoryFilter | orderBy:'createdAt':true)">
+          <td>{{version.user.name || version.user.username}}</td>
+          <td>{{version.createdAt | date: 'medium'}}</td>
+          <td>{{version.project.projectname}}</td>
+          <td ng-show="isType('helprequest')"><span class="badge badge-{{version.status}}">{{version.status}}</span></td>
+          <td ng-show="isType('submission')"><span class="badge badge-{{(version.testResult >= 0.99) ? 'answered' : 'default'}}">{{version.testResult === -1 ? '-' : version.testResult}} {{parseFloat(version.testResult)}}</span></td>
+          <td ng-show="isType('submission')">{{version.numTestsPassed === -1 ? '-' : version.numTestsPassed}}</td>
+          <td ng-show="isType('submission')">{{version.numTestsFailed === -1 ? '-' : version.numTestsFailed}}</td>
+          <td><a class="btn btn-default btn-xs" ng-href="/projects/{{version.projectId}}/{{userVersionType}}/{{version.id}}">Open in IDE</a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>

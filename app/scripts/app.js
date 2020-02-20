@@ -116,7 +116,7 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         controller: 'ProjectSummaryCtrl',
         resolve: {
           projectSummaryData: ['$route', 'ProjectSummaryRes', function($route, ProjectSummaryRes) {
-            return ProjectSummaryRes.get({projectId: $route.current.params.projectId}).$promise;
+            return ProjectSummaryRes.get({projectId: $route.current.params.projectId});
           }]
         }
       })
@@ -160,6 +160,17 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }]
         }
       })
+
+      .when('/courses/:courseId/:versionType', {
+        templateUrl: 'partials/courses/courseHelpRequestsAll',
+        controller: 'CourseHelpRequestsCtrl',
+        resolve: {
+          initialData: ['$route', 'initialDataForCourseUserVersionsAll', function($route, initialDataForCourseUserVersionsAll) {
+            return initialDataForCourseUserVersionsAll($route.current.params.courseId, $route.current.params.versionType);
+          }]
+        }
+      })
+
       .when('/projects/:projectId', {
         // loads a project in the ide (publicly accessible if project is public)
         templateUrl: 'partials/ide',
@@ -223,8 +234,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }]
         }
       })
-      .when('/projects/:projectId/version/:versionType/:resourceId', {
-        // loads a project in the ide (publicly accessible if project is public)
+
+      .when('/projects/:projectId/helprequests/:helpRequestId', {
         templateUrl: 'partials/ide',
         controller: 'IdeCtrl',
         resolve: {
@@ -234,43 +245,8 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
             deferred.resolve(_ltiData);
             return deferred.promise;
           }],
-          projectData: ['$route', '$http', function($route, $http) {
-            let type = ($route.current.params.versionType === 'help') ? 'helpRequests' : 'submissions';
-            return $http.get('/api/projects/' + $route.current.params.projectId + '/' + type + '/' + $route.current.params.resourceId)
-              .then(function (response) {
-
-                // we got the data from the sever but it's not in the exact form that the IdeCtrl expects
-                // thus we reformat it here; we also have to calculate the lastUId (though the user is not likely to add files)
-
-                let projectData = {
-                  projectname: response.data.project.projectname,
-                  language: response.data.project.language,
-                  userRole: $route.current.params.versionType,
-                  username: response.data.user.username, // the user that's being inspected
-                  updatedAt: response.data.updatedAt
-                };
-
-                // construct the fileSet
-                if(response.data.hiddenFilesDump !== null) {
-                  projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);
-                } else {
-                  projectData.fileSet = response.data.userFilesDump;
-                }
-
-                // calculate the lastUId by iterating over all files in fileSet
-                let _lastUId = 0;
-                projectData.fileSet.every(function (elem) {
-                  if (elem.uniqueId > _lastUId) {
-                    _lastUId = elem.uniqueId;
-                  }
-                });
-                projectData.lastUId = _lastUId;
-
-                // we always disable the option to "submit" when looking at a submission
-                projectData.isSubmissionAllowed = false;
-
-                return projectData;
-              });
+          projectData: ['$route', '$http', 'ideInitialDataForUserVersion', function($route, $http, ideInitialDataForUserVersion) {
+            return ideInitialDataForUserVersion($route.current.params.projectId, $route.current.params.helpRequestId, 'helpRequests');
           }]
         }
       })
@@ -280,45 +256,13 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         controller: 'IdeCtrl',
         resolve: {
           ltiData: ['$route', '$q', function($route, $q) {
-
             var deferred = $q.defer();
             var _ltiData = {};
             deferred.resolve(_ltiData);
             return deferred.promise;
           }],
-          projectData: ['$route', '$http', function($route, $http) {
-            return $http.get('/api/projects/' + $route.current.params.projectId + '/submissions/' + $route.current.params.submissionId)
-              .then(function(response) {
-
-                // we got the data from the sever but it's not in the exact form that the IdeCtrl expects
-                // thus we reformat it here; we also have to calculate the lastUId (though the user is not likely to add files)
-
-                var projectData = {
-                  projectname: response.data.project.projectname,
-                  language: response.data.project.language,
-                  userRole: 'submission',
-                  // the user that's being inspected
-                  username: response.data.user.username,
-                  updatedAt: response.data.updatedAt
-                };
-
-                // construct the fileSet
-                projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);
-
-                // calculate the lastUId by iterating over all files in fileSet
-                var _lastUId = 0;
-                projectData.fileSet.every(function(elem) {
-                  if (elem.uniqueId > _lastUId) {
-                    _lastUId = elem.uniqueId;
-                  }
-                });
-                projectData.lastUId = _lastUId;
-
-                // we always disable the option to "submit" when looking at a submission
-                projectData.isSubmissionAllowed = false;
-
-                return projectData;
-              });
+          projectData: ['$route', 'ideInitialDataForUserVersion', function($route, ideInitialDataForUserVersion) {
+            return ideInitialDataForUserVersion($route.current.params.projectId, $route.current.params.submissionId, 'submissions');
           }]
         }
       })
