@@ -82,7 +82,7 @@ app.controller('IdeCtrl',
         var message = 'You currently have unsaved changes.';
 
         // make sure we saved the content currently displayed before deciding if there are unsaved changes
-        saveCurrentlyDisplayedContent();
+        saveCurrentlyDisplayedContent(true);
 
         if (typeof event == 'undefined') {
           event = window.event;
@@ -102,7 +102,7 @@ app.controller('IdeCtrl',
       $scope.$on('$locationChangeStart', function(event) {
 
         // make sure we saved the content currently displayed before deciding if there are unsaved changes
-        saveCurrentlyDisplayedContent();
+        saveCurrentlyDisplayedContent(true);
 
         // if the user has unsaved changes, show the message
         if(ProjectFactory.isProjectModified()) {
