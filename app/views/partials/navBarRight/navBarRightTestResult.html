@@ -12,7 +12,7 @@
                 <ul class="chat p-0 m-0">
                     <li class="chat-line">
                         <div class="chat-line-item chat-line-avatar chat-line-success left w-100">
-                            <div class="message pb-1 mb-0 text-gray-700">{{avatarSays}}</div>
+                            <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="avatarSays"></div>
                         </div>
                     </li>
                 </ul>
@@ -73,7 +73,7 @@
                     <ul class="chat p-0">
                         <li class="chat-line">
                             <div class="chat-line-item chat-line-avatar left float-left w-100" ng-class="{ 'chat-line-fail': (test.status === 'fail')  }">
-                                <div class="message pb-1 mb-0 text-gray-700">{{test.result.note}}</div>
+                                <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="test.result.note"></div>
                             </div>
                         </li>
                     </ul>
