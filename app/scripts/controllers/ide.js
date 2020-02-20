@@ -79,41 +79,14 @@ app.controller('IdeCtrl',
 
       // this function is called when closing or reloading the browser window
       $window.onbeforeunload = function (event) {
-        var message = 'You currently have unsaved changes.';
-
-        // make sure we saved the content currently displayed before deciding if there are unsaved changes
+        // save project to server when leaving the page
         saveCurrentlyDisplayedContent(true);
-
-        if (typeof event == 'undefined') {
-          event = window.event;
-        }
-        if (event && ProjectFactory.isProjectModified()) {
-          event.returnValue = message;
-          return message;
-        }
-        else {
-          // returning a void values prevents the popup to be shown
-          return null;
-        }
-      }
-
+      };
 
       // this function is called when the user clicks on some UI element (e.g. button) that changes the location
       $scope.$on('$locationChangeStart', function(event) {
-
-        // make sure we saved the content currently displayed before deciding if there are unsaved changes
+        // save projec to server when leaving the page
         saveCurrentlyDisplayedContent(true);
-
-        // if the user has unsaved changes, show the message
-        if(ProjectFactory.isProjectModified()) {
-
-          var message = 'You currently have unsaved changes.\n\nAre you sure you want to leave this page?';
-
-          var answer = confirm(message);
-          if (!answer) {
-            event.preventDefault();
-          }
-        }
       });
 
 
