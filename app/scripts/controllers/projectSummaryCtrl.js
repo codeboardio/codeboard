@@ -18,7 +18,7 @@ angular.module('codeboardApp')
        * @return true if the current user is a) authenticated and b) an owner of the project
        */
       $scope.isCurrentUserProjectOwner = function() {
-        return UserSrv.isAuthenticated() && projectSummaryData.ownerSet.some(
+        return UserSrv.isAuthenticated() && projectSummaryData.ownerSet !== undefined && projectSummaryData.ownerSet.some(
             function(element, index, array) {
               return element.username === UserSrv.getUsername();
             }
