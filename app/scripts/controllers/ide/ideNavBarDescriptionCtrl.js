@@ -10,8 +10,8 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarDescriptionCtrl', ['$scope', '$rootScope', '$sce', 'IdeMsgService', 'ProjectFactory',
-    function ($scope, $rootScope, $sce, IdeMsgService, ProjectFactory) {
+    .controller('ideNavBarDescriptionCtrl', ['$scope', '$rootScope', '$sce', '$timeout', 'IdeMsgService', 'ProjectFactory',
+    function ($scope, $rootScope, $sce, $timeout, IdeMsgService, ProjectFactory) {
 
       let slug = 'description';
 
@@ -35,8 +35,10 @@ angular.module('codeboardApp')
         }
 
         // make description default tab
-        let req = IdeMsgService.msgNavBarRightOpenTab('description');
-        $rootScope.$broadcast(req.msg, req.data);
+        $timeout(function() {
+          let req = IdeMsgService.msgNavBarRightOpenTab('description');
+          $rootScope.$broadcast(req.msg, req.data);
+        }, 500);
       };
 
       $scope.init();
