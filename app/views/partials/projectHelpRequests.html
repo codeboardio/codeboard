@@ -40,7 +40,7 @@
           <td>{{request.project.projectname}}</td>
           <td><span class="badge badge-{{request.status}}">{{request.status}}</span></td>
           <td>{{request.isLtiSubmission ? 'yes' : 'no'}}</td>
-          <td><a class="btn btn-default btn-xs"  ng-href="/projects/{{projectId}}/version/help/{{request.helpRequestId}}">Open in IDE</a></td>
+          <td><a class="btn btn-default btn-xs"  ng-href="/projects/{{projectId}}/helprequests/{{request.helpRequestId}}">Open in IDE</a></td>
         </tr>
       </table>
     </div>
