@@ -509,9 +509,6 @@ app.controller('IdeCtrl',
                 $scope.passRate = 1; // todo retrieve passRate
                 $scope.passed = ($scope.passRate <= $scope.score);
 
-                console.log("$scope.passed: " + $scope.passed);
-                console.log("$scope.passed: " + ProjectFactory.getProject().hasLtiData);
-
                 // default texts
                 $scope.title = "Deine Lösung stimmt noch nicht ganz";
                 $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
@@ -808,7 +805,7 @@ app.controller('IdeCtrl',
        * @returns {Boolean|void|boolean}
        */
       $scope.userAllowedToSave = function() {
-        return UserSrv.isAuthenticated();
+        return UserSrv.isAuthenticated() && (ProjectFactory.getProject().userRole === 'user' || ProjectFactory.getProject().userRole === 'owner');
       };
 
       /** Returns true if the current role is that of project 'owner' */
@@ -829,6 +826,11 @@ app.controller('IdeCtrl',
       /** Returns true if the current role is that of project 'userproject' */
       $scope.currentRoleIsUserProject = function() {
         return ProjectFactory.getProject().userRole === 'userproject';
+      };
+
+      /** Returns true if the current role is that of project 'submission' */
+      $scope.currentRoleIsHelp = function() {
+        return ProjectFactory.getProject().userRole === 'help';
       };
 
       /** Returns true if the current role is that of project 'ltiUser' */

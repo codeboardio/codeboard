@@ -653,44 +653,52 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      */
     var saveProjectToServer = function () {
 
-      var payload = {
-        project: {
-          lastUId: getProject().lastUId
-        },
-        files: getNodeArray(getProject().files)
-      };
-
-      // if the current user is an LTI user, we attach her LTI information
-      // LTI users can save their changes to a private project without having access right to the project
-      if(getProject().hasLtiData) {
-        payload.hasLtiData = getProject().hasLtiData;
-        payload.ltiData = getProject().ltiData;
-      }
-
       // create the promise that is returned
       var deferred = $q.defer();
 
-      ProjectRes.update(
-        {projectId: $routeParams.projectId},
-        payload,
-        function success(data, status, header, config) {
+      // check if current user is owner or user. Otherwise reject promise
+      if(getProject().userRole === 'user' || getProject().userRole === 'owner' || getProject().hasLtiData) {
 
-          // make sure we update the hash of the project
-          // (because from now on any change compares to the hash of the newly stored version)
-          setHashOfProject();
+        var payload = {
+          project: {
+            lastUId: getProject().lastUId
+          },
+          files: getNodeArray(getProject().files)
+        };
 
-          // resolve the promise to true
-          deferred.resolve(true);
-        },
-        function error(data, status, header, config) {
-
-          // resolve the promise to false
-          deferred.reject(false);
+        // if the current user is an LTI user, we attach her LTI information
+        // LTI users can save their changes to a private project without having access right to the project
+        if (getProject().hasLtiData) {
+          payload.hasLtiData = getProject().hasLtiData;
+          payload.ltiData = getProject().ltiData;
         }
-      );
 
+        ProjectRes.update(
+            {projectId: $routeParams.projectId},
+            payload,
+            function success(data, status, header, config) {
+
+              // make sure we update the hash of the project
+              // (because from now on any change compares to the hash of the newly stored version)
+              setHashOfProject();
+
+              // resolve the promise to true
+              deferred.resolve(true);
+            },
+            function error(data, status, header, config) {
+
+              // resolve the promise to false
+              deferred.reject(false);
+            }
+        );
+      } else {
+        // resolve the promise to false when not user or owner
+        deferred.reject(false);
+      }
+
+      // return promise
       return deferred.promise;
-    }
+    };
 
 
     var getPayloadForCompilation = function (runCleanCompile) {

@@ -44,8 +44,8 @@
                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('hide_file')">Hide/Unhide file</a></li>
                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('make_file_static')">Make file static or not</a></li>
 
-                        <li ng-show="currentRoleIsOwner() || currentRoleIsUser()"class="divider"></li>
-                        <li><a ng-show="currentRoleIsOwner() || currentRoleIsUser()" ng-click="navBarClick('save_project')">Save changes</a></li>
+                        <li ng-show="userAllowedToSave() && !isActionHidden('save')" class="divider"></li>
+                        <li><a ng-show="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')">Save changes</a></li>
 
                         <li ng-show="currentRoleIsOwner()" class="divider"></li>
                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
