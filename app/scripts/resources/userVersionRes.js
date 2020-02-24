@@ -33,6 +33,12 @@ angular.module('codeboardApp')
                         // construct the fileSet
                         if(response.data.hiddenFilesDump !== null) {
                             projectData.fileSet = response.data.userFilesDump.concat(response.data.hiddenFilesDump);
+
+                            // the config file is also part of the hidden files dump.
+                            projectData.configFile = response.data.hiddenFilesDump.find(function(file) {
+                                return file.filename === "codeboard.json";
+                            });
+
                         } else {
                             projectData.fileSet = response.data.userFilesDump;
                         }

@@ -583,7 +583,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       if(projectDataFromServer.configFile) {
         // by doing the parsing inside a try-catch block we check json-validity
         try {
-          setConfig(JSON.parse(projectDataFromServer.configFile[0].content));
+          setConfig(JSON.parse(projectDataFromServer.configFile.content));
         } catch (e) {
           $log.debug('Fehler in der Konfigurations-Datei: ' + e);
         }
