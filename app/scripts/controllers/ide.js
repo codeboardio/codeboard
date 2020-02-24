@@ -392,7 +392,8 @@ app.controller('IdeCtrl',
 
 
       /**
-       *
+       * Function that executes a "compileAndRun" of the current project.
+       * This functions combines both compilation and execution of a project.
        * @author Janick Michot
        */
       let compileAndRunProject = function (runCleanCompile) {
@@ -406,7 +407,7 @@ app.controller('IdeCtrl',
         // disable all actions till the compile request is completed
         setEnabledActions(0,0,0,0,0);
 
-        ProjectFactory.compileAndRunProject(false)
+        ProjectFactory.compileAndRunProject(runCleanCompile)
             .then(function(data) {
               ideState.stopUrl = data.stopUrl;
               displayWSOutputStream(data.streamUrl, data.startUrl, true);
