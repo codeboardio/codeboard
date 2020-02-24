@@ -852,7 +852,7 @@ app.controller('IdeCtrl',
        * @returns {*}
        */
       $scope.isActionHidden = function(action) {
-        if ((ProjectFactory.getProject().userRole === 'owner' &&  UserSrv.isAuthenticated()) || !ProjectFactory.hasConfig('userDisabledActions')) {
+        if ((UserSrv.isAuthenticated() && ProjectFactory.getProject().userRole !== 'user') || !ProjectFactory.hasConfig('userDisabledActions')) {
             return false;
         }
         return ProjectFactory.getConfig().userDisabledActions.includes(action);
