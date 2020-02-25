@@ -64,14 +64,12 @@ angular.module('codeboardApp')
 
 
 angular.module('codeboardApp')
-    .controller('CourseHelpRequestsCtrl', ['$scope', '$route', 'initialData', function ($scope, $route, initialData) {
-
+    .controller('CourseVersionsCtrl', ['$scope', '$route', 'initialData', function ($scope, $route, initialData) {
 
         $scope.courseData = initialData.courseData;
-        $scope.userVersionSet = initialData.helpRequestSet;
+        $scope.userVersionSet = initialData.userVersionSet;
         $scope.userVersionType = $route.current.params.versionType;
         $scope.usernameFilter = "";
-
 
         /**
          * Because we use the same template for userProjects, helpRequests and submissions

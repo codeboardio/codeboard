@@ -163,7 +163,7 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
 
       .when('/courses/:courseId/:versionType', {
         templateUrl: 'partials/courses/courseVersionsAll',
-        controller: 'CourseHelpRequestsCtrl',
+        controller: 'CourseVersionsCtrl',
         resolve: {
           initialData: ['$route', 'initialDataForCourseUserVersionsAll', function($route, initialDataForCourseUserVersionsAll) {
             return initialDataForCourseUserVersionsAll($route.current.params.courseId, $route.current.params.versionType);

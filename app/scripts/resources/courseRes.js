@@ -51,14 +51,14 @@ angular.module('codeboardApp')
             let courseData = CourseRes.get({courseId: courseId}).$promise;
 
             // get help requests
-            let helpRequests = CourseVersionRes.query({courseId: courseId, versionType: versionType}).$promise;
+            let userVersions = CourseVersionRes.query({courseId: courseId, versionType: versionType}).$promise;
 
             // promise all
-            $q.all([courseData, helpRequests])
+            $q.all([courseData, userVersions])
                 .then(function(results) {
                     deferred.resolve({
                         courseData: results[0],
-                        helpRequestSet: results[1]
+                        userVersionSet: results[1]
                     });
                 }, function(err) {
                     deferred.reject("Course or course data not found");
