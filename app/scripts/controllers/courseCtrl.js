@@ -72,8 +72,6 @@ angular.module('codeboardApp')
         $scope.userVersionType = $route.current.params.versionType;
         $scope.usernameFilter = "";
 
-        console.log($scope.courseData);
-
 
         /**
          * Because we use the same template for userProjects, helpRequests and submissions

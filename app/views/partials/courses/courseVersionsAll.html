@@ -40,7 +40,7 @@
           <th></th>
         </tr>
         <tr ng-repeat="version in filteredData = (userVersionSet | filter: categoryFilter | orderBy:'createdAt':true)">
-          <td>{{version.user.name || version.user.username}}</td>
+          <td><a href="users/{{version.user.username}}">{{version.user.name || version.user.username}}</a></td>
           <td>{{version.createdAt | date: 'medium'}}</td>
           <td>{{version.project.projectname}}</td>
           <td ng-show="isType('helprequest')"><span class="badge badge-{{version.status}}">{{version.status}}</span></td>
