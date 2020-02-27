@@ -31,8 +31,6 @@ angular.module('codeboardApp')
                 $http.get(_urlForUserProject)
                     .then(function (result) {
 
-                        console.log(result);
-
                         var userProjectData = {
                             // the name of the project
                             projectname: project.projectname,

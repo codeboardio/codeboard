@@ -80,9 +80,11 @@ angular.module('codeboardApp')
             // make call to the server
             ChatRes.get( { projectId: projectId, username: username }, payload,
                 function success(data) {
+                    console.log(data);
                     deferred.resolve(data);
                 },
                 function error(response) {
+                console.log(response);
                     deferred.reject(response);
                 }
             );

@@ -1111,7 +1111,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         hasLtiData: getProject().hasLtiData,
         ltiData: getProject().ltiData,
         filesInDefaultFormat: getNodeArray(getProject().files),
-        userRole: getProject().userRole
+        userRole: getProject().userRole,
+        course:  getProject().courseData
       };
 
       // create the promise that is returned
