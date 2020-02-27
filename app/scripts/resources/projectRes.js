@@ -37,4 +37,33 @@ angular.module('codeboardApp')
         {projectId: '@id'},
         {update: {method: 'PUT'}}
     );
+  }])
+
+  .factory('initialProjectData', ['$q', 'initialLtiData', 'ProjectRes', function($q, initialLtiData, ProjectRes) {
+
+    return function(projectId, courseId = null) {
+
+      // usually we just request a project on '/api/projects/:projectId'
+      // however, if the user belongs to an LTI session, we need to send the LTI data as part of the get-request
+      // this way, the server will determine if the user is allowed to access a (private) project because of LTI overwrite
+
+      return initialLtiData.then(function (ltiData) {
+
+        // clone ltiData to use it as our payload
+        let payload = Object.assign({}, ltiData);
+        payload.projectId = projectId;
+        payload.courseId = courseId;
+
+        // return promise
+        return ProjectRes.get(payload).$promise
+            .then(function(_projectData) {
+              // we reject the promise, when the request contains a courseId but no course is in the courseSet
+              if(courseId && _projectData.courseSet.length === 0) {
+                return $q.reject('This project is not part of the course');
+              } else {
+                return _projectData;
+              }
+            });
+      });
+    };
   }]);
