@@ -11,72 +11,6 @@ app.controller('IdeCtrl',
       // set the ProjectFactory to contain the project loaded from the server
       ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
 
-      /**
-       * Function to load the saved version of a project for a user.
-       * Note: this function needs to execute when the controller is loaded. We invoke the function at the end
-       * of the controller. Don't invoke it any earlier as we first need to parse all the functions declared
-       * in the controller.
-       */
-      var loadUserProject = function() {
-
-        // if the current user in the role of 'user' (and not 'owner'),
-        // we check if there's a saved version that we could load
-        // also, we only need to check if the current user is actually authenticated (rather than being #anonymous)
-        if (ProjectFactory.getProject().userRole === 'user' &&  UserSrv.isAuthenticated()) {
-
-          // the url from which to get the files of the user's project
-          var _urlForUserProject = '/api/users/' + UserSrv.getUsername() + '/projects/' + $routeParams.projectId;
-
-          // if we have a Lti user, we need to attach the Lti parameters because the server checks if the user is an lti user and grants access accordingly
-          if($routeParams.ltiSessionId && $routeParams.ltiUserId && $routeParams.ltiNonce) {
-            _urlForUserProject += '?ltiSessionId=' + $routeParams.ltiSessionId + '&ltiUserId=' + $routeParams.ltiUserId + '&ltiNonce=' + $routeParams.ltiNonce;
-          }
-
-          // check if the user has a saved version of a project
-          $http.get(_urlForUserProject)
-            .then(function(result) {
-
-              // this inner function will be called if the user agrees
-              // it will overwrite the default version of the project with the user's version
-              var userProjectData = {
-                // the name of the project
-                name: ProjectFactory.getProject().name,
-                // the last unique Id that was used to create a file
-                lastUId: result.data.project.lastUId,
-                // programming language of the project
-                language: ProjectFactory.getProject().language,
-                // the role of the user who is currently looking at the project in the browser
-                userRole: ProjectFactory.getProject().userRole,
-                // the files of the user
-                fileSet: result.data.files
-              };
-
-              // update the project data in the ProjectFactory
-              ProjectFactory.setProjectFromJSONdata(userProjectData, ltiData);
-
-              // make sure the Tree reloads and shows the user's version
-              $rootScope.$broadcast(IdeMsgService.msgReloadTreeFromProjectFactory().msg);
-
-              // we need to request that the URI is check for any "?view=..." query string
-              // in order to display some files in the ace editor
-              $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-            },
-            function() {
-              // The current user doesn't have a version stored for current project
-              // but we need to request that the URI is check for any "?view=..." query string
-              // in order to display some files in the ace editor
-              $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-            });
-        }
-        else {
-          // don't need to show the modal for loading a user project
-          // but we need to request that the URI is check for any "?view=..." query string
-          // in order to display some files in the ace editor
-          $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-        }
-      };
-
-
       // this function is called when closing or reloading the browser window
       $window.onbeforeunload = function (event) {
         // save project to server when leaving the page
@@ -1565,10 +1499,11 @@ app.controller('IdeCtrl',
         }
       };
 
-      /** Below list all one-time invocations for functions which should run whenever the controller is loaded from scratch.*/
+      // we need to request that the URI is check for any "?view=..." query string
+      // in order to display some files in the ace editor
+      $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
 
-      // invoke function to check if the user has a saved version of this project
-      loadUserProject();
+      /** Below list all one-time invocations for functions which should run whenever the controller is loaded from scratch.*/
     }]);
 
 

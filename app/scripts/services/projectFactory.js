@@ -492,6 +492,39 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       }
     };
 
+    /**
+     * Attaches the given ltiData to the project. It can afterwards
+     * be accessed through getProject().ltiData.
+     * @param aLtiData object containing ltiData
+     */
+    var setLtiData = function (aLtiData) {
+      if(aLtiData.ltiSessionId && aLtiData.ltiUserId && aLtiData.ltiNonce) {
+        getProject().ltiData = aLtiData;
+        getProject().hasLtiData = true;
+      }
+      else {
+        getProject().hasLtiData = false;
+      }
+    };
+
+
+    /**
+     * Set the course data if existing
+     * @param aCourseData
+     */
+    let setCourse = function(aCourseData) {
+
+      console.log(aCourseData);
+
+      getProject().courseData = {};
+      if(typeof aCourseData !== "undefined" && aCourseData && aCourseData.id && aCourseData.coursename) {
+        getProject().courseData = aCourseData;
+        getProject().isCourseSet = true;
+      }
+      else {
+        getProject().isCourseSet = false;
+      }
+    };
 
     /**
      * Sets the project based on data that was send by the server.
@@ -500,6 +533,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @param staticFiles {Array} (optional) an array that
      */
     var setProjectFromJSONdata = function (projectDataFromServer, ltiData) {
+
+      console.log(projectDataFromServer);
 
       // set the lastCompilationId to be empty
       // Otherwise we might switch to a different project
@@ -536,6 +571,9 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       };
 
       setProject(lProject);
+
+      // set any course data for this project
+      setCourse(projectDataFromServer.course);
 
       // set any Lti data for this project
       setLtiData(ltiData);
@@ -594,22 +632,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     };
 
     /**
-     * Attaches the given ltiData to the project. It can afterwards
-     * be accessed through getProject().ltiData.
-     * @param aLtiData object containing ltiData
-     */
-    var setLtiData = function (aLtiData) {
-      if(aLtiData.ltiSessionId && aLtiData.ltiUserId && aLtiData.ltiNonce) {
-        getProject().ltiData = aLtiData;
-        getProject().hasLtiData = true;
-      }
-      else {
-        getProject().hasLtiData = false;
-      }
-    };
-
-
-    /**
      * @description Given an array of nodes (e.g. getProject().files) this function returns a
      * single array that contains all the nodes as elements. The children[] array
      * is removed from the files
@@ -663,6 +685,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
           project: {
             lastUId: getProject().lastUId
           },
+          course: getProject().courseData,
           files: getNodeArray(getProject().files)
         };
 

@@ -171,66 +171,58 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         }
       })
 
-      .when('/projects/:projectId', {
-        // loads a project in the ide (publicly accessible if project is public)
+      .when('/courses/:courseId/projects/:projectId', {
         templateUrl: 'partials/ide',
         controller: 'IdeCtrl',
         resolve: {
-          ltiData: ['$route', '$q', function($route, $q) {
-
-            var deferred = $q.defer();
-            var _ltiData = {};
-            // try to extract the different lti parameter
-            if ($route.current.params.ltiSessionId)
-              _ltiData.ltiSessionId = $route.current.params.ltiSessionId;
-            if($route.current.params.ltiUserId)
-              _ltiData.ltiUserId = $route.current.params.ltiUserId;
-            if($route.current.params.ltiNonce)
-              _ltiData.ltiNonce = $route.current.params.ltiNonce;
-            if($route.current.params.ltiReturnUrl)
-              _ltiData.ltiReturnUrl = $route.current.params.ltiReturnUrl;
-
-            deferred.resolve(_ltiData);
-            return deferred.promise;
+          ltiData: ['$route', 'initialLtiData', function($route, initialLtiData) {
+            return initialLtiData;
           }],
-          projectData: ['$route', 'ProjectRes', function($route, ProjectRes) {
+          projectData: ['$q', '$route', 'initialProjectData', 'initialUserProjectData', 'UserSrv', function($q, $route, initialProjectData, initialUserProjectData, UserSrv) {
+            return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
+              .then(function(_projectData) {
 
-            // usually we just request a project on '/api/projects/:projectId'
-            // however, if the user belongs to an LTI session, we need to send the LTI data as part of the get-request
-            // this way, the server will determine if the user is allowed to access a (private) project because of LTI overwrite
+                // define course
+                _projectData.course = _projectData.courseSet[0];
 
-            // returns an array with lti parameters
-            var getLtiParameter = function() {
-              var result = [];
-              // try to extract the different lti parameter
-              if ($route.current.params.ltiSessionId)
-                result.push($route.current.params.ltiSessionId);
-              if($route.current.params.ltiUserId)
-                result.push($route.current.params.ltiUserId);
-              if($route.current.params.ltiNonce)
-                result.push($route.current.params.ltiNonce);
-              // return the array
-              return result;
-            }
+                // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
+                if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
+                  return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
+                    .catch(function() {
+                      return _projectData; // return original project data
+                    });
+                }
 
-            // get the lti parameters
-            var ltiParameters = getLtiParameter();
-            if(ltiParameters.length == 3) {
-              // we have 3 lti parameter, thus we append them as query parameters
-              return ProjectRes
-                .get(
-                  {
-                    projectId: $route.current.params.projectId,
-                    ltiSessionId: ltiParameters[0],
-                    ltiUserId: ltiParameters[1],
-                    ltiNonce: ltiParameters[2]
-                  })
-                .$promise;
-            }
-            else {
-              // we don't have any lti parameters, thus we don't need to forward them as query parameters
-              return ProjectRes.get({projectId: $route.current.params.projectId}).$promise;
-            }
+                return _projectData;
+              });
+          }]
+        }
+      })
+
+      .when('/projects/:projectId', {
+        templateUrl: 'partials/ide',
+        controller: 'IdeCtrl',
+        resolve: {
+          ltiData: ['$route', 'initialLtiData', function($route, initialLtiData) {
+            return initialLtiData;
+          }],
+          projectData: ['$route', 'initialProjectData', 'initialUserProjectData', 'UserSrv', function($route, initialProjectData, initialUserProjectData, UserSrv) {
+            return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
+                .then(function(_projectData) {
+
+                  // define course
+                  _projectData.course = _projectData.courseSet[0];
+
+                  // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
+                  if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
+                    return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
+                        .catch(function() {
+                          return _projectData; // return original project data
+                        });
+                  }
+
+                  return _projectData;
+                });
           }]
         }
       })
@@ -324,6 +316,9 @@ app.run(['$rootScope', '$route', '$location', 'UserSrv',
    * Fetch errors that might occur when the routeProvider tries a 'resovle' before routing to a page.
    */
   $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
+
+    console.log(rejection);
+
     if(rejection.status === 401)
       $location.path('/401').replace();
     else
