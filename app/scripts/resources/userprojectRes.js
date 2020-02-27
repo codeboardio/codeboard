@@ -31,7 +31,7 @@ angular.module('codeboardApp')
                 $http.get(_urlForUserProject)
                     .then(function (result) {
 
-                        var userProjectData = {
+                        let userProjectData = {
                             // the name of the project
                             projectname: project.projectname,
                             // the last unique Id that was used to create a file
@@ -42,8 +42,12 @@ angular.module('codeboardApp')
                             userRole: project.userRole,
                             // the files of the user
                             fileSet: result.data.files,
+                            // the config file
+                            configFile: project.configFile,
                             // the course for this project
-                            course: result.data.course
+                            course: result.data.course,
+                            // submission allowed?
+                            isSubmissionAllowed: project.isSubmissionAllowed
                         };
 
                         deferred.resolve(userProjectData);

@@ -1078,6 +1078,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       // Note: this is needed because depending on the role, the server needs to treat hidden files differently
       payload.userRole = getProject().userRole;
 
+      // add course to the payload
+      payload.course = getProject().courseData;
 
       // create the promise that is returned
       var deferred = $q.defer();
