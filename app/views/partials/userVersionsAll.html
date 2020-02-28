@@ -3,13 +3,13 @@
 <div class="container" style="margin-top: 40px">
   <div class="row">
     <div class="col-md-12">
-      <h3>{{userVersionType.charAt(0).toUpperCase() + userVersionType.slice(1)}} für Kurs: <a ng-href="/course/{{courseData.courseId}}/summary">{{courseData.coursename}}</a></h3>
+      <h3 ng-bind-html="title"></h3>
     </div>
   </div>
 
   <div class="row" ng-show="userVersionSet.length > 0">
     <div class="col-md-4 pull-right">
-      <input type="text" placeholder="Filter by username" ng-model="usernameFilter" uib-typeahead="request.username as request.username for request in userVersionSet | filter:{username:$viewValue} | limitTo:8" class="form-control">
+      <input type="text" placeholder="Filter by username / name / project" ng-model="usernameFilter" uib-typeahead="request.username as request.username for request in userVersionSet | filter:{username:$viewValue} | limitTo:8" class="form-control">
     </div>
   </div>
 
@@ -29,7 +29,7 @@
       <table class="table table-condensed table-hover my-4">
         <tr>
           <th title="User">User</th>
-          <th title="Date when the version was created">Created</th>
+          <th title="Date when the version was created/updated">Created</th>
           <th title="Project">Project</th>
           <th title="Status of the help request" ng-show="isType('helpRequest')">Status</th>
 
@@ -41,7 +41,7 @@
         </tr>
         <tr ng-repeat="version in filteredData = (userVersionSet | filter: categoryFilter | orderBy:'createdAt':true)">
           <td><a href="users/{{version.user.username}}">{{version.user.name || version.user.username}}</a></td>
-          <td>{{version.createdAt | date: 'medium'}}</td>
+          <td>{{version.updatedAt | date: 'medium'}}</td>
           <td>{{version.project.projectname}}</td>
           <td ng-show="isType('helprequest')"><span class="badge badge-{{version.status}}">{{version.status}}</span></td>
           <td ng-show="isType('submission')"><span class="badge badge-{{(version.testResult >= 0.99) ? 'answered' : 'default'}}">{{version.testResult === -1 ? '-' : version.testResult}} {{parseFloat(version.testResult)}}</span></td>

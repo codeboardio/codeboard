@@ -130,43 +130,33 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }]
         }
       })
-      .when('/projects/:projectId/submissions', {
-        templateUrl: 'partials/projectSubmissions',
-        controller: 'ProjectSubmissionsCtrl',
+
+      .when('/projects/:projectId/:versionType', {
+        templateUrl: 'partials/userVersionsAll',
+        controller: 'ProjectVersionsCtrl',
         resolve: {
-          // we don't inject any data but only check if the user is authorized to access this page
-          placeHolder: ['$route', '$http', function($route, $http) {
-            return $http.get('/api/projects/' + $route.current.params.projectId + '/authorizedownercheck');
-          }]
-        }
-      })
-      .when('/projects/:projectId/helpRequests', {
-        templateUrl: 'partials/projectHelpRequests',
-        controller: 'ProjectHelpRequestsCtrl',
-        resolve: {
-          // we don't inject any data but only check if the user is authorized to access this page
-          placeHolder: ['$route', '$http', function($route, $http) {
-            return $http.get('/api/projects/' + $route.current.params.projectId + '/authorizedownercheck');
-          }]
-        }
-      })
-      .when('/projects/:projectId/userprojects', {
-        templateUrl: 'partials/projectUserProjects',
-        controller: 'ProjectUserProjectsCtrl',
-        resolve: {
-          // we don't inject any data but only check if the user is authorized to access this page
-          placeHolder: ['$route', '$http', function($route, $http) {
-            return $http.get('/api/projects/' + $route.current.params.projectId + '/authorizedownercheck');
+          initialData: ['$route', 'initialDataForProjectUserVersionsAll', function($route, initialDataForProjectUserVersionsAll) {
+            return initialDataForProjectUserVersionsAll($route.current.params.projectId, $route.current.params.versionType);
           }]
         }
       })
 
       .when('/courses/:courseId/:versionType', {
-        templateUrl: 'partials/courses/courseVersionsAll',
+        templateUrl: 'partials/userVersionsAll',
         controller: 'CourseVersionsCtrl',
         resolve: {
           initialData: ['$route', 'initialDataForCourseUserVersionsAll', function($route, initialDataForCourseUserVersionsAll) {
             return initialDataForCourseUserVersionsAll($route.current.params.courseId, $route.current.params.versionType);
+          }]
+        }
+      })
+
+      .when('/courses/:courseId/projects/:projectId/:versionType', {
+        templateUrl: 'partials/userVersionsAll',
+        controller: 'CourseProjectVersionsCtrl',
+        resolve: {
+          initialData: ['$route', 'initialDataForCourseProjectUserVersionsAll', function($route, initialDataForCourseProjectUserVersionsAll) {
+            return initialDataForCourseProjectUserVersionsAll($route.current.params.courseId, $route.current.params.projectId, $route.current.params.versionType);
           }]
         }
       })

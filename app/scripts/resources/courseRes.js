@@ -36,34 +36,4 @@ angular.module('codeboardApp')
             '/api/courses/:courseId/:versionType',
             {courseId: '@id', versionType: '@versionType'}
         );
-    }])
-
-
-    .factory('initialDataForCourseUserVersionsAll', ['$resource', '$q', 'CourseRes', 'CourseVersionRes',
-        function($resource, $q, CourseRes, CourseVersionRes) {
-
-        return function(courseId, versionType) {
-
-            // create the promise that is returned
-            let deferred = $q.defer();
-
-            // get course data
-            let courseData = CourseRes.get({courseId: courseId}).$promise;
-
-            // get help requests
-            let userVersions = CourseVersionRes.query({courseId: courseId, versionType: versionType}).$promise;
-
-            // promise all
-            $q.all([courseData, userVersions])
-                .then(function(results) {
-                    deferred.resolve({
-                        courseData: results[0],
-                        userVersionSet: results[1]
-                    });
-                }, function(err) {
-                    deferred.reject("Course or course data not found");
-                });
-
-            return deferred.promise;
-        };
     }]);

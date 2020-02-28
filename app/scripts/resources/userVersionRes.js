@@ -59,4 +59,102 @@ angular.module('codeboardApp')
 
             return deferred.promise;
         };
-    }]);
+    }])
+
+    .factory('initialDataForCourseUserVersionsAll', ['$resource', '$q', 'CourseRes', 'CourseVersionRes',
+        function($resource, $q, CourseRes, CourseVersionRes) {
+
+            return function(courseId, versionType) {
+
+                // create the promise that is returned
+                let deferred = $q.defer();
+
+                // get course data
+                let courseData = CourseRes.get({courseId: courseId}).$promise;
+
+                // get help requests
+                let userVersions = CourseVersionRes.query({courseId: courseId, versionType: versionType}).$promise;
+
+                // promise all
+                $q.all([courseData, userVersions])
+                    .then(function(results) {
+                        deferred.resolve({
+                            courseData: results[0],
+                            userVersionSet: results[1]
+                        });
+                    }, function(err) {
+                        deferred.reject("Course or course data not found");
+                    });
+
+                return deferred.promise;
+            };
+        }])
+
+
+    .factory('initialDataForProjectUserVersionsAll', ['$resource', '$http', '$q', 'ProjectRes',
+        function($resource, $http, $q, ProjectRes) {
+
+            return function(projectId, versionType) {
+
+                // create the promise that is returned
+                let deferred = $q.defer();
+
+                // get course data
+                let projectData = ProjectRes.get({projectId: projectId}).$promise;
+
+                // get help requests
+                let userVersions = $http.get('/api/projects/' + projectId + '/' + versionType)
+                    .then(function(result) {
+                        return result.data;
+                    });
+
+                // promise all
+                $q.all([projectData, userVersions])
+                    .then(function(results) {
+                        deferred.resolve({
+                            projectData: results[0],
+                            userVersionSet: results[1]
+                        });
+                    }, function(err) {
+                        deferred.reject("Course or course data not found");
+                    });
+
+                return deferred.promise;
+            };
+        }])
+
+    .factory('initialDataForCourseProjectUserVersionsAll', ['$resource', '$http', '$q', 'ProjectRes', 'CourseRes', 'CourseVersionRes',
+        function($resource, $http, $q, ProjectRes, CourseRes, CourseVersionRes) {
+
+            return function(courseId, projectId, versionType) {
+
+                // create the promise that is returned
+                let deferred = $q.defer();
+
+                // get course data
+                let projectData = ProjectRes.get({projectId: projectId}).$promise;
+
+                // get course data
+                let courseData = CourseRes.get({courseId: courseId}).$promise;
+
+                // get help requests
+                let userVersions = $http.get('/api/courses/' + courseId + '/projects/' + projectId + '/' + versionType)
+                    .then(function(result) {
+                        return result.data;
+                    });
+
+                // promise all
+                $q.all([projectData, courseData, userVersions])
+                    .then(function(results) {
+                        deferred.resolve({
+                            projectData: results[0],
+                            courseData: results[1],
+                            userVersionSet: results[2]
+                        });
+                    }, function(err) {
+                        deferred.reject("Course or course data not found");
+                    });
+
+                return deferred.promise;
+            };
+        }]);
