@@ -24,14 +24,14 @@ angular.module('codeboardApp')
       $scope.init = function() {
 
         // get project description file
-        let file = ProjectFactory.getFile('projectDescription.html');
+        let projectDescription = ProjectFactory.getProjectDescription();
 
         // check if a description is available, otherwise use broadcast to make tab disabled
-        if(!file) {
+        if(projectDescription === "") {
           let req = IdeMsgService.msgNavBarRightDisableTab(slug);
           $rootScope.$broadcast(req.msg, req.data);
         } else {
-          $scope.content = file.content;
+          $scope.content = projectDescription;
         }
 
         // make description default tab

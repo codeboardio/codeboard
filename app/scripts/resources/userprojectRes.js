@@ -44,6 +44,8 @@ angular.module('codeboardApp')
                             fileSet: result.data.files,
                             // the config file
                             configFile: project.configFile,
+                            // the projectDescription file
+                            projectDescription: project.projectDescription,
                             // the course for this project
                             course: result.data.course,
                             // submission allowed?

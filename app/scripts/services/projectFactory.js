@@ -36,6 +36,16 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       return true;
     };
 
+    // an object that represents the configuration for this project
+    let projectDescription = "";
+
+    let getProjectDescription = function() {
+      return projectDescription;
+    };
+    let setProjectDescription = function(aProjectDescription) {
+      projectDescription = aProjectDescription;
+    };
+
 
     /**
      * Variable where we store the id of the last compilation response.
@@ -514,8 +524,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      */
     let setCourse = function(aCourseData) {
 
-      console.log(aCourseData);
-
       getProject().courseData = {};
       if(typeof aCourseData !== "undefined" && aCourseData && aCourseData.id && aCourseData.coursename) {
         getProject().courseData = aCourseData;
@@ -533,8 +541,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @param staticFiles {Array} (optional) an array that
      */
     var setProjectFromJSONdata = function (projectDataFromServer, ltiData) {
-
-      console.log(projectDataFromServer);
 
       // set the lastCompilationId to be empty
       // Otherwise we might switch to a different project
@@ -624,6 +630,16 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
           setConfig(JSON.parse(projectDataFromServer.configFile.content));
         } catch (e) {
           $log.debug('Fehler in der Konfigurations-Datei: ' + e);
+        }
+      }
+
+      // set projectDescription
+      if(projectDataFromServer.projectDescription) {
+        // by doing the parsing inside a try-catch block we check json-validity
+        try {
+          setProjectDescription(projectDataFromServer.projectDescription.content);
+        } catch (e) {
+          $log.debug('Fehler in der Projektbeschreibungs-Datei: ' + e);
         }
       }
 
@@ -1169,6 +1185,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       getProject: getProject,
       getConfig: getConfig,
       hasConfig: hasConfig,
+      getProjectDescription: getProjectDescription,
       addFile: addFile,
       addFolder: addFolder,
       renameNode: renameNode,

@@ -1966,7 +1966,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     // can be adjusted in a controller via broadcast.
 
     // tab for project description
-    if(ProjectFactory.getFile("projectDescription.html")) {
+    if(ProjectFactory.getProjectDescription() !== "") {
       $scope.rightBarTabs.description = {
         slug: "description",
         title: "Aufgabe",
