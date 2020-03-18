@@ -10,7 +10,7 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarDescriptionCtrl', ['$scope', '$rootScope', '$sce', '$timeout', 'IdeMsgService', 'ProjectFactory',
+    .controller('ideNavBarRightProjectDescriptionCtrl', ['$scope', '$rootScope', '$sce', '$timeout', 'IdeMsgService', 'ProjectFactory',
     function ($scope, $rootScope, $sce, $timeout, IdeMsgService, ProjectFactory) {
 
       let slug = 'description';

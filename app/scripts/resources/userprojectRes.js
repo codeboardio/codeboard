@@ -46,10 +46,14 @@ angular.module('codeboardApp')
                             configFile: project.configFile,
                             // the projectDescription file
                             projectDescription: project.projectDescription,
+                            // the sampleSolution file
+                            sampleSolution: project.sampleSolution,
                             // the course for this project
                             course: result.data.course,
                             // submission allowed?
-                            isSubmissionAllowed: project.isSubmissionAllowed
+                            isSubmissionAllowed: project.isSubmissionAllowed,
+                            // has the user already completed this project?
+                            projectCompleted: result.data.projectCompleted
                         };
 
                         deferred.resolve(userProjectData);

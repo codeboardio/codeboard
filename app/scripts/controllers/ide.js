@@ -469,12 +469,14 @@ app.controller('IdeCtrl',
                     $scope.textBeforeResult = "Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!";
                     $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
                     $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
+
+                    // trigger successful submission event
+                    let req = IdeMsgService.msgSuccessfulSubmission();
+                    $rootScope.$broadcast(req.msg);
+
                   break;
                 }
 
-                if(ProjectFactory.getProject().hasLtiData) {
-
-                }
 
                 /**
                  * Returns src to for avatar svg depending on test result
@@ -482,6 +484,10 @@ app.controller('IdeCtrl',
                  */
                 $scope.getAvatar = function() {
                   return $scope.avatar;
+                };
+
+                $scope.hasSampleSolution = function() {
+                  return ProjectFactory.hasSampleSolution();
                 };
 
                 /**
@@ -511,6 +517,18 @@ app.controller('IdeCtrl',
 
                   // trigger open help tab
                   let req = IdeMsgService.msgNavBarRightOpenTab("help");
+                  $rootScope.$broadcast(req.msg, req.data);
+                };
+
+                /**
+                 * Open sampleSolution tab
+                 */
+                $scope.openSampleSolution = function() {
+                  // first we close the modal
+                  $uibModalInstance.close();
+
+                  // trigger open help tab
+                  let req = IdeMsgService.msgNavBarRightOpenTab("sampleSolution");
                   $rootScope.$broadcast(req.msg, req.data);
                 };
             }];
@@ -835,6 +853,17 @@ app.controller('IdeCtrl',
 
           // $log.debug('Project uses testing framework: ' + result);
           return _toolIsSupported;
+      };
+
+
+      /**
+       * Returns true if the project has a sample solution
+       * @return {boolean}
+       */
+      $scope.isSampleSolutionSupported = function() {
+        console.log(ProjectFactory.hasSampleSolution());
+        console.log("asdsad");
+        return ProjectFactory.hasSampleSolution();
       };
 
       /**
@@ -1972,7 +2001,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
         title: "Aufgabe",
         disabled: false,
         icon: "glyphicon-education",
-        contentURL: "partials/navBarRight/navBarRightDescription"
+        contentURL: "partials/navBarRight/navBarRightProjectDescription"
       };
     }
 
@@ -1982,7 +2011,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
           slug: "test",
           title: "Test",
           icon: "glyphicon-list-alt",
-          contentURL: "partials/navBarRight/navBarRightTestResult"
+          contentURL: "partials/navBarRight/navBarRightTest"
       };
     }
 
@@ -1993,6 +2022,16 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
           title: "Hilfe",
           icon: "glyphicon-comment",
           contentURL: "partials/navBarRight/navBarRightHelp"
+      };
+    }
+
+    // tab for sampleSolution
+    if(ProjectFactory.hasSampleSolution()) {
+      $scope.rightBarTabs.sampleSolution = {
+          slug: "sampleSolution",
+          title: "Musterlösung",
+          icon: "glyphicon-screenshot",
+          contentURL: "partials/navBarRight/navBarRightSampleSolution"
       };
     }
 
@@ -2033,6 +2072,13 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
      */
     $scope.$on(IdeMsgService.msgNavBarRightDisableTab().msg, function (event, data) {
       $scope.rightBarTabs[data.slug].disabled = true;
+    });
+
+    /**
+     * This broadcast can be used to enable tabs from within a tab specific controller
+     */
+    $scope.$on(IdeMsgService.msgNavBarRightEnableTab().msg, function (event, data) {
+      $scope.rightBarTabs[data.slug].disabled = false;
     });
 
     /**

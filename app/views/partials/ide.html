@@ -352,7 +352,7 @@
   <!-- the modal window that is shown after submitting a solution -->
   <div>
     <script type="text/ng-template" id="ideSubmitModal.html">
-      <ul class="chat">
+      <ul class="chat p-0">
         <li class="clear chat-line my-4 clearfix card">
           <div class="chat-avatar" style="float: left;">
             <div style="float: right">
@@ -381,6 +381,7 @@
 
                 <div class="chat-line-buttons text-right mt-4">
                   <button class="btn btn-default" ng-click="close()">Zurück zur Aufgabe</button>
+                  <button class="btn btn-info" ng-show="hasSampleSolution() && passed" ng-click="openSampleSolution()">Musterlösung anzeigen</button>
                   <button class="btn btn-success" ng-show="passed" ng-click="goToCourse()">Zur Kursübersicht</button>
                   <button class="btn btn-info" ng-if="!isActionHidden('help')" ng-show="!passed" ng-click="requestHelp()">Hilfe Anfordern</button>
                 </div>

@@ -13,7 +13,7 @@ angular.module('codeboardApp')
     /**
      * Controller for Tips
      */
-    .controller('ideTabTestCtrl', ['$scope', '$rootScope', '$log', 'IdeMsgService', 'ProjectFactory',
+    .controller('ideNavBarRightTestCtrl', ['$scope', '$rootScope', '$log', 'IdeMsgService', 'ProjectFactory',
         function ($scope, $rootScope, $log, IdeMsgService, ProjectFactory) {
 
             // title and description

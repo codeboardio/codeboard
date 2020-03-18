@@ -13,7 +13,7 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
+    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
     function ($scope, $rootScope, $sce, $routeParams, $http, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
 
         let slug = 'help',

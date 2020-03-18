@@ -36,7 +36,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       return true;
     };
 
-    // an object that represents the configuration for this project
+    // an object that represents the projectDescription for this project
     let projectDescription = "";
 
     let getProjectDescription = function() {
@@ -44,6 +44,22 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     };
     let setProjectDescription = function(aProjectDescription) {
       projectDescription = aProjectDescription;
+    };
+    let hasProjectDescription = function() {
+      return (projectDescription !== "");
+    };
+
+    // an object that represents the sampleSolution for this project
+    let sampleSolution = "";
+
+    let getSampleSolution = function() {
+      return sampleSolution;
+    };
+    let setSampleSolution = function(aSampleSolution) {
+      sampleSolution = aSampleSolution;
+    };
+    let hasSampleSolution = function() {
+      return (sampleSolution !== "");
     };
 
 
@@ -573,7 +589,10 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         userRole: projectDataFromServer.userRole,
 
         // name of the user being inspected; the username only exists if we're looking at a submission or a userproject
-        userBeingInspected: projectDataFromServer.username ? projectDataFromServer.username : null
+        userBeingInspected: projectDataFromServer.username ? projectDataFromServer.username : null,
+
+        // has the user already completed this project?
+        projectCompleted: projectDataFromServer.projectCompleted ? projectDataFromServer.projectCompleted : false,
       };
 
       setProject(lProject);
@@ -640,6 +659,16 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
           setProjectDescription(projectDataFromServer.projectDescription.content);
         } catch (e) {
           $log.debug('Fehler in der Projektbeschreibungs-Datei: ' + e);
+        }
+      }
+
+      // set sampleSolution
+      if(projectDataFromServer.sampleSolution) {
+        // by doing the parsing inside a try-catch block we check json-validity
+        try {
+          setSampleSolution(projectDataFromServer.sampleSolution.content);
+        } catch (e) {
+          $log.debug('Fehler in der Musterlösung: ' + e);
         }
       }
 
@@ -1186,6 +1215,9 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       getConfig: getConfig,
       hasConfig: hasConfig,
       getProjectDescription: getProjectDescription,
+      hasProjectDescription: hasProjectDescription,
+      getSampleSolution: getSampleSolution,
+      hasSampleSolution: hasSampleSolution,
       addFile: addFile,
       addFolder: addFolder,
       renameNode: renameNode,

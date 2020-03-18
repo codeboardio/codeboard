@@ -418,6 +418,18 @@ angular.module('codeboardApp')
     };
 
     /**
+     * This broadcast can be used to enable a navBarRightTab from within a controller
+     * @return {{msg: string}}
+     * @author Janick Michot
+     */
+    this.msgNavBarRightEnableTab = function (slug) {
+      return {
+        msg: 'ide.navBarRightEnableTab',
+        data: { "slug": slug }
+      };
+    };
+
+    /**
      * This broadcast can be used to disable a navBarRightTab from within a controller
      * @param tabId
      * @returns {{msg: string, data: {tabId: *}}}
@@ -426,6 +438,17 @@ angular.module('codeboardApp')
       return {
         msg: 'ide.navBarRightOpenTab',
         data: { "tab": tab }
+      };
+    };
+
+
+    /**
+     * This broadcast is triggered when a successful submission has been made
+     * @returns {{msg: string}}
+     */
+    this.msgSuccessfulSubmission= function () {
+      return {
+        msg: 'ide.successfulSubmission'
       };
     };
 
