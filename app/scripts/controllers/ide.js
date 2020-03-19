@@ -634,6 +634,20 @@ app.controller('IdeCtrl',
         });
       };
 
+
+      /**
+       * This function redirects a user back to an overview page.
+       * LTI-Users are redirected to the moodle course page.
+       * Non-LTI-Users are redirected to their profile page
+       */
+      let takeMeHome = function() {
+          let url = "/";
+          if(ProjectFactory.getProject().hasLtiData) {
+              url = ProjectFactory.getProject().ltiData.ltiReturnUrl;
+          }
+          $window.location.href = decodeURIComponent(url);
+      };
+
           // we need a way to hold some state of the IDE; this object contains the states that are required
       var ideState = {
         // if the user clicks an action (e.g. compile, run), this variable can be set to indicate that the action supports user-stopping
@@ -889,6 +903,10 @@ app.controller('IdeCtrl',
         var req;
 
         switch (aClickId) {
+          case ('home'):
+            req = IdeMsgService.msgTakeMeHomeRequest();
+            $rootScope.$broadcast(req.msg);
+            break;
           case ('add_file'):
             req = IdeMsgService.msgNewNodeRequest('file');
             $rootScope.$broadcast(req.msg, req.data);
@@ -1431,6 +1449,12 @@ app.controller('IdeCtrl',
       $scope.$on(IdeMsgService.msgResetRequest().msg, function () {
         $log.debug('Reset request received');
         resetSolution();
+      });
+
+      /** Handles a "reset" event */
+      $scope.$on(IdeMsgService.msgTakeMeHomeRequest().msg, function () {
+        $log.debug('Take me Home request received');
+        takeMeHome();
       });
 
 

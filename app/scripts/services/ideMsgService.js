@@ -315,6 +315,16 @@ angular.module('codeboardApp')
       };
     };
 
+    /**
+     * Returns msg object used when a user want back to the course overview
+     * @return {{msg: string}}
+     */
+    this.msgTakeMeHomeRequest = function () {
+      return {
+        msg: 'ide.takeMeHomeRequest'
+      };
+    };
+
 
     /**
      * Returns msg object used to signal that the editor should be shown or hidden.
