@@ -34,11 +34,13 @@ angular.module('codeboardApp')
           $scope.content = projectDescription;
         }
 
-        // make description default tab
-        $timeout(function() {
-          let req = IdeMsgService.msgNavBarRightOpenTab('description');
-          $rootScope.$broadcast(req.msg, req.data);
-        }, 500);
+        // when user, make description default tab
+        if(ProjectFactory.getProject().userRole !== 'help') {
+          $timeout(function () {
+            let req = IdeMsgService.msgNavBarRightOpenTab('description');
+            $rootScope.$broadcast(req.msg, req.data);
+          }, 500);
+        }
       };
 
       $scope.init();

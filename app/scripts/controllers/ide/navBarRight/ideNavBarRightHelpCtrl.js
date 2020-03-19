@@ -13,8 +13,8 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
-    function ($scope, $rootScope, $sce, $routeParams, $http, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
+    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
+    function ($scope, $rootScope, $sce, $routeParams, $http, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
 
         let slug = 'help',
             defaultMessage  = "Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.",
@@ -32,7 +32,7 @@ angular.module('codeboardApp')
          * todo probably not the best solution and not the angular way
          */
         let chatScrollToBottom = function() {
-            setTimeout(function(){
+            $timeout(function(){
                 document.getElementById("targetinto").scrollIntoView();
             }, 10);
         };
@@ -133,6 +133,15 @@ angular.module('codeboardApp')
         $scope.init = function() {
 
             $scope.sendRequestFormVisible = !$scope.currentRoleIsUser();
+
+            // when user role help, make help default tab
+            if(ProjectFactory.getProject().userRole === 'help') {
+                $timeout(function () {
+                    let req = IdeMsgService.msgNavBarRightOpenTab('help');
+                    $rootScope.$broadcast(req.msg, req.data);
+                }, 500);
+            }
+
 
             // load chat history
             ChatSrv.getChatHistory()
