@@ -261,7 +261,26 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
             return deferred.promise;
           }],
           projectData: ['$route', 'UserProjectRes', function($route, UserProjectRes) {
-              return UserProjectRes.get({projectId: $route.current.params.projectId, userprojectId: $route.current.params.userprojectId}).$promise;
+              return UserProjectRes.get({projectId: $route.current.params.projectId, userprojectId: $route.current.params.userprojectId}).$promise
+                  .then(function(aUserProject) {
+
+                    // extract the config file from the fileSet
+                    aUserProject.configFile = aUserProject.fileSet.find(function(file) {
+                      return file.filename === "codeboard.json";
+                    });
+
+                    // extract the projectDescription file from the fileSet
+                    aUserProject.projectDescription = aUserProject.fileSet.find(function(file) {
+                      return file.filename === "projectDescription.html";
+                    });
+
+                    // extract the sampleSolution file from the fileSet
+                    aUserProject.sampleSolution = aUserProject.fileSet.find(function(file) {
+                      return file.filename === "sampleSolution.html";
+                    });
+
+                    return aUserProject;
+                  });
           }]
         }
       })

@@ -24,7 +24,7 @@ angular.module('codeboardApp')
       $scope.init = function() {
         // check if a sampleSolution is available and the user has already a correct submission,
         // otherwise we use broadcast to make tab disabled
-        if(ProjectFactory.getProject().projectCompleted || ProjectFactory.getProject().userRole === 'owner') {
+        if(ProjectFactory.getProject().projectCompleted || ProjectFactory.getProject().userRole !== 'user') {
           $scope.sampleSolution = ProjectFactory.getSampleSolution();
         } else {
           let req = IdeMsgService.msgNavBarRightDisableTab(slug);

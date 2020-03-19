@@ -884,8 +884,6 @@ app.controller('IdeCtrl',
        * @return {boolean}
        */
       $scope.isSampleSolutionSupported = function() {
-        console.log(ProjectFactory.hasSampleSolution());
-        console.log("asdsad");
         return ProjectFactory.hasSampleSolution();
       };
 
