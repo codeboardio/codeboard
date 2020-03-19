@@ -51,7 +51,7 @@ angular.module('codeboardApp')
                             // the course for this project
                             course: result.data.course,
                             // submission allowed?
-                            isSubmissionAllowed: result.data.projectCompleted ? false : project.isSubmissionAllowed,
+                            isSubmissionAllowed: project.isSubmissionAllowed,
                             // has the user already completed this project?
                             projectCompleted: result.data.projectCompleted
                         };

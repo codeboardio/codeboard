@@ -663,11 +663,15 @@ app.controller('IdeCtrl',
       };
 
 
-      /** Settings for different UI elements, e.g. should buttons be visible */
+      /**
+       * Settings for different UI elements, e.g. should buttons be visible
+       * todo maybe combine with isActionHidden?
+       */
       $scope.uiSettings = {
 
         // do we show the submit button?
         showSubmissionBtn: projectData.isSubmissionAllowed,
+        disableSubmissionBtn: projectData.projectCompleted
 
       };
 
@@ -698,11 +702,11 @@ app.controller('IdeCtrl',
        * @param submit {number} if 1, submit action will be set enabled
        */
       var setEnabledActions = function(compile, run, test, tool, submit) {
-        $scope.disabledActions.compile = !(compile == 1);
-        $scope.disabledActions.run = !(run == 1);
-        $scope.disabledActions.test = !(test == 1);
-        $scope.disabledActions.tool = !(tool == 1);
-        $scope.disabledActions.submit = !(submit == 1);
+        $scope.disabledActions.compile = compile !== 1;
+        $scope.disabledActions.run = run !== 1;
+        $scope.disabledActions.test = test !== 1;
+        $scope.disabledActions.tool = tool !== 1;
+        $scope.disabledActions.submit = submit !== 1;
 
         // trigger a digest because when the WebSocket closes, the buttons sometimes don't get enabled
         if(!$scope.$$phase) {
@@ -1002,7 +1006,7 @@ app.controller('IdeCtrl',
       $scope.$on(IdeMsgService.msgForceReloadCurrentNode().msg, function (aEvent, aMsgData) {
         let req = IdeMsgService.msgDisplayFileRequest($scope.ace.currentNodeId, true);
         $rootScope.$broadcast(req.msg, req.data);
-      })
+      });
 
 
       /**
@@ -1137,6 +1141,12 @@ app.controller('IdeCtrl',
         $rootScope.$broadcast(req.msg);
       };
 
+      /**
+       * Hide submission button after successful submission
+       */
+      $scope.$on(IdeMsgService.msgSuccessfulSubmission().msg, function () {
+        $scope.uiSettings.disableSubmissionBtn = true;
+      });
 
       /**
        * Triggers a resize of the editor.

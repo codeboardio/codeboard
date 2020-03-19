@@ -90,8 +90,8 @@
                     <button id="ideToolButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('tool')" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
                       <span class="glyphicon glyphicon-check"></span> <span class="hidden-xs">Analyze</span>
                     </button>
-                    <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit" ng-click="navBarClick('submit')" title="Submit this project">
-                      <span class="glyphicon glyphicon-send"></span> <span class="hidden-xs">Submit</span>
+                    <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" ng-click="navBarClick('submit')" title="Submit this project">
+                      <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe erfolgreich abgegeben</span>
                     </button>
 
                   </form>
@@ -103,7 +103,7 @@
                     <ul class="nav navbar-nav m-0">
 
                       <li class="nav-item pull-right">
-                        <button ng-hide="currentRoleIsOwner()" class="btn btn-info btn-sm nav-link" ng-if="!isActionHidden('help')" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+                        <button ng-hide="currentRoleIsOwner()" class="btn btn-info btn-sm nav-link" ng-if="!isActionHidden('help')" ng-click="navBarClick('help')" title="Hilfe anfordern">
                           <span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Ich brauche Hilfe</span>
                         </button>
                       </li>
