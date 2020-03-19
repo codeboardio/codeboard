@@ -799,9 +799,14 @@ app.controller('IdeCtrl',
         return ProjectFactory.getProject().userRole === 'userproject';
       };
 
-      /** Returns true if the current role is that of project 'submission' */
+      /** Returns true if the current role is that of project 'help' */
       $scope.currentRoleIsHelp = function() {
         return ProjectFactory.getProject().userRole === 'help';
+      };
+
+      /** Returns the current role */
+      $scope.getCurrentRole = function() {
+        return ProjectFactory.getProject().userRole;
       };
 
       /** Returns true if the current role is that of project 'ltiUser' */
@@ -2173,6 +2178,14 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
         _userProjectRole = 'Inspecting user-project from user "' +  ProjectFactory.getProject().userBeingInspected + '"';
       }
       return _userProjectRole;
+    } else if($scope.currentRoleIsHelp()) {
+      var _helpRequestRole = 'Inspection of a helprequest';
+
+      // we check we now the name of the user we're inspecting; if yes, we use the name as part of the role description
+      if(ProjectFactory.getProject().userBeingInspected) {
+        _helpRequestRole = 'Inspecting helpRequest from user "' +  ProjectFactory.getProject().userBeingInspected + '"';
+      }
+      return _helpRequestRole;
     }
   };
 

@@ -588,7 +588,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         // the role of the user who is currently looking at the project in the browser
         userRole: projectDataFromServer.userRole,
 
-        // name of the user being inspected; the username only exists if we're looking at a submission or a userproject
+        // name of the user being inspected; the username only exists if we're looking at a submission, help or a userproject
         userBeingInspected: projectDataFromServer.username ? projectDataFromServer.username : null,
 
         // has the user already completed this project?

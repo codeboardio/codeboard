@@ -24,7 +24,7 @@ angular.module('codeboardApp')
                     let projectData = {
                         projectname: response.data.project.projectname,
                         language: response.data.project.language,
-                        userRole: $route.current.params.versionType,
+                        userRole: response.data.userRole,
                         username: response.data.user.username, // the user that's being inspected
                         updatedAt: response.data.updatedAt
                     };

@@ -151,6 +151,9 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.ideHeader .projectTitle span.glyphicon {
+  font-size: 0.8em;
+}
 
 #ideNavBar {
   border-radius: 0;
