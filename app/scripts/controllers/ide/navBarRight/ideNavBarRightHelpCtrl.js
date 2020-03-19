@@ -91,7 +91,7 @@ angular.module('codeboardApp')
             // call ProjectFactory to store the request
             return ProjectFactory.createHelpRequest()
                 .then(function(helpRequest) {
-                    let reference = "/projects/" + helpRequest.projectId + "/version/help/" + helpRequest.id;
+                    let reference = "/projects/" + helpRequest.projectId + "/helprequests/" + helpRequest.id;
                     return ChatSrv.addChatLineCard(aMessage,"Hilfe angefragt", 'help', reference, helpRequest.id);
                 })
                 .then(function(chatLine) {
