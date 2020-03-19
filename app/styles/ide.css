@@ -425,22 +425,6 @@ body {
   outline: 0;
   font-weight: 900;
 }
-.ideUserInput i {
-    position: absolute;
-    width: 1px;
-    height: 80%;
-    background-color: gray;
-    left: 0;
-    top: 10%;
-    animation-name: blink;
-    animation-duration: 800ms;
-    animation-iteration-count: infinite;
-    opacity: 1;
-}
-
-.ideUserInput input:focus + i {
-    display: none;
-}
 
 @keyframes blink {
     from { opacity: 1; }
