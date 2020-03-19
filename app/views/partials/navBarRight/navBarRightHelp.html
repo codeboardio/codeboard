@@ -13,7 +13,7 @@
                 </div>
                 <div class="mt-3 chat-message" style="float: {{chatLine.alignment}};">
                     <div class="chat-line-posted-at text-{{chatLine.alignment}}">
-                        <small>{{chatLinePostedAt(chatLine.createdAt)}} | {{chatLine.author.username}}</small>
+                        <small>{{chatLinePostedAt(chatLine.createdAt)}} | {{chatLine.author.name || chatLine.author.username}}</small>
                     </div>
                     <div ng-include="getChatLine(chatLine)"></div>
                 </div>
