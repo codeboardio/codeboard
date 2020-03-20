@@ -184,12 +184,13 @@ app.controller('IdeCtrl',
             });
         };
 
+        // todo only works for compileAndRun
         let compilationError = true;
 
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
 
-          if(aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '') === "Compilation success") {
+          if(aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '') === "Compilation successful") {
             compilationError = false;
             return;
           }
