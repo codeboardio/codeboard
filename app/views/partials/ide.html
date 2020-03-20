@@ -379,7 +379,8 @@
                     <span class="numTestsPassed"><b>{{numTestsPassed}}</b> &#10004;</span>
                   </div>
                   <div class="progress-bar" style="background: #ab5c5c" role="progressbar" ng-style="{'width': (100 - progress) + '%'}" aria-valuenow="{{(100 - progress)}}" aria-valuemin="0" aria-valuemax="100">
-                    <span class="numTestsFailed"><b>{{numTestsFailed}}</b> X</span>
+                    <span ng-show="hasResult" class="numTestsFailed"><b>{{numTestsFailed}}</b> X</span>
+                    <span ng-hide="hasResult" class="progress-loading-icon glyphicon glyphicon-repeat gly-spin" aria-hidden="true"></span>
                   </div>
                 </div>
 

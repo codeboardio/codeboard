@@ -434,148 +434,193 @@ app.controller('IdeCtrl',
         // disable all other actions while we wait for the submission to complete
         setEnabledActions(0,0,0,0,0);
 
-        // submit the project
-        ProjectFactory.submitProject()
-          .then( function(data) {
+        /**
+         * Submit Modal Instance used to show submission result, back to course link etc.
+         * @type {*[]}
+         */
+        let submitModalInstanceCtrl =  ['$rootScope','$scope', '$uibModalInstance', function ($rootScope, $scope, $uibModalInstance) {
 
-            $log.debug('Submission successful.');
+          // init scope variables
+          $scope.numTestsFailed = $scope.numTestsPassed = $scope.numTests = 0;
+          $scope.score = 0;
+          $scope.progress = 0;
+          $scope.passRate = 1;
+          $scope.passed = false;
+          $scope.hasResult= false;
 
-            setOutput(data.msg, false);
+          // default texts
+          $scope.title = "Deine Lösung wird überprüft";
+          $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
+          $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
 
-            /**
-             * Submit Modal Instance used to show submission result, back to course link etc.
-             * @type {*[]}
-             */
-            let submitModalInstanceCtrl =  ['$rootScope','$scope', '$uibModalInstance', 'testResult',
-              function ($rootScope, $scope, $uibModalInstance, testResult) {
+          /**
+           * Defines what to do when no tests passed
+           * For a non-dynamic programming language, no passed tests mean that the compilation failed.
+           * todo Differentiate texts depending on whether they are dynamic or not
+           */
+          let noTestsPassed = function() {
+            $scope.textBeforeResult = "Sehr wahrscheinlich hat deine Lösung einen Kompilier-Fehler. Versuche diesen zu beheben, damit du deine Lösung erfolgreich abgeben kannst.";
+            $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+          };
 
-                // get test result
+          /**
+           * Defines what to do when no tests passed
+           */
+          let notEnoughTestsPassed = function(numTests) {
+            $scope.textBeforeResult = "Gut gemacht! Deine Lösung erfüllt bereits " + $scope.numTestsPassed + " von " + $scope.numTests + " Tests.";
+            $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+          };
+
+          /**
+           * Defines what to do to when all tests passed
+           * When the passRates is reached we trigger the msgSuccessfulSubmission event
+           */
+          let enoughTestsPassed = function() {
+            $scope.title = "Deine Lösung wurde erfolgreich übermittelt";
+            $scope.textBeforeResult = "Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!";
+            $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
+            $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
+
+            // trigger successful submission event
+            let req = IdeMsgService.msgSuccessfulSubmission();
+            $rootScope.$broadcast(req.msg);
+          };
+
+          /**
+           * Defines what to do when a submission went wrong
+           */
+          let submissionFailed = function() {
+            $scope.title = "Submission fehlgeschlagen";
+            $scope.textBeforeResult = "Bitte versuche deine Aufgabe erneut abzugeben. Wenn die Submission erneut fehlschlägt, wennde dich bitte an deinen Kursleiter";
+          };
+
+          /**
+           * Initial function submits the solution via projectFactory and prepares the testResult
+           */
+          let init = function() {
+
+            // submit the project
+            ProjectFactory.submitProject()
+              .then(function(result) {
+
+                $log.debug('Submission successful.');
+
+                setOutput(result.msg, false);
+
+                let testResult = result.data;
+
+                // get num tests
+                $scope.hasResult = true;
                 $scope.numTestsFailed = testResult.numTestsFailed;
                 $scope.numTestsPassed = testResult.numTestsPassed;
-                $scope.numTests = $scope.numTestsFailed + $scope.numTestsPassed;
+                $scope.numTests = testResult.numTestsFailed + testResult.numTestsPassed;
 
-                $scope.score = $scope.numTestsPassed / $scope.numTests;
+                // calculate score and determine if passed
+                $scope.score = testResult.numTestsPassed / $scope.numTests;
                 $scope.progress = $scope.score * 100;
-                $scope.passRate = 1; // todo retrieve passRate
+                $scope.passRate = 1;
                 $scope.passed = ($scope.passRate <= $scope.score);
 
-                // default texts
-                $scope.title = "Deine Lösung stimmt noch nicht ganz";
-                $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
-
-                // switch depending on score
+                // the modal context depends on the test result. In the following we check the result
+                // and call the depending function
                 switch (true) {
 
                   // if no tests passed -> probably compile error
-                  case ($scope.score === 0):
-                    $scope.textBeforeResult = "Sehr wahrscheinlich hat deine Lösung einen Kompilier-Fehler. Versuche diesen zu beheben, damit du deine Lösung erfolgreich abgeben kannst.";
-                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
-                  break;
+                  case ($scope.score === 0): noTestsPassed(); break;
 
-                  // if at least on test is passed
-                  case ($scope.score < $scope.passRate):
-                    $scope.textBeforeResult = "Gut gemacht! Deine Lösung erfüllt bereits " + $scope.numTestsPassed + " von " + $scope.numTests + " Tests.";
-                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
-                  break;
+                  // if at least on test is passed but not enough to pass the testing
+                  case ($scope.score < $scope.passRate): notEnoughTestsPassed(); break;
 
                   // if the score is greater than the passRate
-                  default:
-                    $scope.title = "Deine Lösung wurde erfolgreich übermittelt";
-                    $scope.textBeforeResult = "Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!";
-                    $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
-                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
+                  case ($scope.score >= $scope.passRate): enoughTestsPassed(); break;
 
-                    // trigger successful submission event
-                    let req = IdeMsgService.msgSuccessfulSubmission();
-                    $rootScope.$broadcast(req.msg);
-
-                  break;
+                  // default should not be possible, therefore show an error
+                  default: submissionFailed(); break;
                 }
 
+                // enable compilation and submission (not running, because what the submission compiles might differ from the last compilation if the user changed something; that could be confusing for the user)
+                setEnabledActions(1,0,1,1,1);
 
-                /**
-                 * Returns src to for avatar svg depending on test result
-                 * @returns {string}
-                 */
-                $scope.getAvatar = function() {
-                  return $scope.avatar;
-                };
+              }, function(reason) {
+                $log.debug('Submission failed.' + reason.data.msg);
+                setOutput(reason.data.msg, false);
 
-                $scope.hasSampleSolution = function() {
-                  return ProjectFactory.hasSampleSolution();
-                };
+                // show an error message in modal
+                submissionFailed();
 
-                /**
-                 * Close Modal
-                 */
-                $scope.close = function() {
-                  $uibModalInstance.close({});
-                };
+                // the submission failed; because we don't know why, we enable compilation and submission
+                setEnabledActions(1,0,1,1,1);
+              });
+          };
+          init();
 
-                /**
-                 * link to the course page
-                 */
-                $scope.goToCourse = function() {
-                    // get url from project
-                    let courseUrl = ProjectFactory.getProject().ltiData.ltiReturnUrl;
+          /**
+           * Returns src to for avatar svg depending on test result
+           * @returns {string}
+           */
+          $scope.getAvatar = function() {
+            return $scope.avatar;
+          };
 
-                    // redirect
-                    $window.location.href = decodeURIComponent(courseUrl);
-                };
+          /**
+           * Checks if the current project has a sample solution
+           * @returns {*}
+           */
+          $scope.hasSampleSolution = function() {
+            return ProjectFactory.hasSampleSolution();
+          };
 
-                /**
-                 * Open help tab
-                 */
-                $scope.requestHelp = function() {
-                  // first we close the modal
-                  $uibModalInstance.close();
+          /**
+           * Close modal function
+           */
+          $scope.close = function() {
+            $uibModalInstance.close({});
+          };
 
-                  // trigger open help tab
-                  let req = IdeMsgService.msgNavBarRightOpenTab("help");
-                  $rootScope.$broadcast(req.msg, req.data);
-                };
+          /**
+           * link to the course page
+           */
+          $scope.goToCourse = function() {
+            let courseUrl = ProjectFactory.getProject().ltiData.ltiReturnUrl;
+            $window.location.href = decodeURIComponent(courseUrl);
+          };
 
-                /**
-                 * Open sampleSolution tab
-                 */
-                $scope.openSampleSolution = function() {
-                  // first we close the modal
-                  $uibModalInstance.close();
+          /**
+           * Open help tab
+           */
+          $scope.requestHelp = function() {
+            // first we close the modal
+            $uibModalInstance.close();
 
-                  // trigger open help tab
-                  let req = IdeMsgService.msgNavBarRightOpenTab("sampleSolution");
-                  $rootScope.$broadcast(req.msg, req.data);
-                };
-            }];
+            // trigger open help tab
+            let req = IdeMsgService.msgNavBarRightOpenTab("help");
+            $rootScope.$broadcast(req.msg, req.data);
+          };
 
-            /**
-             * call the function to open the modal (we ignore the modalInstance returned by
-             * this call as we don't need to access any data from the modal)
-             */
-            $uibModal.open({
-              appendTo: angular.element( document.querySelector('#modalAppendTo') ),
-              templateUrl: 'ideSubmitModal.html',
-              controller: submitModalInstanceCtrl,
-              windowClass: 'avatar-modal',
-              size: "md",
-              resolve: {
-                testResult: function () {
-                  return data.data;
-                }
-              }
-            });
+          /**
+           * Open sampleSolution tab
+           */
+          $scope.openSampleSolution = function() {
+            // first we close the modal
+            $uibModalInstance.close();
 
-            // enable compilation and submission (not running, because what the submission compiles might differ from the last compilation if the user changed something; that could be confusing for the user)
-            setEnabledActions(1,0,1,1,1);
-          },
-          function(reason) {
-            $log.debug('Submission failed.' + reason.data.msg);
-            setOutput(reason.data.msg, false);
+            // trigger open help tab
+            let req = IdeMsgService.msgNavBarRightOpenTab("sampleSolution");
+            $rootScope.$broadcast(req.msg, req.data);
+          };
+        }];
 
-            // the submission failed; because we don't know why, we enable compilation and submission
-            setEnabledActions(1,0,1,1,1);
-          }
-        );
+        /**
+         * call the function to open the modal (we ignore the modalInstance returned by
+         * this call as we don't need to access any data from the modal)
+         */
+        $uibModal.open({
+          appendTo: angular.element( document.querySelector('#modalAppendTo') ),
+          templateUrl: 'ideSubmitModal.html',
+          controller: submitModalInstanceCtrl,
+          windowClass: 'avatar-modal',
+          size: "md"
+        });
       };
 
 
