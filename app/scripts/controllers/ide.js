@@ -162,7 +162,7 @@ app.controller('IdeCtrl',
         // counter for the number of messages added to the output (1 on every WS send event)
         var numOfMessages = 0;
         // max number of messages we allow
-        var maxNumOfMessageCharacters = 15000;
+        var maxNumOfMessageCharacters = 1000;
 
         // clear the output
         setOutput('');
@@ -184,9 +184,15 @@ app.controller('IdeCtrl',
             });
         };
 
+        let compilationError = true;
 
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
+
+          if(aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '') === "Compilation success") {
+            compilationError = false;
+            return;
+          }
 
           // replace line breaks with <br> and allow html
           aNewlyReceivedData = aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
@@ -210,6 +216,14 @@ app.controller('IdeCtrl',
           if(numOfMessages === 0) {
             addToOutput('--Session ended without output.--', false);
           }
+
+
+          if(compilationError) {
+            console.log("Compilation Error aufgetreten");
+            let req = IdeMsgService.msgNavBarRightOpenTab('test');
+            $rootScope.$broadcast(req.msg, req.data);
+          }
+
 
           // we no longer have a stoppableAction
           // send out a msg stoppableActionGone
