@@ -218,13 +218,14 @@ app.controller('IdeCtrl',
             addToOutput('--Session ended without output.--', false);
           }
 
-
+          // check for compilation errors
           if(compilationError) {
-            console.log("Compilation Error aufgetreten");
             let req = IdeMsgService.msgNavBarRightOpenTab('test');
             $rootScope.$broadcast(req.msg, req.data);
           }
 
+          // set focus back to the editor
+          $scope.ace.editor.focus();
 
           // we no longer have a stoppableAction
           // send out a msg stoppableActionGone
@@ -360,6 +361,14 @@ app.controller('IdeCtrl',
             .then(function(data) {
               ideState.stopUrl = data.stopUrl;
               displayWSOutputStream(data.streamUrl, data.startUrl, true);
+
+              // Note: doing the DOM manipulation in the controller is not "the Angular way"
+              // However, we would need 2 more directives otherwise (one for enter-click, one for send-button click)
+              // About element selection see: http://mlen.io/angular-js/get-element-by-id.html
+              var domElem = angular.element(document.querySelector('#idFooterUserInput'));
+              if(domElem) {
+                domElem.focus();
+              }
             })
             .catch(function(reason) {
               // the error callback
