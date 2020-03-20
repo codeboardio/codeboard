@@ -190,6 +190,7 @@ app.controller('IdeCtrl',
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
 
+          // check for compilation errors and dont print the sucessful compilation message
           if(aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '') === "Compilation successful") {
             compilationError = false;
             return;
