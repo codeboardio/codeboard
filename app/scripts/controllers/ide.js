@@ -162,7 +162,7 @@ app.controller('IdeCtrl',
         // counter for the number of messages added to the output (1 on every WS send event)
         var numOfMessages = 0;
         // max number of messages we allow
-        var maxNumOfMessageCharacters = 1000;
+        var maxNumOfMessageCharacters = 200;
 
         // clear the output
         setOutput('');
