@@ -266,5 +266,5 @@
 }
 /* dont wait till ng-hide-animation ends */
 .avatar-modal .progress-loading-icon.ng-hide.ng-hide-animate {
-    display: none; !important;
+    display: none !important;
 }
