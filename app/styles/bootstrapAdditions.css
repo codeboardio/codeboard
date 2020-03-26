@@ -10,7 +10,7 @@
     color: #444;
     border-bottom: #aaa 2px solid;
     line-height: initial;
-    opacity: 0.8;
+    opacity: 0.9;
     box-sizing: border-box;
     outline: 0;
 }
@@ -22,6 +22,7 @@
 .open > .dropdown-toggle.btn{
     opacity: 1;
     outline: 0 !important;
+    border-bottom-color: #0000008a !important;
 }
 .btn .glyphicon {
     padding: 0 4px;
