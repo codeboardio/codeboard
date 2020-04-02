@@ -38,9 +38,9 @@
 
 /* Button Info */
 .btn-info {
-    background: #17a2b8 !important;
-    border-bottom: 2px solid #096d7d !important;
-    color: rgba(255, 255, 255, 0.8) !important;
+    background: #0d8fa4 !important;
+    border-bottom: 2px solid #065f6d !important;
+    color: rgba(255, 255, 255, 0.95) !important;
 }
 
 /* Button Success */
