@@ -1070,7 +1070,7 @@ app.controller('IdeCtrl',
             }
             break;
           case ('submit'):
-            if(!($scope.disabledActions.submit)) {
+            if(!($scope.disabledActions.submit || $scope.uiSettings.disableSubmissionBtn)) {
               req = IdeMsgService.msgSubmitRequest();
               $rootScope.$broadcast(req.msg);
             }

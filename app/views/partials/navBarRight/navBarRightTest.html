@@ -50,8 +50,8 @@
         <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
     </button>
 
-    <button ng-if="!isActionHidden('submit')" ng-show="(correctSolution && uiSettings.showSubmissionBtn)" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
-        <span class="glyphicon glyphicon-send"></span> Lösung abgeben
+    <button ng-if="!isActionHidden('submit')" ng-show="(correctSolution && uiSettings.showSubmissionBtn)" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
+        <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe bereits erfolgreich gelöst</span>
     </button>
 </div>
 
