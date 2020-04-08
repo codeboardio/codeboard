@@ -181,9 +181,9 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
                     .catch(function() {
                       return _projectData; // return original project data
                     });
+                } else {
+                  return _projectData;
                 }
-
-                return _projectData;
               });
           }]
         }
