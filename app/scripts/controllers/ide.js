@@ -11,17 +11,97 @@ app.controller('IdeCtrl',
       // set the ProjectFactory to contain the project loaded from the server
       ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
 
+      /**
+       * Contains functions and events to save the project automatically
+       * Triggers msgProcessViewQueryStringRequest to open the correct files according to the passed query
+       */
+      let initProject = function() {
+
+        // we need to request that the URI is check for any "?view=..." query string
+        // in order to display some files in the ace editor
+        $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
+      };
+
       // this function is called when closing or reloading the browser window
       $window.onbeforeunload = function (event) {
-        // save project to server when leaving the page
-        saveCurrentlyDisplayedContent(true);
+        let message = 'You currently have unsaved changes.';
+
+        // make sure we saved the content currently displayed before deciding if there are unsaved changes
+        saveCurrentlyDisplayedContent();
+
+        if (event && ProjectFactory.isProjectModified()) {
+          event.returnValue = message;
+          return message;
+        }
+        else {
+          // returning a void values prevents the popup to be shown
+          return null;
+        }
       };
+
 
       // this function is called when the user clicks on some UI element (e.g. button) that changes the location
       $scope.$on('$locationChangeStart', function(event) {
-        // save projec to server when leaving the page
-        saveCurrentlyDisplayedContent(true);
+
+        // make sure we saved the content currently displayed before deciding if there are unsaved changes
+        saveCurrentlyDisplayedContent();
+
+        // if the user has unsaved changes, show the message
+        if(ProjectFactory.isProjectModified()) {
+
+          let message = 'You currently have unsaved changes.\n\nAre you sure you want to leave this page?';
+
+          let answer = confirm(message);
+          if (!answer) {
+            event.preventDefault();
+          }
+        }
       });
+
+      /**
+       * We check every 5 seconds if the code has unsaved changes.
+       * @type {boolean}
+       */
+      $scope.isProjectModified = false;
+
+      let checkProjectInterval = 2000,
+          saveProjectTimer = 0,
+          saveProjectTimeout = 30000;
+
+      setInterval(function() {
+
+        // To check for any changes we need to save currently display content first.
+        saveCurrentlyDisplayedContent();
+
+        // check if modified status has changed
+        // we disable auto save for project owners
+        if($scope.isProjectModified  !== ProjectFactory.isProjectModified() && ProjectFactory.getProject().userRole !== 'owner') {
+
+          // if a timer is set but project is not modified we stop the timer.
+          // this can happen when undoing changes
+          if (saveProjectTimer && !ProjectFactory.isProjectModified()) {
+            clearTimeout(saveProjectTimer);
+            saveProjectTimer = 0;
+          }
+
+          // otherwise we set a timeout and save the project
+          else if (!saveProjectTimer && ProjectFactory.isProjectModified()) {
+            saveProjectTimer = setTimeout(function() {
+              ProjectFactory.saveProjectToServer()
+                  .then(function() {
+                    // reset timer after save project to server
+                    clearTimeout(saveProjectTimer);
+                    saveProjectTimer = 0;
+                  });
+            }, saveProjectTimeout);
+          }
+        }
+
+        // change scope variables
+        $scope.isProjectModified = ProjectFactory.isProjectModified();
+        $scope.$apply();
+
+      }, checkProjectInterval);
 
 
       // if the project Url has a query string with a "view" parameter, we use that information
@@ -1635,11 +1715,10 @@ app.controller('IdeCtrl',
         }
       };
 
-      // we need to request that the URI is check for any "?view=..." query string
-      // in order to display some files in the ace editor
-      $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-
       /** Below list all one-time invocations for functions which should run whenever the controller is loaded from scratch.*/
+
+      // invoke function to init the project
+      initProject();
     }]);
 
 

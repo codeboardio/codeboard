@@ -172,6 +172,10 @@ body {
   cursor: pointer !important;
 }
 
+.unsavedChanges {
+  border-color: #8b0000;
+  color: #8b0000;
+}
 
 /** - - - - - - - Main Content of IDE - - - - - - - */
 #ideTabArea {

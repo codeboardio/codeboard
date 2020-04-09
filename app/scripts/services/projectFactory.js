@@ -751,12 +751,12 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
               setHashOfProject();
 
               // resolve the promise to true
-              deferred.resolve(true);
+              deferred.resolve(data.msg);
             },
             function error(data, status, header, config) {
 
               // resolve the promise to false
-              deferred.reject(false);
+              deferred.reject(data.msg);
             }
         );
       } else {

@@ -62,7 +62,7 @@
                       </ul>
                     </div>
 
-                    <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" title="Save Project">
+                    <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" ng-class="{'unsavedChanges': isProjectModified}" title="Save Project">
                       <span class="glyphicon glyphicon-floppy-disk"></span>
                     </a>
 
