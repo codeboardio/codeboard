@@ -74,32 +74,35 @@ app.controller('IdeCtrl',
         saveCurrentlyDisplayedContent();
 
         // check if modified status has changed
-        // we disable auto save for project owners
-        if($scope.isProjectModified  !== ProjectFactory.isProjectModified() && ProjectFactory.getProject().userRole !== 'owner') {
+        if($scope.isProjectModified  !== ProjectFactory.isProjectModified()) {
 
-          // if a timer is set but project is not modified we stop the timer.
-          // this can happen when undoing changes
-          if (saveProjectTimer && !ProjectFactory.isProjectModified()) {
-            clearTimeout(saveProjectTimer);
-            saveProjectTimer = 0;
+          // we disable auto save for project owners
+          if(ProjectFactory.getProject().userRole !== 'owner') {
+            // if a timer is set but project is not modified we stop the timer.
+            // this can happen when undoing changes
+            if (saveProjectTimer && !ProjectFactory.isProjectModified()) {
+              clearTimeout(saveProjectTimer);
+              saveProjectTimer = 0;
+            }
+
+            // otherwise we set a timeout and save the project
+            else if (!saveProjectTimer && ProjectFactory.isProjectModified()) {
+              saveProjectTimer = setTimeout(function () {
+                ProjectFactory.saveProjectToServer()
+                    .then(function (res) {
+                      console.log(res);
+                      // reset timer after save project to server
+                      clearTimeout(saveProjectTimer);
+                      saveProjectTimer = 0;
+                    });
+              }, saveProjectTimeout);
+            }
           }
 
-          // otherwise we set a timeout and save the project
-          else if (!saveProjectTimer && ProjectFactory.isProjectModified()) {
-            saveProjectTimer = setTimeout(function() {
-              ProjectFactory.saveProjectToServer()
-                  .then(function() {
-                    // reset timer after save project to server
-                    clearTimeout(saveProjectTimer);
-                    saveProjectTimer = 0;
-                  });
-            }, saveProjectTimeout);
-          }
+          // change scope variables
+          $scope.isProjectModified = ProjectFactory.isProjectModified();
+          $scope.$apply();
         }
-
-        // change scope variables
-        $scope.isProjectModified = ProjectFactory.isProjectModified();
-        $scope.$apply();
 
       }, checkProjectInterval);
 

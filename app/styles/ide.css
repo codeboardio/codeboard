@@ -173,8 +173,8 @@ body {
 }
 
 .unsavedChanges {
-  border-color: #8b0000;
-  color: #8b0000;
+  border-color: #8b0000 !important ;
+  color: #8b0000 !important;
 }
 
 /** - - - - - - - Main Content of IDE - - - - - - - */
