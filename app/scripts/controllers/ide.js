@@ -20,91 +20,56 @@ app.controller('IdeCtrl',
         // we need to request that the URI is check for any "?view=..." query string
         // in order to display some files in the ace editor
         $rootScope.$broadcast(IdeMsgService.msgProcessViewQueryStringRequest().msg);
-      };
 
-      // this function is called when closing or reloading the browser window
-      $window.onbeforeunload = function (event) {
-        let message = 'You currently have unsaved changes.';
+        // this function is called when closing or reloading the browser window
+        $window.onbeforeunload = function (event) {
+          let message = 'You currently have unsaved changes.';
 
-        // make sure we saved the content currently displayed before deciding if there are unsaved changes
-        saveCurrentlyDisplayedContent();
+          // make sure we saved the content currently displayed before deciding if there are unsaved changes
+          saveCurrentlyDisplayedContent();
 
-        if (event && ProjectFactory.isProjectModified()) {
-          event.returnValue = message;
-          return message;
-        }
-        else {
-          // returning a void values prevents the popup to be shown
-          return null;
-        }
-      };
-
-
-      // this function is called when the user clicks on some UI element (e.g. button) that changes the location
-      $scope.$on('$locationChangeStart', function(event) {
-
-        // make sure we saved the content currently displayed before deciding if there are unsaved changes
-        saveCurrentlyDisplayedContent();
-
-        // if the user has unsaved changes, show the message
-        if(ProjectFactory.isProjectModified()) {
-
-          let message = 'You currently have unsaved changes.\n\nAre you sure you want to leave this page?';
-
-          let answer = confirm(message);
-          if (!answer) {
-            event.preventDefault();
+          if (event && ProjectFactory.isProjectModified()) {
+            event.returnValue = message;
+            return message;
           }
-        }
-      });
+          else {
+            // returning a void values prevents the popup to be shown
+            return null;
+          }
+        };
 
-      /**
-       * We check every 5 seconds if the code has unsaved changes.
-       * @type {boolean}
-       */
-      $scope.isProjectModified = false;
 
-      let checkProjectInterval = 2000,
-          saveProjectTimer = 0,
-          saveProjectTimeout = 30000;
+        // this function is called when the user clicks on some UI element (e.g. button) that changes the location
+        $scope.$on('$locationChangeStart', function(event) {
 
-      setInterval(function() {
+          // make sure we saved the content currently displayed before deciding if there are unsaved changes
+          saveCurrentlyDisplayedContent();
 
-        // To check for any changes we need to save currently display content first.
-        saveCurrentlyDisplayedContent();
+          // if the user has unsaved changes, show the message
+          if(ProjectFactory.isProjectModified()) {
 
-        // check if modified status has changed
-        if($scope.isProjectModified  !== ProjectFactory.isProjectModified()) {
+            let message = 'You currently have unsaved changes.\n\nAre you sure you want to leave this page?';
 
-          // we disable auto save for project owners
-          if(ProjectFactory.getProject().userRole !== 'owner') {
-            // if a timer is set but project is not modified we stop the timer.
-            // this can happen when undoing changes
-            if (saveProjectTimer && !ProjectFactory.isProjectModified()) {
-              clearTimeout(saveProjectTimer);
-              saveProjectTimer = 0;
-            }
+            let answer = confirm(message);
+            if (!answer) {
+              event.preventDefault();
+            } else {
 
-            // otherwise we set a timeout and save the project
-            else if (!saveProjectTimer && ProjectFactory.isProjectModified()) {
-              saveProjectTimer = setTimeout(function () {
-                ProjectFactory.saveProjectToServer()
-                    .then(function (res) {
-                      console.log(res);
-                      // reset timer after save project to server
-                      clearTimeout(saveProjectTimer);
-                      saveProjectTimer = 0;
-                    });
-              }, saveProjectTimeout);
+              console.log("leave page");
+
+              $scope.ace.editor.destroy();
+
+              // clear interval used to auto save project when leaving the ide
+              clearInterval(interval);
+
             }
           }
 
-          // change scope variables
-          $scope.isProjectModified = ProjectFactory.isProjectModified();
-          $scope.$apply();
-        }
 
-      }, checkProjectInterval);
+        });
+
+      };
+
 
 
       // if the project Url has a query string with a "view" parameter, we use that information
