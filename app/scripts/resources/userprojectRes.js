@@ -31,6 +31,23 @@ angular.module('codeboardApp')
                 $http.get(_urlForUserProject)
                     .then(function (result) {
 
+                        let fileSet = project.fileSet;
+                        let index = 0;
+
+                        // in order to have the actual project data, we loop trough the project file set.
+                        // we check for every file if it is static. If not we replace the projectFile with
+                        // the userProjectFile.
+                        fileSet.forEach(function(file) {
+                            if(!file.isStatic) {
+                                let userFile = result.data.files.find(userFile => userFile.filename === file.filename);
+                                if(userFile) {
+                                    fileSet.splice(index, 1, userFile);
+                                }
+                            }
+                            index++;
+                        });
+
+
                         let userProjectData = {
                             // the name of the project
                             projectname: project.projectname,
@@ -41,7 +58,7 @@ angular.module('codeboardApp')
                             // the role of the user who is currently looking at the project in the browser
                             userRole: project.userRole,
                             // the files of the user
-                            fileSet: result.data.files,
+                            fileSet: fileSet,
                             // the config file
                             configFile: project.configFile,
                             // the projectDescription file
