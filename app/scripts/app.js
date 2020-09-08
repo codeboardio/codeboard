@@ -172,9 +172,6 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
             return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
               .then(function(_projectData) {
 
-                // define course
-                _projectData.course = _projectData.courseSet[0];
-
                 // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
                 if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
                   return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
@@ -199,9 +196,6 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           projectData: ['$route', 'initialProjectData', 'initialUserProjectData', 'UserSrv', function($route, initialProjectData, initialUserProjectData, UserSrv) {
             return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
                 .then(function(_projectData) {
-
-                  // define course
-                  _projectData.course = _projectData.courseSet[0];
 
                   // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
                   if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
