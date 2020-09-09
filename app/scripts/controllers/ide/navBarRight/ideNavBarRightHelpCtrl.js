@@ -17,7 +17,6 @@ angular.module('codeboardApp')
     function ($scope, $rootScope, $sce, $routeParams, $http, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
 
         let slug = 'help',
-            defaultMessage  = "Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.",
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
 
         // scope variables
@@ -146,9 +145,6 @@ angular.module('codeboardApp')
             // load chat history
             ChatSrv.getChatHistory()
                 .then(function(result) {
-                    // default message
-                    addChatLine({ id: -1, authorId: -1, type: "text", message: defaultMessage, author: {username: avatarName} });
-
                     result.data.forEach(function(chatLine) {
                         addChatLine(chatLine);
                     });

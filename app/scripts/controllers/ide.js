@@ -945,10 +945,30 @@ app.controller('IdeCtrl',
        * @returns {*}
        */
       $scope.isActionHidden = function(action) {
-        if ((UserSrv.isAuthenticated() && ProjectFactory.getProject().userRole !== 'user') || !ProjectFactory.hasConfig('userDisabledActions')) {
+        // if the current user is admin return false
+        if (UserSrv.isAuthenticated() && ProjectFactory.getProject().userRole !== 'user') {
             return false;
         }
-        return ProjectFactory.getConfig().userDisabledActions.includes(action);
+
+        // array that hols the config
+        let disabledActions = [];
+
+        // check for disabled action in the context of a course
+        let courseData = ProjectFactory.getProject().courseData;
+        if(typeof courseData !== "undefined" && courseData.hasOwnProperty('courseOptions')) {
+          let courseUserDisabledActions = courseData.courseOptions.find(o => o.option === 'userDisabledActions');
+          if(typeof courseUserDisabledActions !== "undefined") {
+            disabledActions = disabledActions.concat(courseUserDisabledActions.value.split('|'));
+          }
+        }
+
+        // check for disabled actions in the context of a project
+        if(ProjectFactory.hasConfig('userDisabledActions')) {
+          disabledActions = disabledActions.concat(ProjectFactory.getConfig().userDisabledActions);
+        }
+
+        // check if disabled actions contains the action
+        return disabledActions.includes(action);
       };
 
       /**
