@@ -253,11 +253,9 @@
 
     <!-- the status bar on the bottom of the page, showing username, role, info etc.-->
     <div style="height: 3px; background-color: #f5f5f5;"></div>
-    <div ng-controller="IdeFooterStatusBarCtrl" class="ideFooterStatusBar" ng-hide="isUsingLti() && !currentRoleIsOwner()">
+    <div ng-controller="IdeFooterStatusBarCtrl" class="ideFooterStatusBar">
       <span ng-bind-html="getUsername()"></span>
-      <span style="margin-left: 20px;">Role: {{getRole()}}</span>
-      <span style="margin-left: 20px;" ng-show="isUsingLti()">Info: Submissions are forwarded to external platform</span>
-      <span class="pull-right"><a style="margin-left: 20px;" href="/">Codeboard</a></span>
+      <span style="margin-left: 20px;" ng-hide="isUsingLti() && !currentRoleIsOwner()">Role: {{getRole()}}</span>
     </div>
 
     <div id="modalAppendTo"></div>
