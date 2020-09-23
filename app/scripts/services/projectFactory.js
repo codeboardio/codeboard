@@ -539,15 +539,27 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @param aCourseData
      */
     let setCourse = function(aCourseData) {
-
       getProject().courseData = {};
-      if(typeof aCourseData !== "undefined" && aCourseData && aCourseData.id && aCourseData.coursename) {
-        getProject().courseData = aCourseData;
+      if(aCourseData) {
+        getProject().courseData = {
+          id: aCourseData.id,
+          coursename: aCourseData.coursename,
+          contextId: aCourseData.contextId || null,
+          courseOptions: aCourseData.courseOptions || []
+        };
         getProject().isCourseSet = true;
       }
       else {
         getProject().isCourseSet = false;
       }
+    };
+
+    let getCourse = function() {
+      return getProject().courseData;
+    };
+
+    let getCourseId = function () {
+      return getProject().isCourseSet ? getProject().courseData.id : null;
     };
 
     /**
@@ -730,8 +742,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
           project: {
             lastUId: getProject().lastUId
           },
-          course: getProject().courseData,
-          files: getNodeArray(getProject().files)
+          files: getNodeArray(getProject().files),
+          courseId: getCourseId()
         };
 
         // if the current user is an LTI user, we attach her LTI information
@@ -806,6 +818,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       // attach information about lit session (ltiData might be an empty object)
       payload.hasLtiData = getProject().hasLtiData;
       payload.ltiData = getProject().ltiData;
+      payload.courseId = getProject().courseData.id;
 
       // return the payload object
       return payload;
@@ -1159,7 +1172,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         ltiData: getProject().ltiData,
         filesInDefaultFormat: getNodeArray(getProject().files),
         userRole: getProject().userRole,
-        course:  getProject().courseData
+        courseId:  getCourseId()
       };
 
       // create the promise that is returned
