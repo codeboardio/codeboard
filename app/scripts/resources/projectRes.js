@@ -57,7 +57,7 @@ angular.module('codeboardApp')
         // return promise
         return ProjectRes.get(payload).$promise
             .then(function(_projectData) {
-              // we reject the promise, when the request contains a courseId but no course is in the courseSet
+              // we reject the promise, when the request contains a courseId but no course is set
               if(courseId && typeof _projectData.course === "undefined") {
                 return $q.reject('This project is not part of the course');
               } else {

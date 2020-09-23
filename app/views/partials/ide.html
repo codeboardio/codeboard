@@ -256,6 +256,7 @@
     <div ng-controller="IdeFooterStatusBarCtrl" class="ideFooterStatusBar">
       <span ng-bind-html="getUsername()"></span>
       <span style="margin-left: 20px;" ng-hide="isUsingLti() && !currentRoleIsOwner()">Role: {{getRole()}}</span>
+      <span style="margin-left: 20px;" ng-show="hasCourse()">Kurs: {{getCourse()}}</span>
     </div>
 
     <div id="modalAppendTo"></div>

@@ -1003,8 +1003,7 @@ app.controller('IdeCtrl',
       $scope.isToolSupported = function() {
           return false;
 
-          // todo check what we can use here (Janick)
-
+          /* todo check what we can use here (Janick)
           var _toolProjects = ['Infer-Java'];
           var _toolIsSupported = false;
 
@@ -1014,6 +1013,7 @@ app.controller('IdeCtrl',
 
           // $log.debug('Project uses testing framework: ' + result);
           return _toolIsSupported;
+          */
       };
 
 
@@ -2283,6 +2283,11 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
     return _msg;
   };
 
+  /* Returns a string that details the current user's role */
+  $scope.getCourse = function() {
+    return ProjectFactory.getProject().courseData ? ProjectFactory.getProject().courseData.coursename : '';
+  };
+
 
   /* Returns a string that details the current user's role */
   $scope.getRole = function() {
@@ -2327,6 +2332,10 @@ app.controller('IdeFooterStatusBarCtrl', ['$scope', '$routeParams', 'UserSrv', '
   /** Returns 'true' is the project is using Lti for the submission */
   $scope.isUsingLti = function() {
     return ProjectFactory.getProject().hasLtiData;
+  };
+
+  $scope.hasCourse = function() {
+    return (typeof ProjectFactory.getProject().courseData !== "undefined");
   };
 
 }]);
