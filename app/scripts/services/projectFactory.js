@@ -1201,7 +1201,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       // create payload
       let payload = {
         status: status,
-        helpRequestId: helpRequestId
+        helpRequestId: helpRequestId,
+        courseId:  getCourseId()
       };
 
       // create the promise that is returned
