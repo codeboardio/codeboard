@@ -713,9 +713,17 @@ app.controller('IdeCtrl',
             // the url from which to get the files of the project
             let _urlForProject = '/api/projects/' + $routeParams.projectId;
 
+            // separator used to add courseId. If lti we need & otherwise ?
+            var sep = "?";
+
             // if we have a Lti user, we need to attach the Lti parameters because the server checks if the user is an lti user and grants access accordingly
             if($routeParams.ltiSessionId && $routeParams.ltiUserId && $routeParams.ltiNonce) {
               _urlForProject += '?ltiSessionId=' + $routeParams.ltiSessionId + '&ltiUserId=' + $routeParams.ltiUserId + '&ltiNonce=' + $routeParams.ltiNonce;
+              sep = "&";
+            }
+
+            if(ProjectFactory.getCourseId()) {
+              _urlForProject += sep + "courseId=" + ProjectFactory.getCourseId();
             }
 
             // load original

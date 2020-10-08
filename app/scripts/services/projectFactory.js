@@ -1253,6 +1253,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       updateHelpRequest: updateHelpRequest,
       isProjectModified: isProjectModified,
       getFile: getFile,
+      getCourseId: getCourseId,
 
       // the following are only exported for testing
       getNodeArray: getNodeArray,
