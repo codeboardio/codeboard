@@ -1031,6 +1031,9 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       payload.action = 'test';
       payload.testData = testData; // add our test object to the payload
 
+      // used to store compilation errors, may be deleted in the future
+      payload.filesInDefaultFormat = getNodeArray(getProject().files);
+
       // create the promise that is returned
       var deferred = $q.defer();
 
