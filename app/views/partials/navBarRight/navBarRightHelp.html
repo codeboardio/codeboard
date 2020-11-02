@@ -2,44 +2,19 @@
 
     <h1 class="modal-title">Wie kann ich dir helfen?</h1>
 
-    <div class="row conversation">
-        <ul class="chat px-4">
-
-            <li class="clear chat-line my-4 clearfix text">
-                <div class="chat-avatar" style="float: left">
-                    <div style="float: left">
-                        <img src="/images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg" width="55px" height="55px" />
-                    </div>
-                </div>
-                <div class="mt-3 chat-message" style="float: left;">
-                    <div class="chat-line-posted-at text-left">
-                        <small>Roby</small>
-                    </div>
-
-                    <div class="chat-line-item left float-left w-100">
-                        <div class="message pb-1 mb-0 text-gray-700">
+    <div class="conversation">
+        <chat chat-lines="chatLines" class="px-4">
+            <before-chat>
+                <li class="clear chat-line my-4 clearfix text">
+                    <chat-line author="Roby" alignment="left">
+                        <chat-line-simple>
                             <p class="mb-0" ng-show="!isActionHidden('chat')">Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Lass dir zunächst Tipps anzeigen. Falls du noch immer Mühe hast, nutze die Chat-Funktion, um Hilfe anzufordern.</p>
                             <p class="mb-0" ng-show="isActionHidden('chat')">Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Drücke auf den grünen Knopf und lass dir Tipps zu dieser Aufgabe anzeigen.</p>
-                        </div>
-                    </div>
-                </div>
-            </li>
-
-
-            <li ng-repeat="chatLine in chatLines" class="clear chat-line my-4 clearfix {{chatLine.type}}">
-                <div class="chat-avatar" style="float: {{chatLine.alignment}};">
-                    <div style="float: {{chatLine.alignment}}">
-                        <img src="{{getUserAvatar(chatLine)}}" width="55px" height="55px" />
-                    </div>
-                </div>
-                <div class="mt-3 chat-message" style="float: {{chatLine.alignment}};">
-                    <div class="chat-line-posted-at text-{{chatLine.alignment}}">
-                        <small>{{chatLinePostedAt(chatLine.createdAt)}} | {{chatLine.author.name || chatLine.author.username}}</small>
-                    </div>
-                    <div ng-include="getChatLine(chatLine)"></div>
-                </div>
-            </li>
-        </ul>
+                        </chat-line-simple>
+                    </chat-line>
+                </li>
+            </before-chat>
+        </chat>
     </div>
 
     <!-- User Actions -->
@@ -72,32 +47,3 @@
 
     <div id="targetinto" style="height: 1px; width: 100%"></div>
 </div>
-
-
-
-<!-- Template for chat lines "Text" -->
-<script type="text/ng-template" id="chatLineText.html">
-    <div class="chat-line-item {{chatLine.alignment}} float-left w-100">
-        <div class="message pb-1 mb-0 text-gray-700">{{chatLine.message}}</div>
-    </div>
-</script>
-
-
-<!-- Template for chat lines "HTML" -->
-<script type="text/ng-template" id="chatLineHtml.html">
-    <div class="chat-line-item {{chatLine.alignment}} float-left w-100">
-        <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="chatLine.message"></div>
-    </div>
-</script>
-
-
-<!-- Template for chat lines "Card" -->
-<script type="text/ng-template" id="chatLineCard.html">
-    <div class="chat-line-card {{chatLine.alignment}} {{chatLine.message.cardType}} float-left w-100">
-        <div class="card-header">
-            <span ng-show="currentRoleIsUser() || !chatLine.message.cardReference">{{chatLine.message.cardHeader}}</span>
-            <a ng-hide="currentRoleIsUser() || !chatLine.message.cardReference" href="{{chatLine.message.cardReference}}">{{chatLine.message.cardHeader}}</a>
-        </div>
-        <div class="card-body" ng-bind-html="chatLine.message.cardBody"></div>
-    </div>
-</script>

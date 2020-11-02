@@ -227,4 +227,13 @@ angular.module('codeboardApp')
                 }
             };
 
+
+            $scope.onMessageRating = function (messageId, rating) {
+                console.log(messageId);
+                console.log(rating);
+
+                // todo rating dem Kompilier-Fehler hinzufügen..
+
+            };
+
         }]);

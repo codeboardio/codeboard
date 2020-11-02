@@ -50,17 +50,22 @@
     clear: both;
 }
 
-.chat-line .chat-avatar {
-    width: 65px;
+.chat-line .chat-line-avatar {
+    width: 70px;
 }
 .chat-line .chat-message {
     width: 75%; /* fallback */
-    width: calc(100% - 130px); /* double the width of the .chat-avatar */
+    width: calc(100% - 140px); /* double the width of the .chat-line-avatar */
 }
 
 .chat-line-posted-at {
     color: #ccc;
     margin-bottom: 4px;
+}
+
+.chat-line.right .chat-line-avatar {
+    float: right;
+    text-align: right;
 }
 
 .chat-line-item,
@@ -73,19 +78,19 @@
     position: relative;
     box-sizing: border-box;
 }
-.chat-line-item.left,
-.chat-line-card.left {
+.chat-line.left .chat-line-item,
+.chat-line.left .chat-line-card {
     background: #f1f5f9;
 }
-.chat-line-item.right,
-.chat-line-card.right {
-    background: #fff;
+.chat-line.right .chat-line-item,
+.chat-line.right .chat-line-card {
+    background: #f2f2f2;
     float: right;
 }
-.chat-line-item.left:before,
-.chat-line-item.right:after,
-.chat-line-card.left:before,
-.chat-line-card.right:after {
+.chat-line.left .chat-line-item:before,
+.chat-line.right .chat-line-item:after,
+.chat-line.left .chat-line-card:before,
+.chat-line.right .chat-line-card:after {
     width: 0;
     height: 0;
     content: "";
@@ -93,17 +98,17 @@
     position: absolute;
     border-style: solid;
 }
-.chat-line-item.left:before,
-.chat-line-card.left:before {
+.chat-line.left .chat-line-item:before,
+.chat-line.left .chat-line-card:before {
     left: -10px;
     border-width: 0 13px 13px 0;
     border-color: transparent #f1f5f9 transparent transparent;
 }
-.chat-line-item.right:after,
-.chat-line-card.right:after {
+.chat-line.right .chat-line-item:after,
+.chat-line.right .chat-line-card:after {
     right: -10px;
     border-width: 13px 13px 0 0;
-    border-color: #fff transparent transparent transparent;
+    border-color: #f2f2f2 transparent transparent transparent;
 }
 
 .chat-line-item .text {
@@ -125,12 +130,20 @@
     padding: 10px 20px;
     color: rgba(255, 255, 255, 0.9);
     font-size: 1.1em;
+    background: #b6b6b6;
+    border-color: #b6b6b6;
 }
-.chat-line-card.left .card-header {
+.chat-line.left .chat-line-card .card-header {
     border-top-right-radius: 5px;
 }
-.chat-line-card.right .card-header {
+.chat-line.right .chat-line-card .card-header {
     border-top-left-radius: 5px;
+}
+.chat-line.right .chat-line-card:after {
+    border-top-color: #b6b6b6;
+}
+.chat-line.left .chat-line-card:before {
+    border-right-color: #b6b6b6;
 }
 .chat-line-card .card-header a {
     font-weight: 900;
@@ -140,24 +153,30 @@
     padding: 15px;
 }
 
-/* Card Help */
-.chat-line-card.help .card-header {
-    border-bottom: 1px solid #94b397;
-    background-color: #009788;
-}
-.chat-line-card.help.right:after {
-    border-top-color: #009788 !important;
-}
-.chat-line-card.help.left:before {
-    border-right-color: #009788 !important;
-}
-.chat-line-card.help .card-header:before {
-    content:"\e085";
-    font-family: "Glyphicons Halflings";
+
+/** Card Icons **/
+.chat-line .chat-line-card .card-header:before {
+    content:"";
+    font-family: "Glyphicons Halflings", serif;
     display: inline-block;
     width: 36px;
     font-size: 20px;
     color: rgba(255, 255, 255, 0.6);
+}
+
+/* Card Help */
+.chat-line .chat-line-card.help .card-header {
+    border-bottom: 1px solid #94b397;
+    background-color: #009788;
+}
+.chat-line.right .chat-line-card.help:after {
+    border-top-color: #009788 !important;
+}
+.chat-line.left .chat-line-card.help:before {
+    border-right-color: #009788 !important;
+}
+.chat-line .chat-line-card.help .card-header:before {
+    content:"\e085";
 }
 
 /* Card Tip */
@@ -167,18 +186,14 @@
 }
 .chat-line-card.tip .card-header:before {
     content:"\e086";
-    font-family: "Glyphicons Halflings";
-    display: inline-block;
-    width: 36px;
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.6);
 }
-.chat-line-card.tip.right:after {
+.chat-line.right .chat-line-card.tip:after {
     border-top-color: #fe5722 !important;
 }
-.chat-line-card.tip.left:before {
+.chat-line.left .chat-line-card.tip:before {
     border-right-color: #fe5722 !important;
 }
+
 /* Card Submission */
 .chat-line-card.submission .card-header {
     border-bottom: 1px solid #ea4d1b;
@@ -186,49 +201,45 @@
 }
 .chat-line-card.submission .card-header:before {
     content: "\e233";
-    font-family: "Glyphicons Halflings";
-    display: inline-block;
-    width: 36px;
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.6);
 }
-.chat-line-card.submission.right:after {
+.chat-line.right.chat-line-card.submission:after {
     border-top-color: #fe5722 !important;
 }
-.chat-line-card.submission.left:before {
+.chat-line.left .chat-line-card.submission:before {
     border-right-color: #fe5722 !important;
 }
 
-
-
-/** - - - Colors => Tests - - - */
-.chat-line-item.chat-line-avatar {
-    background-color: #b7bec3;
-    min-height: 24px;
-    color: #ffffffde;
+/* Card Error */
+.chat-line-card.error .card-header {
+    border-bottom: 1px solid #b44238;
+    background-color: #e44c42;
 }
-.chat-line-item.chat-line-avatar.left:before {
-    border-right-color: #b7bec3;
-    left: -15px;
-    top: calc(50% - 12px);
-    border-width: 12px 20px 12px 0;
+.chat-line-card.error .card-header:before {
+    content:"\e083";
 }
-
-/* ChatLine Success */
-.chat-line-success.chat-line-avatar {
-    background: #66a385;
+.chat-line.right .chat-line-card.error:after {
+    border-top-color: #e44c42 !important;
 }
-.chat-line-success.chat-line-avatar.left:before {
-    border-right-color: #66a385;
-}
-/* ChatLine Fail */
-.chat-line-fail.chat-line-avatar {
-    background: #99c1dc;
-}
-.chat-line-fail.chat-line-avatar.left:before {
-    border-right-color: #99c1dc;
+.chat-line.left .chat-line-card.error:before {
+    border-right-color: #e44c42 !important;
 }
 
+
+/** Rating **/
+.chat-line-rating {
+    border-top: 1px solid #ddd;
+}
+.chat-line-rating .text-muted {
+    color: #aaa;
+}
+.chat-line-rating .star {
+    color: #666;
+    text-decoration: none;
+}
+.chat-line-rating .star.active {
+    color: orange;
+    text-decoration: none;
+}
 
 
 .sendRequest {
@@ -252,7 +263,7 @@
     border: none;
     box-shadow: none; -moz-box-shadow: none; -webkit-box-shadow: none; -o-box-shadow: none;
 }
-.avatar-modal .chat-line .chat-avatar {
+.avatar-modal .chat-line .chat-line-avatar {
     width: 100px;
 }
 .avatar-modal .chat-message {

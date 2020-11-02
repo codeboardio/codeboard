@@ -1,0 +1,34 @@
+<div class="row">
+
+    <ul class="chat px-4">
+
+        <ng-transclude ng-transclude-slot="beforeChat"></ng-transclude>
+
+        <li class="clear chat-line my-4 clearfix text" ng-repeat="chatLine in chatLines">
+
+            <div ng-switch="chatLine.type">
+
+                <div ng-switch-when="card">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="{{chatLine.avatar}}">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="html">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="{{chatLine.avatar}}">
+                        <chat-line-simple>
+                            <div ng-bind-html="chatLine.message"></div>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-default>
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="{{chatLine.avatar}}">
+                        <chat-line-simple>{{chatLine.message}}</chat-line-simple>
+                    </chat-line>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

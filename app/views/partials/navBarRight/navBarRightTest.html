@@ -20,6 +20,19 @@
         </div>
     </div>
 
+    <!-- Just an example, todo delet -->
+    <ul class="list-unstyled">
+        <li class="clear chat-line my-4">
+            <chat-line alignment="left" author="Compile Message Service" avatar="/images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg" allowRating="true">
+                <chat-line-card card-title="Fehler beim Kompilieren" card-type="error">
+                    Dieser Fehler tritt auf, wenn im Code etwas fehlt. Oftmals wird dies durch ein fehlendes Semikolon oder durch schliessende Klammern verursacht.
+                    <chat-line-rating on-rate-message="onMessageRating(id, rating)" />
+                </chat-line-card>
+            </chat-line>
+        </li>
+    </ul>
+
+
     <!-- Accordion with ioTests -->
     <div class="panel-group modalAccordion" id="ioTestsAccordion">
         <div ng-repeat="test in tests" class="panel panel-default {{test.method}}" ng-hide="(test.method === 'compileTest' && test.status === 'success')">

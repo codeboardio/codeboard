@@ -37,6 +37,38 @@ angular.module('codeboardApp')
         };
 
         /**
+         * Returns the url to an avatar depending on user und message
+         *
+         * @param chatLine
+         * @returns {string}
+         */
+        let getChatLineAvatar = function(chatLine) {
+
+            let avatar;
+
+            // avatar used for auto generated messages
+            if(chatLine.author.username === avatarName) {
+
+                // default avatar
+                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
+
+                if(chatLine.type === "card") {
+                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg";
+                }
+            } else {
+
+                // default human avatar = teacher
+                avatar = "../../../images/avatars/Avatar_Teacher_RZ_2020.svg";
+
+                // students avatar
+                if(chatLine.author.username === chatLine.user.username) {
+                    avatar = "../../../images/avatars/Avatar_Student_RZ_2020.svg";
+                }
+            }
+            return avatar;
+        };
+
+        /**
          * Returns the number of already sent tips
          * @returns {*}
          */
@@ -57,11 +89,16 @@ angular.module('codeboardApp')
          */
         let addChatLine = function(chatLine, scrollToBottom = false) {
 
-            // define chatline alignment depending on current visitor
-            chatLine.alignment = (chatLine.authorId !== chatLine.userId) ? 'left' : 'right';
-
             // if chatLine type card, parse the message
-            if(chatLine.type === 'card') chatLine.message = JSON.parse(chatLine.message);
+            // if current user role is 'user' remove the reference
+            if(chatLine.type === 'card') {
+                chatLine.message = JSON.parse(chatLine.message);
+                chatLine.message.cardReference = (ProjectFactory.getProject().userRole === 'user') ? null : chatLine.message.cardReference;
+            }
+
+            chatLine.avatar = getChatLineAvatar(chatLine);
+            chatLine.author = chatLine.author.name || chatLine.author.username;
+            chatLine.alignment = (chatLine.authorId !== chatLine.userId) ? 'left' : 'right';
 
             // add card to the list
             $scope.chatLines.push(chatLine);
@@ -174,19 +211,6 @@ angular.module('codeboardApp')
         });
 
         /**
-         * Returns formatted posted at
-         * @param date
-         * @returns {string}
-         */
-        $scope.chatLinePostedAt = function(date) {
-            let postedAt = new Date(date);
-            if(postedAt instanceof Date && !isNaN(postedAt)) {
-                return postedAt.toLocaleString("de-DE");
-            }
-            return "";
-        };
-
-        /**
          * This functions adds a chatline with a tip.
          */
         $scope.askForTip = function() {
@@ -227,54 +251,6 @@ angular.module('codeboardApp')
             action.catch(function (error) {
                 $scope.sendHelpFormErrors = "Fehler beim Senden deiner Nachricht. Versuche es später noch einmal oder wende dich an den Systemadministrator.";
             });
-        };
-
-        /**
-         * Returns the template for a chat line
-         * @param chatLine
-         * @returns {string}
-         */
-        $scope.getChatLine = function (chatLine) {
-            switch (chatLine.type) {
-                case 'text':
-                    return "chatLineText.html";
-                case 'html':
-                    return "chatLineHtml.html";
-                case 'card':
-                    return "chatLineCard.html";
-            }
-        };
-
-        /**
-         * get the user icon depending on the author and message type
-         *
-         * @param chatLine
-         * @returns {string}
-         */
-        $scope.getUserAvatar = function(chatLine) {
-
-            let avatar;
-
-            // avatar used for auto generated messages
-            if(chatLine.author.username === avatarName) {
-
-                // default avatar
-                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
-
-                if(chatLine.type === "card") {
-                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg";
-                }
-            } else {
-
-                // default human avatar = teacher
-                avatar = "../../../images/avatars/Avatar_Teacher_RZ_2020.svg";
-
-                // students avatar
-                if(chatLine.author.username === chatLine.user.username) {
-                    avatar = "../../../images/avatars/Avatar_Student_RZ_2020.svg";
-                }
-            }
-            return avatar;
         };
 
         /**
