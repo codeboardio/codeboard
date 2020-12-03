@@ -44,9 +44,14 @@ angular.module('codeboardApp')
                 createdAt: '@?'
             },
             controller: ['$scope', function chatController($scope) {
-                $scope.avatarSize = $scope.avatarSize || 'sm';
-                $scope.avatar = $scope.avatar || '/images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg';
 
+                $scope.avatarSize = $scope.avatarSize || 'sm';
+
+                /**
+                 * Returns a well formed date
+                 * @param date
+                 * @returns {string}
+                 */
                 $scope.postedAt = function(date) {
                     let postedAt = new Date(date);
                     let options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
@@ -54,6 +59,24 @@ angular.module('codeboardApp')
                         return postedAt.toLocaleString("de-DE", options);
                     }
                     return "";
+                };
+
+                /**
+                 * Returns the avatar uri for a given avatar name
+                 * @param avatarName
+                 * @returns {string}
+                 */
+                $scope.getAvatarUri = function(avatarName) {
+                    switch (avatarName) {
+                        case 'idea': return "../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg";
+                        case 'neutral': return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
+                        case 'thumbUp': return "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
+                        case 'almostRight': return "../../../images/avatars/Avatar_RobyCoder_RZ_almost-right_2020.svg";
+                        case 'worried': return "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+                        case 'student': return "../../../images/avatars/Avatar_Student_RZ_2020.svg";
+                        case 'teacher': return "../../../images/avatars/Avatar_Teacher_RZ_2020.svg";
+                        default: return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
+                    }
                 };
             }],
             templateUrl: 'partials/chat/chatLine'
@@ -105,36 +128,59 @@ angular.module('codeboardApp')
             restrict: 'E',
             scope: {
                 askUserText: '@?',
-                onRateMessage: "&"
+                onRateMessage: "&",
+                messageId: '='
             },
             link: function ($scope, element) {
 
                 // set defaults
                 $scope.askUserText = $scope.askUserText || 'Wie hilfreich war dieser Tipp?';
                 $scope.messageRated = false;
+                $scope.grading = ['Überhaupt nicht hilfreich', 'Nicht hilfreich', 'Einigermassen hilfreich', 'Hilfreich', 'Sehr hilfreich'];
 
-                // the grading in textform
-                $scope.grading = ['Überhaupt nicht hilfreich', 'Nicht hilfreich', 'Einigermassen hilfreich', 'Hilfreich', 'Sehr hilfreich']
 
+                // Scope Methods
+
+                /**
+                 * Method that is called when to user hits a rating
+                 * @param i
+                 */
                 $scope.onRateSend = function(i) {
                     // call parent method if defined // todo messageId
                     if(angular.isDefined($scope.onRateMessage))
-                        $scope.onRateMessage({id: 5, rating: i});
+                        $scope.onRateMessage({id: $scope.messageId, rating: i});
 
                     $scope.messageRated = true;
                 };
 
-                // hover and leave actions to mark all stars with lower index
+                /**
+                 * Mark all lower stars on hover
+                 * @param index
+                 */
                 $scope.onRateHover = function(index) {
                     for(let i = 1; i <= index; i++) {
                         angular.element(element[0].querySelector('.star'+i)).addClass('active');
                     }
                 };
+
+                /**
+                 * Deselect all stars
+                 * @param index
+                 */
                 $scope.onRateLeave = function (index) {
                     for(let i = 1; i <= index; i++) {
                         angular.element(element[0].querySelector('.star'+i)).removeClass('active');
                     }
                 };
+
+
+                // Watchers
+
+                $scope.$watch('val', function(newValue, oldValue) {
+                    if (newValue)
+                        console.log("I see a data change!");
+                }, true);
+
             },
             templateUrl: 'partials/chat/chatLineRating'
         };

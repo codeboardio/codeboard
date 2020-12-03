@@ -6,8 +6,8 @@
 'use strict';
 
 angular.module('codeboardApp')
-    .service('ChatSrv',['$rootScope', '$routeParams', '$q', 'SessionRes', '$location', 'ChatRes', 'UserSrv', 'ProjectFactory',
-        function ChatService($rootScope, $routeParams, $q, SessionRes, $location, ChatRes, UserSrv, ProjectFactory) {
+    .service('ChatSrv',['$rootScope', '$routeParams', '$q', 'SessionRes', '$location', 'ChatRes', 'ChatLineRes', 'UserSrv', 'ProjectFactory',
+        function ChatService($rootScope, $routeParams, $q, SessionRes, $location, ChatRes, ChatLineRes, UserSrv, ProjectFactory) {
 
         /**
          * add chat line
@@ -91,9 +91,34 @@ angular.module('codeboardApp')
         };
 
 
+
+        let rateMessage = function() {
+        };
+
+        /**
+         * Rate a compilation error message
+         * todo This method should be replaced when the chat is rebuilt
+         * @param chatMessageId
+         * @param rate
+         */
+        let rateCompilationErrorMessage = function (chatMessageId, rate) {
+            let deferred = $q.defer();
+            ChatLineRes.update({chatLineId: chatMessageId}, { rating: rate},
+                function success(data, status, header, config) {
+                    deferred.resolve();
+                },
+                function error(data, status, header, config) {
+                    deferred.reject();
+                });
+            return deferred.promise;
+        };
+
+
         return {
             getChatHistory: getChatHistory,
             addChatLine: addChatLine,
-            addChatLineCard: addChatLineCard
+            addChatLineCard: addChatLineCard,
+            // rateMessage: rateMessage
+            rateCompilationErrorMessage: rateCompilationErrorMessage
         };
     }]);

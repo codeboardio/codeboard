@@ -43,29 +43,11 @@ angular.module('codeboardApp')
          * @returns {string}
          */
         let getChatLineAvatar = function(chatLine) {
-
-            let avatar;
-
-            // avatar used for auto generated messages
             if(chatLine.author.username === avatarName) {
-
-                // default avatar
-                avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
-
-                if(chatLine.type === "card") {
-                    avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg";
-                }
+                return (chatLine.type === "card") ? 'idea' : 'neutral';
             } else {
-
-                // default human avatar = teacher
-                avatar = "../../../images/avatars/Avatar_Teacher_RZ_2020.svg";
-
-                // students avatar
-                if(chatLine.author.username === chatLine.user.username) {
-                    avatar = "../../../images/avatars/Avatar_Student_RZ_2020.svg";
-                }
+                return (chatLine.author.username === chatLine.user.username) ? 'student' : 'teacher';
             }
-            return avatar;
         };
 
         /**
