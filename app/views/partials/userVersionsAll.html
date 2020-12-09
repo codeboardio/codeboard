@@ -47,7 +47,10 @@
           <td ng-show="isType('submission')"><span class="badge badge-{{(version.testResult >= 0.99) ? 'answered' : 'default'}}">{{version.testResult === -1 ? '-' : version.testResult}} {{parseFloat(version.testResult)}}</span></td>
           <td ng-show="isType('submission')">{{version.numTestsPassed === -1 ? '-' : version.numTestsPassed}}</td>
           <td ng-show="isType('submission')">{{version.numTestsFailed === -1 ? '-' : version.numTestsFailed}}</td>
-          <td><a class="btn btn-default btn-xs" ng-href="/projects/{{version.projectId}}/{{userVersionType}}/{{version.id}}">Open in IDE</a></td>
+          <td class="text-right">
+            <a class="btn btn-default btn-xs" ng-href="/projects/{{version.projectId}}/{{userVersionType}}/{{version.id}}">Open in IDE</a>
+            <a ng-show="isType('helprequest')" class="btn btn-primary btn-xs" ng-click="updateHelpRequestStatus(version)"><span class="glyphicon glyphicon-ok"></span></a>
+          </td>
         </tr>
       </table>
     </div>

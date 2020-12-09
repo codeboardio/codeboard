@@ -7,7 +7,7 @@
 
 
 angular.module('codeboardApp')
-    .controller('CourseVersionsCtrl', ['$scope', '$route', 'initialData', function ($scope, $route, initialData) {
+    .controller('CourseVersionsCtrl', ['$scope', '$route', 'initialData', 'ProjectFactory', function ($scope, $route, initialData, ProjectFactory) {
 
         $scope.courseData = initialData.courseData;
         $scope.userVersionSet = initialData.userVersionSet;
@@ -52,11 +52,20 @@ angular.module('codeboardApp')
             }
             return false;
         };
+
+        /**
+         * Method to update help request
+         * @param helpRequestId
+         * @returns {a}
+         */
+        $scope.updateHelpRequestStatus = function(helpRequest) {
+            return ProjectFactory.updateHelpRequest(helpRequest.id).then(() => helpRequest.status = "answered");
+        };
     }]);
 
 
 angular.module('codeboardApp')
-    .controller('ProjectVersionsCtrl', ['$scope', '$route', 'initialData', function ($scope, $route, initialData) {
+    .controller('ProjectVersionsCtrl', ['$scope', '$route', 'initialData', 'ProjectFactory', function ($scope, $route, initialData, ProjectFactory) {
 
         $scope.projectData = initialData.projectData;
         $scope.userVersionSet = initialData.userVersionSet;
@@ -101,10 +110,19 @@ angular.module('codeboardApp')
             }
             return false;
         };
+
+        /**
+         * Method to update help request
+         * @param helpRequestId
+         * @returns {a}
+         */
+        $scope.updateHelpRequestStatus = function(helpRequest) {
+            return ProjectFactory.updateHelpRequest(helpRequest.id).then(() => helpRequest.status = "answered");
+        };
     }]);
 
 angular.module('codeboardApp')
-    .controller('CourseProjectVersionsCtrl', ['$scope', '$route', 'initialData', function ($scope, $route, initialData) {
+    .controller('CourseProjectVersionsCtrl', ['$scope', '$route', 'initialData', 'ProjectFactory', function ($scope, $route, initialData, ProjectFactory) {
 
         $scope.projectData = initialData.projectData;
         $scope.courseData = initialData.courseData;
@@ -149,6 +167,15 @@ angular.module('codeboardApp')
                 return version;
             }
             return false;
+        };
+
+        /**
+         * Method to update help request
+         * @param helpRequestId
+         * @returns {a}
+         */
+        $scope.updateHelpRequestStatus = function(helpRequest) {
+            return ProjectFactory.updateHelpRequest(helpRequest.id).then(() => helpRequest.status = "answered");
         };
     }]);
 
