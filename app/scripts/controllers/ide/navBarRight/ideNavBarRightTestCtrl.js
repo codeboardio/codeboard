@@ -212,8 +212,6 @@ angular.module('codeboardApp')
                             ioTesting(compilationResult.id)
                                 .then(function(hasIoErrors) {
 
-                                    console.log(hasIoErrors);
-
                                     if(hasIoErrors) {
                                         $scope.state = $scope.states.ioError;
                                     } else {
@@ -231,7 +229,7 @@ angular.module('codeboardApp')
                         }
                     })
                     .catch(function(error) {
-                        console.log(error);
+                        // console.log(error);
                         $log.debug(error);
                     });
             };

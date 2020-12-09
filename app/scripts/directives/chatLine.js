@@ -123,7 +123,7 @@ angular.module('codeboardApp')
  * An additional directive that can be used to display chat message rating.
  */
 angular.module('codeboardApp')
-    .directive('chatLineRating', function ($window, $timeout) {
+    .directive('chatLineRating', ['$window', '$timeout', function ($window, $timeout) {
         return {
             restrict: 'E',
             scope: {
@@ -186,4 +186,4 @@ angular.module('codeboardApp')
             },
             templateUrl: 'partials/chat/chatLineRating'
         };
-    });
+    }]);
