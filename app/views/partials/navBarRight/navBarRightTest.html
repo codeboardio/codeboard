@@ -3,21 +3,58 @@
     <h1 class="ide-tab-title ide-tab-title-test pb-3">Überprüfe deine Lösung</h1>
 
     <!-- Avatar with successMessage -->
-    <div ng-show="(showAvatar)">
+    <div ng-hide="state === states.compilationError || state === states.ioError" class="mb-4">
         <ul class="list-unstyled">
             <li class="clear chat-line my-4" ng-class="{'fadeOut': avatarFade, 'fadeIn': avatarFade}">
-                <chat-line alignment="left" author="Roby" avatar="{{getAvatar()}}" allowRating="true">
+                <chat-line alignment="left" author="Roby" avatar="avatar">
                     <chat-line-simple>
-                        <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="avatarSays"></div>
+                        <div class="message pb-1 mb-0 text-gray-700" ng-bind-html="texts.avatar"></div>
                     </chat-line-simple>
                 </chat-line>
             </li>
         </ul>
     </div>
 
+    <h3 style="margin-top: 30px">Deine Lösung muss folgende Tests bestehen</h3>
+
     <!-- Accordion with ioTests -->
-    <div class="panel-group modalAccordion" id="ioTestsAccordion" nh-hide="disableTesting">
-        <div ng-repeat="test in tests" class="panel panel-default {{test.method}}" ng-hide="(test.method === 'compileTest' && test.status === 'success')">
+    <div class="panel-group modalAccordion mt-4" id="ioTestsAccordion" ng-hide="testingDisabled">
+
+        <!-- region: compilation -->
+
+        <div class="panel panel-default compileTest" ng-show="compilation.compilationError || state === states.inProgress">
+            <div class="panel-heading {{compilation.status}}">
+                <a data-target="#compTestSection" data-toggle="collapse" data-parent="#ioTestsAccordion" ng-class="{'collapsed': compilation.status === 'fail'}">
+                    <span class="title" title="Überprüfung Kompilierung">Überprüfung Kompilierung</span>
+                    <span ng-class="{'gly-spin': state === states.inProgress}" class="pull-right flag glyphicon {{compilation.status}}" aria-hidden="true"></span>
+                </a>
+            </div>
+
+            <div id="compTestSection" class="panel-collapse collapse" ng-class="{'in': compilation.status === 'fail'}">
+                <div class="panel-body">
+                    <ul class="list-unstyled d-none">
+                        <li class="clear chat-line my-4" ng-class="{'fadeOut': avatarFade, 'fadeIn': avatarFade}">
+                            <chat-line alignment="left" author="Compile Message Service" avatar="'worried'">
+                                <chat-line-card card-title="Fehler beim Kompilieren" card-type="error" style="font-size: 1.1em">
+                                    {{compilation.compErrorHelpMessage || "Dein Code besitzt leider noch Kompilier-Fehler. Versuche die untenstehende Fehlermeldung zu verstehen. Wenn du nicht mehr weiterkommst, nutze die Chat-Funkion, um Hilfe zu verlangen."}}
+                                    <chat-line-rating message-id="compilation.compilationErrorId" on-rate-message="onMessageRating(messageId, rating)" can-rate="true"/>
+                                </chat-line-card>
+                            </chat-line>
+                        </li>
+                    </ul>
+
+                    <div class="form-group" ng-hide="(compilation.status === 'success')">
+                        <label class="areaLabel">Output:</label>
+                        <textarea class="inputOutputArea teachersInput" disabled>{{compilation.output}}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- region: io testing -->
+
+        <div ng-repeat="test in ioTestSet" class="panel panel-default {{test.method}}">
             <div class="panel-heading {{test.status}}">
                 <a data-target="#ioTest{{$index}}" data-toggle="collapse" data-parent="#ioTestsAccordion" ng-class="{'collapsed': (test.open)}">
                     <span class="title" title="{{test.name}}">{{test.name}}</span>
@@ -37,16 +74,16 @@
         </p>
     </div>
 
-    <button ng-hide="inProgress" class="btn btn-success btn-100" ng-click="doTheIoTesting()" ng-disabled="disableTesting">
+    <button ng-hide="state === state.inProgress" class="btn btn-success btn-100" ng-click="doTheIoTesting()" ng-disabled="disableTesting">
         <span class="glyphicon glyphicon-check"></span>
-        <span ng-bind="ioTestButtonText"></span>
+        <span ng-bind="texts.testButton"></span>
     </button>
 
-    <button ng-if="!isActionHidden('help')" ng-show="(!correctSolution)" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
+    <button ng-if="!isActionHidden('help')" ng-hide="state === state.correctSolution" class="btn btn-info btn-100" ng-disabled="disabledActions.help" ng-click="navBarClick('help')" title="Hilfe anfordern">
         <span class="glyphicon glyphicon-question-sign"></span> Ich brauche Hilfe
     </button>
 
-    <button ng-if="!isActionHidden('submit')" ng-show="(correctSolution && uiSettings.showSubmissionBtn)" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
+    <button ng-if="!isActionHidden('submit')" ng-show="(state === state.correctSolution && uiSettings.showSubmissionBtn)" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" class="btn btn-primary btn-100" ng-click="navBarClick('submit')" title="Lösung abgeben">
         <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe bereits erfolgreich gelöst</span>
     </button>
 </div>
@@ -63,7 +100,7 @@
 
             <ul class="list-unstyled">
                 <li class="clear chat-line my-4" ng-class="{'fadeOut': avatarFade, 'fadeIn': avatarFade}">
-                    <chat-line alignment="left" author="Roby" avatar="{{(test.status === 'success') ? 'thumbUp' : 'worried'}}">
+                    <chat-line alignment="left" author="Roby" avatar="(test.status === 'success') ? 'thumbUp' : 'worried'">
                         <chat-line-simple ng-class="{ 'chat-line-fail': (test.status === 'fail')  }">
                             <div class="message pb-1 mb-0 text-gray-700 chat-line-fail" ng-bind-html="test.result.note"></div>
                         </chat-line-simple>
@@ -94,29 +131,4 @@
     </script>
 </div>
 
-<!-- compileTest -->
-<div>
-    <script type="text/ng-template" id="ideCompileTestResult.html">
-        <div class="panel-body">
-
-
-            <ul class="list-unstyled d-none">
-                <li class="clear chat-line my-4" ng-class="{'fadeOut': avatarFade, 'fadeIn': avatarFade}">
-                    <chat-line alignment="left" author="Compile Message Service" avatar="worried">
-                        <chat-line-card card-title="Fehler beim Kompilieren" card-type="error">
-                            {{test.result[0].note || "Dein Code besitzt leider noch Komprimierungs-Fehler. Versuche die untenstehende Fehlermeldung zu verstehen. Wenn du nicht mehr weiterkommst, nutze die Chat-Funkion, um Hilfe zu verlangen."}}
-                            <chat-line-rating message-id="compilationErrorId" on-rate-message="onMessageRating(id, rating)" />
-                        </chat-line-card>
-                    </chat-line>
-                </li>
-            </ul>
-
-            <div class="form-group" ng-hide="(test.status === 'success')">
-                <label class="areaLabel">Output:</label>
-                <textarea class="inputOutputArea teachersInput" disabled>{{test.output}}</textarea>
-            </div>
-
-        </div>
-    </script>
-</div>
 <!---- End of TestMethod templates ---->

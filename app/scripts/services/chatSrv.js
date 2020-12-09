@@ -91,10 +91,6 @@ angular.module('codeboardApp')
         };
 
 
-
-        let rateMessage = function() {
-        };
-
         /**
          * Rate a compilation error message
          * todo This method should be replaced when the chat is rebuilt

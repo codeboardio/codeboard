@@ -1,9 +1,7 @@
 /**
  * @author Janick Michot
- * @date 19.12.2019
+ * @date 04.12.2020
  *
- * todo create init function where we load tests. If an error occurs dont allow to do the ioTest. Instead
- *  show an error message. So we dont have to load the tests each time.
  */
 
 'use strict';
@@ -16,96 +14,107 @@ angular.module('codeboardApp')
     .controller('ideNavBarRightTestCtrl', ['$scope', '$rootScope', '$log', 'IdeMsgService', 'ProjectFactory', 'ChatSrv',
         function ($scope, $rootScope, $log, IdeMsgService, ProjectFactory, ChatSrv) {
 
-            let testSet = {};
-
-            // title and description
-            $scope.ioTestButtonText = "Lösung überprüfen";
-            $scope.inProgress = false;
-            $scope.correctSolution = false;
-            $scope.compileError = false;
-            $scope.compilationErrorId = null;
-
-            // test related variables
-            $scope.compilationResult = { inProgress: true };
-            $scope.tests = [];
-
-            // show/hide avatar and avatars text
-            $scope.showAvatar = true;
-            $scope.avatarSays = "Damit du deine Lösung abgeben kannst, muss dein Programm alle Tests bestehen.";
-
-            /**
-             *  todo avatar mit fade effect ersetzen
-             */
-            let changeAvatar = function() {
-                $scope.avatarFade = true;
-                setTimeout(function() {
-                    $scope.avatarFade = false;
-                    $scope.$apply();
-                },1000);
+            // enum for states and default state
+            $scope.states = {
+                notStarted: 1,
+                inProgress: 2,
+                compilationError: 3,
+                ioError: 4,
+                correctSolution: 5
             };
+            $scope.state = $scope.states.notStarted;
+
+            // io tests
+            $scope.ioTestSet = [];
+            let _ioTestSet = [];
+
+            // compilation data
+            $scope.compilation = {
+                compilationError: false,
+                id: '',
+                output: '',
+                status: 'pending', // fail | success
+                compErrorHelpMessage: "",
+                compilationErrorId: 0
+            };
+
+            // texts used in the template
+            $scope.texts = {
+                testButton: "Lösung überprüfen",
+                avatar: "Damit du deine Lösung abgeben kannst, muss dein Programm alle Tests bestehen."
+            };
+
+            $scope.onSuccess = "";
+            $scope.avatar = "neutral";
+
 
             /**
              * Shows text with a short delay and ...
-             *
-             * todo typing effect einbauen
-             *
              * @param text
              */
             let changeAvatarText = function(text) {
-                $scope.avatarSays = "...";
-                setTimeout(function(){
-                    $scope.avatarSays = text;
+                $scope.texts.avatar = "...";
+                setTimeout(function() {
+                    $scope.texts.avatar = text;
                     $scope.$apply();
                 },600);
             };
 
-
             /**
-             * On init we load and display all the tests related to the project
+             * On init we extract the testing related information from codeboard.json
              */
             $scope.init = function() {
-                ProjectFactory.getTests()
-                    .then(function(data) {
-                        if(data.fail) {
-                            $scope.inProgress = false;
-                            $scope.disableTesting = true;
-                        } else {
-                            $scope.tests = testSet = data.tests;
-                            $scope.onSuccessMessage = data.onSuccess;
-                            $scope.compilationResult.inProgress = false;
-                        }
+                if (ProjectFactory.hasConfig('Testing', 'ioTests')) {
+                    let testingConfig = ProjectFactory.getConfig().Testing;
+                    $scope.onSuccess = testingConfig.onSuccess;
+                    testingConfig.ioTests.forEach(function(ioTest) {
+                        _ioTestSet.push({
+                            'name': ioTest.name,
+                            'method': 'ioTest',
+                            'status': 'pending', // fail | success
+                            'input': ioTest.input,
+                            'tests': ioTest.tests,
+                            'result': {},
+                            'output': '',
+                            'expectedOutput': ioTest.expectedOutput,
+                            'stopOnFailure': ioTest.stopOnFailure || false,
+                            'id': '',
+                            'open': false
+                        });
                     });
+                    $scope.ioTestSet = _ioTestSet;
+                } else {
+                    $scope.testingDisabled = true;
+                }
             };
             $scope.init();
 
 
+            /**
+             * todo how can we access this method from outside?
+             *  so we dont need a sepearate execution when the student has a comp error in run
+             *  instead we can call this function with the compResult
+             */
+            let setCompilationResult = function(compilationResult) {
+                $scope.compilation.compilationError = compilationResult.compilationError;
+                $scope.compilation.id = compilationResult.id;
+                $scope.compilation.output = compilationResult.output;
+                $scope.compilation.compilationErrorId = compilationResult.compilationErrorId;
+                $scope.compilation.compErrorHelpMessage = compilationResult.compErrorHelpMessage;
+                $scope.compilation.status = compilationResult.compilationError ? 'fail' : 'sccuess';
+            };
 
             /**
-             * Test Project
+             * @returns {*}
              */
-            $scope.doTheIoTesting = function() {
-                $log.debug('Test request received');
+            let ioTesting = function(compilationId = 0) {
 
-                // trigger a save of the currently displayed content
-                $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
+                // reset tests
+                $scope.ioTestSet = _ioTestSet;
 
                 let hasErrors = false;
-
-                $scope.inProgress = true;
-                $scope.correctSolution = false;
-                $scope.compileError = false;
-                $scope.showAvatar = true;
-
-                changeAvatarText("Ich bearbeite nun deinen Code.");
-
-                // before actual testing we close all the panes
-                for (let i = 0; i < $scope.tests.length; i++) {
-                    $scope.tests[i].open = false;
-                }
-
-                // do io-test asynchronously one after another
                 let i = 0;
-                return testSet.reduce(function (promiseChain, test) {
+                return _ioTestSet.reduce(function (promiseChain, test) {
 
                     // Note, Promise.resolve() resolve is our initial value
                     return promiseChain.then(function (id) {
@@ -113,11 +122,12 @@ angular.module('codeboardApp')
                         // dont make any further tests after 'stopOnFailure'
                         if(i > 0 && id === 0) {
                             test.status = "unreachable";
-                            $scope.tests[i] = test; i++;
+                            $scope.ioTestSet[i] = test;
+                            i++;
                             return 0;
                         }
 
-                        $scope.tests[i].status = 'processing';
+                        $scope.ioTestSet[i].status = 'processing';
 
                         // set compilation/run id from last call
                         test.id = id;
@@ -129,7 +139,7 @@ angular.module('codeboardApp')
                                 let ret = testResult.id;
 
                                 // update testData
-                                $scope.tests[i] = testResult;
+                                $scope.ioTestSet[i] = testResult;
 
                                 // check if test failed
                                 if(testResult.status === 'fail') {
@@ -138,53 +148,92 @@ angular.module('codeboardApp')
                                     $scope.showAvatar = false;
 
                                     // expand the first error
-                                    $scope.tests[i].open = false;
+                                    $scope.ioTestSet[i].open = false;
                                     if(!hasErrors) {
-                                        $scope.tests[i].open = true;
+                                        $scope.ioTestSet[i].open = true;
                                         hasErrors = true;
                                     }
 
                                     // stop further tests if 'stopOnFailure' is set
                                     if(testResult.stopOnFailure) {
-                                        if(testResult.method === "compileTest") {
-                                            $scope.tests[i].name = "Fehler beim Kompilieren";
-                                            $scope.compileError = true;
-                                            console.log(testResult);
-                                            console.log(testResult.compilationErrorId);
-
-                                            // used to identify compilation message rating
-                                            $scope.compilationErrorId = testResult.compilationErrorId;
-                                        }
                                         ret = 0;
                                     }
                                 }
 
                                 // count and return either id of testResult or 0 if stopOnFailure
-                                i++; return ret;
+                                i++;
+                                return ret;
                             });
-                        });
-                }, Promise.resolve() )
+                    });
+                }, Promise.resolve(compilationId) )
+                    .then(function() {
+                        return hasErrors;
+                    });
+            };
 
-                .then(function() {
 
-                    $scope.numTestsPassed = $scope.tests.filter(test => { return (test.status === 'success'); }).length;
-                    $scope.numTestsFailed = $scope.tests.filter(test => { return (test.status !== 'success'); }).length;
-                    $scope.testResult = (1 / $scope.tests.length * $scope.numTestsPassed);
-                    $scope.correctSolution = ($scope.testResult === 1);
+            /**
+             * Test Project
+             */
+            $scope.doTheIoTesting = function() {
+                $log.debug('Test request received');
 
-                    // change scope variables
-                    $scope.ioTestButtonText = "Lösung erneut überprüfen?";
-                    $scope.inProgress = false;
+                // trigger a save of the currently displayed content
+                $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
 
-                    // change avatar
-                    changeAvatarText($scope.onSuccessMessage);
+                $scope.state = $scope.states.inProgress;
+                $scope.compilation.status = 'pending';
 
-                    // force update of scope (used for status)
-                    $scope.$apply();
-                })
-                .catch(function(error) {
-                    $log.debug(error);
-                });
+                changeAvatarText("Ich bearbeite nun deinen Code.");
+
+                // before actual testing we close all the panes
+                for (let i = 0; i < $scope.ioTestSet.length; i++) {
+                    $scope.ioTestSet[i].open = false;
+                }
+
+                // set clean compilation, stream and compErrorHelp
+                return ProjectFactory.compileProject(true, false, true)
+                    .then(function(compilationResult) {
+                        setCompilationResult(compilationResult);
+                        return compilationResult;
+                    })
+                    .then(function(compilationResult) {
+
+                        $scope.state = (compilationResult.compilationError) ? $scope.states.compilationError : $scope.states.inProgress;
+
+                        if (compilationResult.compilationError) {
+
+                            $scope.state = $scope.states.compilationError;
+
+                        } else {
+
+                            $scope.state = $scope.states.inProgress;
+
+                            ioTesting(compilationResult.id)
+                                .then(function(hasIoErrors) {
+
+                                    console.log(hasIoErrors);
+
+                                    if(hasIoErrors) {
+                                        $scope.state = $scope.states.ioError;
+                                    } else {
+                                        $scope.state = $scope.states.correctSolution;
+                                        changeAvatarText($scope.onSuccess);
+                                    }
+                                    $scope.texts.testButton = "Lösung erneut überprüfen?";
+
+                                    // change avatar
+                                    $scope.avatar = "thumbUp";
+
+                                    // force update of scope (used for status)
+                                    $scope.$apply();
+                                });
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                        $log.debug(error);
+                    });
             };
 
 
@@ -198,14 +247,6 @@ angular.module('codeboardApp')
             });
 
             /**
-             * Return avatar depending on current status
-             * @returns {string}
-             */
-            $scope.getAvatar = function() {
-                return ($scope.correctSolution) ? 'thumpUp' : 'neutral';
-            };
-
-            /**
              * because the html of different test methods can vary, this functions cis used to load the html for
              * a certain test method
              * @param method
@@ -215,8 +256,6 @@ angular.module('codeboardApp')
                 switch (method) {
                     case 'ioTest':
                         return 'ideIoTestResult.html';
-                    case 'compileTest':
-                        return 'ideCompileTestResult.html';
                 }
             };
 
@@ -230,7 +269,7 @@ angular.module('codeboardApp')
             $scope.onMessageRating = function (messageId, rating) {
                 ChatSrv.rateCompilationErrorMessage(messageId, rating)
                     .then(function() {
-                        console.log("Saved your rating");
+                        // console.log("Message rated");
                     });
             };
         }]);

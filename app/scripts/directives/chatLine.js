@@ -38,7 +38,7 @@ angular.module('codeboardApp')
             scope: {
                 alignment: '@?',
                 type: '@?',
-                avatar: '@?',
+                avatar: '=?',
                 avatarSize: '@?',
                 author: '@?',
                 createdAt: '@?'
@@ -123,34 +123,36 @@ angular.module('codeboardApp')
  * An additional directive that can be used to display chat message rating.
  */
 angular.module('codeboardApp')
-    .directive('chatLineRating', function () {
+    .directive('chatLineRating', function ($window, $timeout) {
         return {
             restrict: 'E',
             scope: {
                 askUserText: '@?',
                 onRateMessage: "&",
-                messageId: '='
+                messageId: "="
             },
             link: function ($scope, element) {
 
                 // set defaults
                 $scope.askUserText = $scope.askUserText || 'Wie hilfreich war dieser Tipp?';
-                $scope.messageRated = false;
                 $scope.grading = ['Überhaupt nicht hilfreich', 'Nicht hilfreich', 'Einigermassen hilfreich', 'Hilfreich', 'Sehr hilfreich'];
-
-
-                // Scope Methods
 
                 /**
                  * Method that is called when to user hits a rating
-                 * @param i
+                 * @param messageId
+                 * @param rate
                  */
-                $scope.onRateSend = function(i) {
-                    // call parent method if defined // todo messageId
-                    if(angular.isDefined($scope.onRateMessage))
-                        $scope.onRateMessage({id: $scope.messageId, rating: i});
+                $scope.onRateSend = function(messageId, rate) {
+                    if(angular.isDefined($scope.onRateMessage)) {
+                        $scope.onRateMessage({messageId: messageId, rating: rate});
+                    }
 
-                    $scope.messageRated = true;
+                    // show thank you message for certain seconds
+                    $scope.showThankYou = true;
+                    $timeout(function() {
+                        $scope.showThankYou = false;
+                    }, 2000);
+
                 };
 
                 /**

@@ -630,6 +630,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         return 0;
       });
 
+      console.log(files);
+
       // add the first node (i.e. the root folder)
       var rootNode = getNewNode(
         files[0].filename,
@@ -828,11 +830,20 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     /**
      * Compiles the current project on the server.
      * @param runCleanCompile if true, a clean compile will be executed, otherwise a regular compilation
+     * @param stream
+     * @param compErrorHelp
      * @returns a promise that resolves when a the compilation result is received
      */
-    var compileProject = function (runCleanCompile) {
+    // todo var compileProject = function (_payload) { for more flexibility
+    var compileProject = function (runCleanCompile, stream = true, compErrorHelp = true) {
 
       var payload = getPayloadForCompilation(runCleanCompile);
+
+      // NOTE: we also store the files in default format to store compilation errors with the related code
+      payload.filesInDefaultFormat = getNodeArray(getProject().files);
+      payload.stream = stream;
+      payload.compErrorHelp = compErrorHelp;
+      // todo replace the above three payload values with a parameter _payload
 
       // create the promise that is returned
       var deferred = $q.defer();
@@ -1128,6 +1139,8 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
     var submitProject = function () {
 
       var payload = getPayloadForCompilation(true);
+
+      console.log(payload);
 
       // the above payload contains the files in a form that's suited for Mantra compilation
       // however, we also want to store the files in the DB in format that we later load them

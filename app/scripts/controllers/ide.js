@@ -561,7 +561,7 @@ app.controller('IdeCtrl',
             ProjectFactory.submitProject()
               .then(function(result) {
 
-                $log.debug('Submission successful.');
+                $log.debug('Submission successful.'); // todo nope stimmt nicht
 
                 setOutput(result.msg, false);
 
@@ -583,7 +583,7 @@ app.controller('IdeCtrl',
                 // and call the depending function
                 switch (true) {
 
-                  // if no tests passed -> probably compile error
+                  // if no tests passed -> probably compile error // todo neu direkt prüfen ob compilationError enthalten ist..
                   case ($scope.score === 0): noTestsPassed(); break;
 
                   // if at least on test is passed but not enough to pass the testing
