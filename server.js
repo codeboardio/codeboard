@@ -59,6 +59,26 @@ if(env === 'production') {
 }
 
 
+// proxy forward requests to mantra
+const proxyMantra = false;
+if(proxyMantra) {
+  var proxy = require('http-proxy').createProxyServer({
+    host: config.host
+  });
+  app.use('/mantra', function(req, res, next) {
+
+    proxy.web(req, res, {
+      target: config.mantra.url + ':' + config.mantra.port,
+      changeOrigin: true,
+      pathRewrite: (path) => {
+        return path.replace('/mantra', '');
+      }
+    }, next);
+  });
+}
+
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(expressValidator());
@@ -132,7 +152,6 @@ wsLoadBalancer.on('error', function (err, req, res) {
   console.log(err);
   console.log('---');
 });
-
 
 // load the routes only after setting static etc. Otherwise the files won't be served correctly
 require('./lib/routes')(app);
