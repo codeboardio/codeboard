@@ -1,32 +1,28 @@
-'use strict';
-
-var express = require('express'),
-  path = require('path'),
-  fs = require('fs'),
-  bodyParser = require('body-parser'),
-  util = require('util'),
-  expressValidator = require('express-validator'),
-  session = require('express-session'),
-  MongoStore = require('connect-mongo')(session),
-  mongoose = require('mongoose'),
-  passport = require('passport'),
-  httpProxy = require('http-proxy'),
-  url = require('url'),
-  config = require('./lib/config/config.js');
-
 /**
  * Main application file
  *
  * Note: consider storing express settings in a separate file: require('./lib/config/express')(app);
  */
 
+'use strict';
+
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose');
+const passport = require('passport');
+const httpProxy = require('http-proxy');
+const url = require('url');
+const config = require('./lib/config/config.js');
+
+
 // Set default node environment to development
-var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // get an express instance
 var app = express();
-
-
 
 if (env === 'development') {
   app.use(require('connect-livereload')());
@@ -43,8 +39,6 @@ if (env === 'development') {
 
   app.use(express.static(path.join(config.root, '.tmp')));
   app.use(express.static(path.join(config.root, 'app')));
-  //app.use(express.static(path.join(config.root, ''));
-
 
   app.set('views', path.normalize(config.root + '/app/views'));
 }
@@ -77,11 +71,8 @@ if(proxyMantra) {
   });
 }
 
-
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(expressValidator());
 
 
 app.engine('html', require('ejs').renderFile);
@@ -132,16 +123,17 @@ require('./lib/config/passport.js'); // configure passport & set strategy
 // Create the server using app
 var server = require('http').createServer(app);
 
-
 // Create a proxy server that redirects WebSocket request directly to the Docker daemon.
 var wsLoadBalancer = httpProxy.createProxyServer({target: 'ws://' + config.mantra.ip + ':' + config.mantra.port, changeOrigin: true});
 // Intercept upgrade events (from http to WS) and forward the to docker daemon
 server.on('upgrade', function(req, socket, head) {
 
+  console.log("Server update");
+
   var urlObject = url.parse(req.url, true);
   var mantraNode = urlObject.query.mantra;
 
-  req.headers['cookie'] = 'CoboMantraId=' + mantraNode;
+  req.headers.cookie = 'CoboMantraId=' + mantraNode;
 
   wsLoadBalancer.ws(req, socket, head);
 });
@@ -152,6 +144,7 @@ wsLoadBalancer.on('error', function (err, req, res) {
   console.log(err);
   console.log('---');
 });
+
 
 // load the routes only after setting static etc. Otherwise the files won't be served correctly
 require('./lib/routes')(app);
