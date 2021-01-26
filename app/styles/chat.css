@@ -224,6 +224,20 @@
     border-right-color: #e44c42 !important;
 }
 
+/* Card Compilation Help */
+.chat-line-card.compHelp .card-header {
+    border-bottom: 1px solid #eea236;
+    background-color: #f0ad4e;
+}
+.chat-line-card.compHelp .card-header:before {
+    content:"\e019";
+}
+.chat-line.right .chat-line-card.compHelp:after {
+    border-top-color: #f0ad4e !important;
+}
+.chat-line.left .chat-line-card.compHelp:before {
+    border-right-color: #f0ad4e !important;
+}
 
 /** Rating **/
 .chat-line-rating {

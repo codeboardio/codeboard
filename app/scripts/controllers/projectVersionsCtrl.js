@@ -11,7 +11,7 @@ angular.module('codeboardApp')
 
         $scope.courseData = initialData.courseData;
         $scope.userVersionSet = initialData.userVersionSet;
-        $scope.userVersionType = $route.current.params.versionType;
+        $scope.userVersionType = $route.current.params.versionType.toLowerCase();
         $scope.usernameFilter = "";
 
         // define title depending userVersionType
@@ -69,7 +69,7 @@ angular.module('codeboardApp')
 
         $scope.projectData = initialData.projectData;
         $scope.userVersionSet = initialData.userVersionSet;
-        $scope.userVersionType = $route.current.params.versionType;
+        $scope.userVersionType = $route.current.params.versionType.toLowerCase();
         $scope.usernameFilter = "";
 
         // define title depending userVersionType
@@ -127,7 +127,7 @@ angular.module('codeboardApp')
         $scope.projectData = initialData.projectData;
         $scope.courseData = initialData.courseData;
         $scope.userVersionSet = initialData.userVersionSet;
-        $scope.userVersionType = $route.current.params.versionType;
+        $scope.userVersionType = $route.current.params.versionType.toLowerCase();
         $scope.usernameFilter = "";
 
         // define title depending userVersionType

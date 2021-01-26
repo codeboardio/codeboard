@@ -24,7 +24,7 @@ angular.module('codeboardApp')
         $scope.tips = [];
         $scope.sendRequestFormVisible = false;
         $scope.requestTipDisabled = true;
-
+        $scope.noteStudent = $scope.noteTeacher = "";
 
         /**
          * Function to scroll to the bottom of the chat tab
@@ -90,60 +90,10 @@ angular.module('codeboardApp')
             }
 
             // re-empty note field
-            $scope.note = "";
+            $scope.noteStudent = "";
+            $scope.noteTeacher = "";
         };
 
-
-        /**
-         * First create a new 'helpRequest' and then add a new chatline with reference
-         * to the helpRequest.
-         *
-         * @param aMessage
-         * @returns {*}
-         */
-        let sendHelpRequest = function(aMessage) {
-
-            // trigger a save of the currently displayed content
-            $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
-
-            // call ProjectFactory to store the request
-            return ProjectFactory.createHelpRequest()
-                .then(function(helpRequest) {
-                    let reference = "/projects/" + helpRequest.projectId + "/helprequests/" + helpRequest.id;
-                    return ChatSrv.addChatLineCard(aMessage,"Hilfe angefragt", 'help', reference, helpRequest.id);
-                })
-                .then(function(chatLine) {
-                    addChatLine(chatLine, true);
-                    $scope.sendRequestFormVisible = false;
-                });
-        };
-
-        /**
-         * First check for open helpRequests and get id of latest request.
-         * Then add new chatline with reference to this request.
-         *
-         * @param aMessage
-         * @returns {*}
-         */
-        let teacherAnswerHelpRequest = function(aMessage) {
-
-            // filter all chatlines with status unanswered
-            let chatLinesUnanswered = $scope.chatLines.filter(function(chatLine) {
-               return (chatLine.subject && chatLine.subject.status === 'unanswered');
-            });
-
-            // change status (update) of all unanswered helpRequests
-            return chatLinesUnanswered.reduce(function(previousHelpRequest, chatLine) {
-                return ProjectFactory.updateHelpRequest(chatLine.subjectId);
-            }, Promise.resolve())
-                .then(function(helpRequest) {
-                    let id = (helpRequest !== undefined) ? helpRequest.id : -1;
-                    return ChatSrv.addChatLine(aMessage, id, UserSrv.getUsername(), 'html');
-                })
-                .then(function(chatLine) {
-                    addChatLine(chatLine, true);
-                });
-        };
 
         /**
          * init this tab by loading chat history and read tips
@@ -193,46 +143,101 @@ angular.module('codeboardApp')
         });
 
         /**
+         * Message that is emitted when a new message should be added to the help tab.
+         */
+        $scope.$on(IdeMsgService.msgAddHelpMessage().msg, function (event, data) {
+
+            let chatline = {
+                type: data.type,
+                message: data.msg,
+                author: data.sender,
+                avatar: data.avatar
+            };
+
+            $scope.chatLines.push(chatline);
+
+            chatScrollToBottom();
+        });
+
+        /**
          * This functions adds a chatline with a tip.
          */
         $scope.askForTip = function() {
             let tip = $scope.tips[getNumTipsAlreadySent()];
             if(typeof tip !== "undefined") {
                 ChatSrv.addChatLineCard(tip.note, tip.name, 'tip', null, null, avatarName)
-                    .then(function(chatLine) {
-                        addChatLine(chatLine, true);
+                    .then(function(aChatLine) {
+                        addChatLine(aChatLine, true);
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
                     });
             }
         };
 
+
         /**
-         * Each time a message should be sent, this functions determines
-         * which action is performed. This can be either the sending of a help request
-         * or the answering of a help request.
+         * This method is called by a student requires help for a project.
+         * First create a new 'helpRequest' and then add a new chatline with reference
+         * to the helpRequest.
+         * @returns {*}
          */
-        $scope.sendMessage = function() {
-
-            let aMessage = $scope.note;
-
-            // check if note is present
-            if(!aMessage || aMessage === "" || typeof aMessage === "undefined") {
-                $scope.sendHelpFormErrors = "Versuche dein Anliegen, im folgenden Feld zu beschreiben.";
+        $scope.sendHelpRequest = function() {
+            let noteStudent = $scope.noteStudent;
+            if(!noteStudent || noteStudent === "" || typeof noteStudent === "undefined") {
+                $scope.sendHelpFormErrors = "Nutze das darunterliegende Feld, um dein Anliegen zu beschreiben.";
                 return false;
             }
 
-            // select action depending on userBeingInspected
-            let action = Promise.resolve();
-            if(ProjectFactory.getProject().userBeingInspected) {
-                action = teacherAnswerHelpRequest(aMessage);
-            } else if(ProjectFactory.getProject().userRole === 'user') {
-                action = sendHelpRequest(aMessage);
+            // trigger a save of the currently displayed content
+            $rootScope.$broadcast(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg);
+
+            // call ProjectFactory to store the request
+            return ProjectFactory.createHelpRequest()
+                .then(function(helpRequest) {
+                    let reference = "/projects/" + helpRequest.projectId + "/helprequests/" + helpRequest.id;
+                    return ChatSrv.addChatLineCard(noteStudent,"Hilfe angefragt", 'help', reference, helpRequest.id);
+                })
+                .then(function(aChatLine) {
+                    addChatLine(aChatLine, true);
+                    $scope.sendRequestFormVisible = false;
+                })
+                .catch(function() {
+                    $scope.sendHelpFormErrors = "Fehler beim Senden deiner Nachricht. Versuche es später noch einmal oder wende dich an den Systemadministrator.";
+                });
+        };
+
+        /**
+         * This method is called by a teacher to answer a students help request.
+         * By doing so we first check the for valid message. Next we search for open
+         * helpRequests and extract id of latest request. Then add new chatline with
+         * reference to this request.
+         */
+        $scope.answerHelpRequest = function() {
+
+            let noteTeacher = $scope.noteTeacher;
+            if(!noteTeacher || noteTeacher === "" || typeof noteTeacher === "undefined") {
+                $scope.sendHelpFormErrors = "Es wurde noch keine Antwort formuliert";
+                return false;
             }
 
-            // if no error occurs, add chatline into the view
-            action.catch(function (error) {
-                $scope.sendHelpFormErrors = "Fehler beim Senden deiner Nachricht. Versuche es später noch einmal oder wende dich an den Systemadministrator.";
+            // filter all chatlines with status unanswered
+            let chatLinesUnanswered = $scope.chatLines.filter(function(chatLine) {
+                return (chatLine.subject && chatLine.subject.status === 'unanswered');
             });
+
+            // change status (update) of all unanswered helpRequests
+            return chatLinesUnanswered.reduce(function(previousHelpRequest, chatLine) {
+                return ProjectFactory.updateHelpRequest(chatLine.subjectId);
+            }, Promise.resolve())
+                .then(function(helpRequest) {
+                    let id = (helpRequest !== undefined) ? helpRequest.id : -1;
+                    return ChatSrv.addChatLine(noteTeacher, id, UserSrv.getUsername(), 'html');
+                })
+                .then(function(chatLine) {
+                    addChatLine(chatLine, true);
+                })
+                .catch(function() {
+                    $scope.sendHelpFormErrors = "Beim Senden der Antwort ist ein Fehler aufgetreten. Bitte noch einmal versuchen";
+                });
         };
 
         /**

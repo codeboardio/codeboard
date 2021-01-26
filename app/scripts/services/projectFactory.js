@@ -630,8 +630,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
         return 0;
       });
 
-      console.log(files);
-
       // add the first node (i.e. the root folder)
       var rootNode = getNewNode(
         files[0].filename,
@@ -1270,6 +1268,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       isProjectModified: isProjectModified,
       getFile: getFile,
       getCourseId: getCourseId,
+      getPayloadForCompilation: getPayloadForCompilation,
 
       // the following are only exported for testing
       getNodeArray: getNodeArray,

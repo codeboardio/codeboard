@@ -29,20 +29,29 @@
         </button>
 
         <!-- Add Message Form -->
-        <form ng-show="sendRequestFormVisible" id="sendHelpRequest" class="form-inline" ng-submit="sendMessage()">
+        <div ng-show="sendRequestFormVisible">
+            <form ng-show="currentRoleIsUser()" id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
+                <p class="text-danger">{{sendHelpFormErrors}}</p>
+                <div class="form-group w-100 mb-2">
+                    <textarea class="topic w-100 border-box p-4" ng-model="noteStudent" name="noteStudent" placeholder="Dein Anliegen"></textarea>
+                </div>
+                <div class="form-group w-100">
+                    <button class="btn btn-info btn-100">
+                        <span class="glyphicon glyphicon-question-sign"></span>Frage senden
+                    </button>
+                </div>
+            </form>
 
-            <p class="text-danger">{{sendHelpFormErrors}}</p>
-
-            <div class="form-group w-100 mb-2">
-                <textarea class="topic w-100 border-box p-4" ng-model="note" name="note" placeholder="Dein Anliegen"></textarea>
-            </div>
-            <div class="form-group w-100">
-                <button ng-show="currentRoleIsUser()" class="btn btn-info btn-100">
-                    <span class="glyphicon glyphicon-question-sign"></span>Frage senden
-                </button>
-                <button ng-hide="currentRoleIsUser()" class="btn btn-info btn-100">Nachricht an den Studenten</button>
-            </div>
-        </form>
+            <form ng-show="currentRoleIsHelp()" id="answerHelpRequest" class="form-inline" ng-submit="answerHelpRequest()">
+                <p class="text-danger">{{sendHelpFormErrors}}</p>
+                <div class="form-group w-100 mb-2">
+                    <textarea class="topic w-100 border-box p-4" ng-model="noteTeacher" name="noteTeacher" placeholder="Antwort an den Studenten"></textarea>
+                </div>
+                <div class="form-group w-100">
+                    <button class="btn btn-info btn-100">Nachricht senden</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div id="targetinto" style="height: 1px; width: 100%"></div>

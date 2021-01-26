@@ -462,4 +462,18 @@ angular.module('codeboardApp')
       };
     };
 
+
+    /**
+     * This broadcast is triggered when a new message is added to the help tab
+     * @param msg
+     * @param type
+     * @param sender
+     * @returns {{msg: string, data: {msg: *, sender: *, type: *}}}
+     */
+    this.msgAddHelpMessage= function (msg, type, sender, avatar) {
+      return {
+        msg: 'ide.addHelpMessage',
+        data: { msg: msg, type: type, sender: sender, avatar: avatar }
+      };
+    };
   });

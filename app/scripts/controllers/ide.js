@@ -204,8 +204,10 @@ app.controller('IdeCtrl',
        * Function that handles the displaying of a Mantra WebSocket output.
        * @param {string} aStreamUrl - the WS Url to connect to the Mantra container
        * @param {string} aStartUrl - the Url to start the Mantra container
+       * @param onMessageReceived
+       * @param onConnectionClosed
        */
-      var displayWSOutputStream = function(aStreamUrl, aStartUrl) {
+      var displayWSOutputStream = function(aStreamUrl, aStartUrl, onMessageReceived = null, onConnectionClosed = null) {
 
         // counter for the number of messages added to the output (1 on every WS send event)
         var numOfMessages = 0;
@@ -238,7 +240,11 @@ app.controller('IdeCtrl',
         // Function to handle the event of the WS receiving data
         var onWSDataHandler = function(aNewlyReceivedData) {
 
-          // check for compilation errors and dont print the sucessful compilation message
+          if(onMessageReceived) {
+            onMessageReceived(aNewlyReceivedData);
+          }
+
+          // check for compilation errors and dont print the successful compilation message
           if(aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '') === "Compilation successful") {
             compilationError = false;
             return;
@@ -267,12 +273,6 @@ app.controller('IdeCtrl',
             addToOutput('--Session ended without output.--', false);
           }
 
-          // check for compilation errors
-          if(compilationError) {
-            let req = IdeMsgService.msgNavBarRightOpenTab('test');
-            $rootScope.$broadcast(req.msg, req.data);
-          }
-
           // set focus back to the editor
           $scope.ace.editor.focus();
 
@@ -282,6 +282,10 @@ app.controller('IdeCtrl',
           $rootScope.$broadcast(IdeMsgService.msgStoppableActionGone().msg);
 
           setEnabledActions(1,1,1,1,1);
+
+          if(onMessageReceived) {
+            onConnectionClosed(compilationError);
+          }
         };
 
         // TODO stopAction: make a callback function or onOpen which makes the http startUrl call
@@ -367,7 +371,7 @@ app.controller('IdeCtrl',
             ideState.stopUrl = data.stopUrl;
 
             // the success case gives us a url to the Mantra WebSocket and a url how to start the container
-            displayWSOutputStream(data.streamUrl, data.startUrl, true);
+            displayWSOutputStream(data.streamUrl, data.startUrl);
           },
           function (reason) {
             // the error callback
@@ -409,7 +413,43 @@ app.controller('IdeCtrl',
         ProjectFactory.compileAndRunProject(runCleanCompile)
             .then(function(data) {
               ideState.stopUrl = data.stopUrl;
-              displayWSOutputStream(data.streamUrl, data.startUrl, true);
+
+              let outputArray = [];
+              let onMessageReceived = function(aNewlyReceivedData) {
+                outputArray.push(aNewlyReceivedData);
+              };
+              let onConnectionClosed = function(compilationError) {
+                if(compilationError) {
+
+                  let payload = ProjectFactory.getPayloadForCompilation();
+                  payload.compilation = {
+                      compilationError: true,
+                      output: outputArray.join(),
+                      outputArray: outputArray,
+                      stream: false
+                  };
+
+                  $http.post('/api/' + $routeParams.projectId + '/help/compilation', payload)
+                      .then(function(result) {
+                        console.log(result);
+                          if(typeof result.data !== "undefined") {
+                            let reqOpenHelpTab = IdeMsgService.msgNavBarRightOpenTab("help");
+                            $rootScope.$broadcast(reqOpenHelpTab.msg, reqOpenHelpTab.data);
+
+                            let chatLineCard = {
+                              cardHeader: "Fehler beim Kompilieren",
+                              cardBody: result.data,
+                              cardType: "compHelp",
+                            };
+
+                            let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, "card", "Roby", "worried");
+                            $rootScope.$broadcast(reqAddMsg.msg, reqAddMsg.data);
+                          }
+                      });
+                }
+              };
+
+              displayWSOutputStream(data.streamUrl, data.startUrl, onMessageReceived, onConnectionClosed);
 
               // Note: doing the DOM manipulation in the controller is not "the Angular way"
               // However, we would need 2 more directives otherwise (one for enter-click, one for send-button click)
@@ -2198,7 +2238,7 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
     }
 
     // tab for help / chat
-    if(!$scope.isActionHidden("help") && !$scope.currentRoleIsOwner()) {
+    if(!$scope.isActionHidden("help")) {
       $scope.rightBarTabs.help = {
           slug: "help",
           title: "Hilfe",
