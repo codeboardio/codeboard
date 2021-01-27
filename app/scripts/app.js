@@ -67,32 +67,17 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
       .when('/users/:username', {
         // shows the :userId page (non-public projects are included when user is authorized)
         templateUrl: 'partials/userProjects',
-        controller: 'UserProjectsCtrl',
-        resolve: {
-          isAuth: ['UserSrv', function(UserSrv) {
-            return UserSrv.isUserAuthForAdmin();
-          }]
-        }
+        controller: 'UserProjectsCtrl'
       })
       .when('/courses/new', {
         // user creates a new project
         templateUrl: 'partials/courses/courseNew',
-        controller: 'CourseNewCtrl',
-        resolve: {
-          isAuth: ['UserSrv', function(UserSrv){
-            return UserSrv.isUserAuthForAdmin();
-          }]
-        }
+        controller: 'CourseNewCtrl'
       })
       .when('/projects/new', {
         // user creates a new project
         templateUrl: 'partials/projectNew',
-        controller: 'ProjectNewCtrl',
-        resolve: {
-          isAuth: ['UserSrv', function(UserSrv) {
-            return UserSrv.isUserAuthForAdmin();
-          }]
-        }
+        controller: 'ProjectNewCtrl'
       })
       .when('/projects/:projectId/settings', {
         // allows to modify the general settings for :projectId (only accessible to project owners)
@@ -170,18 +155,17 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }],
           projectData: ['$q', '$route', 'initialProjectData', 'initialUserProjectData', 'UserSrv', function($q, $route, initialProjectData, initialUserProjectData, UserSrv) {
             return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
-              .then(function(_projectData) {
-
-                // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
-                if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
-                  return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
-                    .catch(function() {
-                      return _projectData; // return original project data
-                    });
-                } else {
-                  return _projectData;
-                }
-              });
+                .then(function (_projectData) {
+                  // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
+                  if (_projectData.userRole === 'user') {
+                    return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
+                        .catch(function () {
+                          return _projectData; // return original project data
+                        });
+                  } else {
+                    return _projectData;
+                  }
+                });
           }]
         }
       })
@@ -195,16 +179,14 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
           }],
           projectData: ['$route', 'initialProjectData', 'initialUserProjectData', 'UserSrv', function($route, initialProjectData, initialUserProjectData, UserSrv) {
             return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
-                .then(function(_projectData) {
-
+                .then(function (_projectData) {
                   // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
-                  if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
+                  if (_projectData.userRole === 'user' && UserSrv.isAuthenticated()) {
                     return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
-                        .catch(function() {
+                        .catch(function () {
                           return _projectData; // return original project data
                         });
                   }
-
                   return _projectData;
                 });
           }]
@@ -299,19 +281,29 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
 app.run(['$rootScope', '$route', '$location', 'UserSrv',
   function($rootScope, $route, $location, UserSrv) {
 
+    let unrestricted = [''];
 
   /**
    *
    */
-  $rootScope.$on('$routeChangeStart', function(event, current, previous, rejection) {
+  $rootScope.$on('$routeChangeStart', function(event, to) {
+
+    if (unrestricted.indexOf(to.originalPath) >= 0)
+      return;
 
     // the ide controller sets a function on onbeforeunload; we only want the in the IDE, nowhere else
     // so we reset it to null if the route changes to something different than an IDE route
     window.onbeforeunload = null;
 
-    if(!UserSrv.isAuthenticated()) {
-      UserSrv.tryAuthenticateUser();
-    }
+    to.resolve = to.resolve || {};
+
+    // can be overridden by route definition
+    to.resolve.isAuth = function() {
+      return UserSrv.isUserAuthForAdmin()
+          .catch(function(err) {
+            $location.path('/');
+          });
+    };
   });
 
 
@@ -319,8 +311,6 @@ app.run(['$rootScope', '$route', '$location', 'UserSrv',
    * Fetch errors that might occur when the routeProvider tries a 'resovle' before routing to a page.
    */
   $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
-
-    console.log(rejection);
 
     if(rejection.status === 401)
       $location.path('/401').replace();
