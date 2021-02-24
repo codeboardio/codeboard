@@ -38,23 +38,13 @@ angular.module('codeboardApp')
     };
 
 
-    this.tryAuthenticateUser = function() {
-
-      var username = '';
-
-      SessionRes.get(
-        function(data){
-          setAuthenticatedUser(data.username, data.role);
-          $rootScope.$broadcast('userLoggedIn');
-        },
-        function(error) {
-          $log.debug('Cannot authenticate user; Status: ' + error.status);
-        }
-      );
-    };
-
-
-    this.isUserAuthForAdmin = function() {
+    /**
+     * Method that checks id a user is authenticated.
+     * If isAuthRequired is set to true, redirect to home page
+     * @param isAuthRequired
+     * @returns {*}
+     */
+    this.tryAuthenticateUser = function(isAuthRequired) {
 
         var defer = $q.defer();
 
@@ -63,15 +53,17 @@ angular.module('codeboardApp')
                 setAuthenticatedUser(data.username, data.role);
                 $rootScope.$broadcast('userLoggedIn');
 
-                if(data.role === 'user') {
-                    defer.resolve();
-                } else {
+                if(data.role !== 'user' && isAuthRequired) {
                     defer.reject({status: 401});
                 }
+                defer.resolve();
             },
             function(error) {
                 $log.debug('Cannot authenticate user; Status: ' + error.status);
-                defer.reject({status: 401});
+                if(isAuthRequired) {
+                    defer.reject({status: 401});
+                }
+                defer.resolve();
             }
         );
 

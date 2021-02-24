@@ -149,23 +149,26 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
       .when('/courses/:courseId/projects/:projectId', {
         templateUrl: 'partials/ide',
         controller: 'IdeCtrl',
+        isAuthRequired: false,
         resolve: {
           ltiData: ['$route', 'initialLtiData', function($route, initialLtiData) {
             return initialLtiData;
           }],
           projectData: ['$q', '$route', 'initialProjectData', 'initialUserProjectData', 'UserSrv', function($q, $route, initialProjectData, initialUserProjectData, UserSrv) {
-            return initialProjectData($route.current.params.projectId, $route.current.params.courseId)
-                .then(function (_projectData) {
-                  // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
-                  if (_projectData.userRole === 'user') {
-                    return initialUserProjectData(_projectData, UserSrv.getUsername(), $route.current.params.projectId, $route.current.params.courseId)
-                        .catch(function () {
-                          return _projectData; // return original project data
-                        });
-                  } else {
-                    return _projectData;
-                  }
-                });
+            let projectId = $route.current.params.projectId;
+            let courseId = $route.current.params.courseId;
+            return initialProjectData(projectId, courseId)
+              .then(function (_projectData) {
+                // if the current user in the role of 'user' (and not 'owner'), we check if there's a saved version that we could load
+                if (_projectData.userRole === 'user' &&  UserSrv.isAuthenticated()) {
+                  return initialUserProjectData(_projectData, UserSrv.getUsername(), projectId, courseId)
+                      .catch(function (err) {
+                        return _projectData; // return original project data
+                      });
+                } else {
+                  return _projectData;
+                }
+              });
           }]
         }
       })
@@ -173,6 +176,7 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
       .when('/projects/:projectId', {
         templateUrl: 'partials/ide',
         controller: 'IdeCtrl',
+        isAuthRequired: false,
         resolve: {
           ltiData: ['$route', 'initialLtiData', function($route, initialLtiData) {
             return initialLtiData;
@@ -297,13 +301,16 @@ app.run(['$rootScope', '$route', '$location', 'UserSrv',
 
     to.resolve = to.resolve || {};
 
-    // can be overridden by route definition
-    to.resolve.isAuth = function() {
-      return UserSrv.isUserAuthForAdmin()
-          .catch(function(err) {
-            $location.path('/');
-          });
-    };
+    // if route definition dont has its own isAuth used default
+    let isAuthRequired = (to.isAuthRequired !== false);
+    if(typeof to.resolve.isAuth === "undefined") {
+      to.resolve.isAuth = function() {
+        return UserSrv.tryAuthenticateUser(isAuthRequired)
+            .catch(function(err) {
+              $location.path('/');
+            });
+      };
+    }
   });
 
 

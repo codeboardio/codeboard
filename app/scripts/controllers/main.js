@@ -13,10 +13,6 @@ angular.module('codeboardApp')
      * the user is redirected to their user page.
      */
     $scope.init = function() {
-
-        console.log(UserSrv.getUserRole() === 'user');
-        console.log(UserSrv.getUserRole());
-
       if(UserSrv.isAuthenticated() && UserSrv.getUserRole() === 'user') {
           $location.path('/users/' + UserSrv.getUsername());
       }

@@ -431,7 +431,6 @@ app.controller('IdeCtrl',
 
                   $http.post('/api/' + $routeParams.projectId + '/help/compilation', payload)
                       .then(function(result) {
-                        console.log(result);
                           if(typeof result.data !== "undefined") {
                             let reqOpenHelpTab = IdeMsgService.msgNavBarRightOpenTab("help");
                             $rootScope.$broadcast(reqOpenHelpTab.msg, reqOpenHelpTab.data);
@@ -1251,8 +1250,6 @@ app.controller('IdeCtrl',
         if(imageFileTypes.includes(lFileType)) {
           $scope.ace.isImage = true;
           let fileContent = JSON.parse(ProjectFactory.getNode(aMsgData.nodeId).content);
-
-          console.log(fileContent);
 
           $scope.ace.image = fileContent.imagePath;
         }
