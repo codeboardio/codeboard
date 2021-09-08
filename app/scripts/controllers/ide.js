@@ -419,7 +419,7 @@ app.controller('IdeCtrl',
                 outputArray.push(aNewlyReceivedData);
               };
               let onConnectionClosed = function(compilationError) {
-                if(compilationError) {
+                if(compilationError && outputArray.length > 0) {
 
                   let payload = ProjectFactory.getPayloadForCompilation();
                   payload.compilation = {
@@ -444,6 +444,9 @@ app.controller('IdeCtrl',
                             let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, "card", "Roby", "worried");
                             $rootScope.$broadcast(reqAddMsg.msg, reqAddMsg.data);
                           }
+                      }, function(error) {
+                        console.log(error);
+                        $log.debug('An error occurred while trying to create help message for compilation error.');
                       });
                 }
               };
