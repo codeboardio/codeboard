@@ -36,8 +36,6 @@ angular.module('codeboardApp')
         angular.copy(projectData, $scope.originalData);
         $scope.data = projectData;
 
-        console.log(projectData);
-
         // set possible and selected courses
         $scope.courses = courseSet;
         $scope.coursesSelected = (typeof projectData.courseSet !== "undefined") ? projectData.courseSet.map(function(c) { return c.id; }) : [];
