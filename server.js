@@ -127,9 +127,6 @@ var server = require('http').createServer(app);
 var wsLoadBalancer = httpProxy.createProxyServer({target: 'ws://' + config.mantra.ip + ':' + config.mantra.port, changeOrigin: true});
 // Intercept upgrade events (from http to WS) and forward the to docker daemon
 server.on('upgrade', function(req, socket, head) {
-
-  console.log("Server update");
-
   var urlObject = url.parse(req.url, true);
   var mantraNode = urlObject.query.mantra;
 
