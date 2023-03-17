@@ -1,5 +1,5 @@
 # Codeboard
-This is the codeboard extension, which is being implemented as part of a bachelor thesis.
+This is a codeboard extension, which is being implemented as part of a bachelor thesis.
 
 Codeboard is a web-based IDE to teach programming in the classroom. This is the core of the Codeboard web application. Part of the codeboard.io project.
 
