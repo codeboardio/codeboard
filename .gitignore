@@ -24,3 +24,4 @@ test/coverage
 # Package.lock
 .package-lock.json
 
+development.js
