@@ -1,0 +1,87 @@
+/* Coding-Assistant */
+/* Variables */
+:root {
+    --editor-bg: #eee;
+}
+
+/* Reset Styles */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.editor__wrapper {
+    width: 80%;
+    /* height: 85%;  */
+    display: flex;
+    flex-direction: column;
+    background-color: var(--editor-bg);
+    padding: 2em;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+.editor__body {
+    /*flex:  1;*/
+    display: flex;
+}
+
+.editor__exp {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 1px solid var(--editor-border);
+    overflow: auto;
+    white-space: nowrap;
+}
+
+/* .level {
+    margin-left: 15px;
+} */
+
+.level0 {
+    min-width: 100%;
+}
+
+.anyDiv {
+    display: table;
+    padding-right: 2px;
+}
+
+.unknown {
+    background-color: #fff;
+}
+
+.unknown-error {
+    background-color: red;
+    padding: 0%;
+}
+
+.looksNice {
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.looksNiceStart {
+    border-bottom: 1px solid transparent;
+}
+
+.looksNiceEnd {
+    border-top: 1px solid transparent;
+}
+
+.disable {
+    pointer-events: none;
+}

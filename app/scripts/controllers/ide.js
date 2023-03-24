@@ -2257,6 +2257,16 @@ app.controller('RightBarCtrl', ['$scope', '$rootScope', '$http', '$uibModal', 'P
       };
     }
 
+    // tab for code explanation (coding-assistant)
+    if(!$scope.isActionHidden("explanation")) {
+      $scope.rightBarTabs.explanation = {
+          slug: "explanation",
+          title: "Erklärungen",
+          icon: "glyphicon-eye-open",
+          contentURL: "partials/navBarRight/navBarRightExplanation"
+      };
+    }	
+
     // todo define other tabs
 
     /**
