@@ -12,7 +12,7 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
     "codingAssistantCodeMatchSrv",
     function ($scope, $interval, codingAssistantCodeMatchSrv) {
         $scope.explanationsString = "";
-        // Automatic fuction executed every x millseconds
+        // Automatic function executed every 500 millseconds
         function updateExplanations() {
             codingAssistantCodeMatchSrv
                 .getJsonData()
@@ -38,6 +38,7 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
         }
 
         var intervalPromise = $interval(updateExplanations, 500);
+        
         // Cancel the interval when the scope is destroyed
         $scope.$on("$destroy", function () {
             $interval.cancel(intervalPromise);
