@@ -58,13 +58,16 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             const newVarComparisationRegex = /^\s*((?:boolean))\s*(\w+)\s*\=\s*([A-z0-9$_()+\-*\/%\s]+)\s+([<=!>]+)\s+([A-z0-9$_()\-+*\/%\s]+);\s*$/;
             const redeclareVarComparisationRegex = /^\s*(\w+)\s+\=\s+([A-z0-9$_.()*\-+/%\s*]+)\s+([<=!>]+)\s+([A-z0-9$_.()*\-+/%\s*]+);\s*$/;
 
+            // store "regex" from "lines" in explanations.json
             var regex = [];
+            // store "regex" from "expressions" in explanations.json
             var expressions = [];
+            // store colors from colors.json
             var colors = [];
             var aceEditor = aceEditor;
             // var editorLineHeight;
 
-            // Variables needed to highlight the code in the Code-Editor
+            // Variables to highlight the code in the Code-Editor
             var currLine;
             var wholeLineTxt;
             var countWhiteSpacesLine;
@@ -96,7 +99,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
 
             // reset output that it wont add up
             var outputText = "";
-            // array to store rownumbers, explanations and links
+            // array to store part of explanations to combine them at the end
+            var explanationParts = [];
+            // array to store row-numbers, explanations and links
             var explanations = [];
 
             // variable for varScope-blocks
@@ -133,7 +138,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 linelevel++;
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Check if line is a comment and other related stuff
+                // Check if code-line is a comment
                 if (line.match(/\/\//) || line.match(/\/\*/)) {
                     isComment = true;
                     ifActive[level] = false;
@@ -149,14 +154,14 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Check if public or something like that is used
+                // Check if public, private or protected is used
                 if (line.match(beforeRegex)) {
                     var currentRegex2 = line.match(beforeRegex);
                     var before = true;
                 }
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Loop all the regex over the line (Code from Code-Editor)
+                // Loop all the regex from "line" over the Code from Code-Editor
                 regex.forEach(function (currentRegex) {
                     if (line.match(currentRegex) && matched == false && isComment == false) {
                         // matched == false to not go over it again once it matched
@@ -170,10 +175,10 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             if ("/" + dbline.regex + "/" == currentRegex) {
                                 // capture groups are saved in currentMatch
                                 const currentMatch = line.match(currentRegex);
-                                // splits explanations form json by ' and store them in answerArray[]
+                                // splits explanations form json by ' and store them in answerArray[] to get capture groups
                                 var answerArray = dbline.answer.split("'");
 
-                                // CATCH, ELSE-IF, ELSE
+                                // EVERYTHING EXCEPT CATCH, ELSE-IF, ELSE
                                 if (dbline.name !== "catchRegex" && dbline.name !== "elseIfRegex" && dbline.name !== "elseRegex") {
                                     if (dbline.link != "") {
                                         // outputText += dbline.link;
@@ -187,7 +192,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     } else {
                                         importMap.set(currentMatch[2], currentMatch[1]);
                                     }
-                                    console.log(importMap.get(currentMatch[2]));
                                 }
 
                                 // METHOD CREATION
@@ -237,27 +241,43 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                             const currentNumber = answerArray[j].match(/^1$/);
                                             // stores the text from "answer" in database.json
                                             outputText += currentMatch[currentNumber];
+                                            explanationParts.push(currentMatch[currentNumber]);
                                         } else {
                                             // gets output from answer field in json
                                             outputText += answerArray[j];
+                                            explanationParts.push(answerArray[j]);
                                         }
                                     }
+
+                                    // add parameters to explanation if code match "callMethodInputRegex"
                                     if (dbline.name === "callMethodInputRegex") {
                                         let inputPara = currentMatch[2].split(",");
                                         if (inputPara.length == 1) {
                                             outputText += ' mit dem Parameter "' + inputPara[0] + '"';
+                                            explanationParts.push(' mit dem Parameter "' + inputPara[0] + '"');
                                         } else if (inputPara.length > 1) {
                                             outputText += ' mit den Parametern "';
+                                            explanationParts.push(' mit den Parametern "');
                                             for (let j = 0; j < inputPara.length; j++) {
                                                 if (j == inputPara.length - 1) {
                                                     outputText += inputPara[j] + '"';
+                                                    explanationParts.push(inputPara[j] + '"');
                                                 } else {
                                                     outputText += inputPara[j] + ", ";
+                                                    explanationParts.push(inputPara[j] + ", ");
                                                 }
                                             }
                                         }
                                     }
                                     outputText += " aufgerufen";
+                                    explanationParts.push(" aufgerufen");
+                                    explanations.push({
+                                        answer: explanationParts.join(""),
+                                        link: dbline.link,
+                                        lineLevel: linelevel,
+                                    });
+                                    // reset the explanationParts array for the next line
+                                    explanationParts = [];
                                 } else {
                                     // loops through all the splitted answers
                                     for (let j = 0; j < answerArray.length; j++) {
@@ -875,8 +895,8 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 }
             });
             // explanations.push(outputText);
-            console.log(explanations);
-            return outputText;
+            // console.log(outputText);
+            return explanations;
         };
     },
 ]);

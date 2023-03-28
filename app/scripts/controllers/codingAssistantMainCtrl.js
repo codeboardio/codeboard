@@ -12,7 +12,7 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
     "codingAssistantCodeMatchSrv",
     function ($scope, $interval, codingAssistantCodeMatchSrv) {
         $scope.explanationsString = "";
-        // Automatic function executed every 500 millseconds
+        // Automatic function executed every 500 milliseconds
         function updateExplanations() {
             codingAssistantCodeMatchSrv
                 .getJsonData()
@@ -31,12 +31,11 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
                         .replace(/ +/g, " ")
                         .replace(/\s*\;\s*$/g, ";");
                     var inputCodeArray = inputCode.split("\n");
-                    $scope.explanationsString = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
+                    $scope.explanations = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
                 });
-
-            document.getElementById("editorExp").innerHTML = $scope.explanationsString;
         }
 
+        // execute updateExplanations() function every 500 miliseconds
         var intervalPromise = $interval(updateExplanations, 500);
         
         // Cancel the interval when the scope is destroyed
