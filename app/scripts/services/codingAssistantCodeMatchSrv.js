@@ -96,8 +96,10 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
 
             // reset output that it wont add up
             var outputText = "";
+            // array to store rownumbers, explanations and links
+            var explanations = [];
 
-            // text for varScope
+            // variable for varScope-blocks
             var varScopeText = "";
 
             // other used variables
@@ -126,7 +128,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 //         codeEditor.session.removeMarker(markers[item].id);
                 //     }
                 // }
-                
+
                 // with every line of code/no code the linelevel increments by 1
                 linelevel++;
 
@@ -146,20 +148,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                     stayComment = false;
                 }
 
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Check if closing of a div is necessary (e.g. if-else statement) - needed for code-block visualization
-                if (ifActive[level] === true) {
-                    var removeEndDiv = false;
-                    if (line.match(/[\w,.\"=+-<>!?;:\[\]\(\)\{\}]/)) {
-                        removeEndDiv = true;
-                    }
-                    if (line.match(elseifRegex) || line.match(elseRegex) || line.match(catchRegex)) {
-                        outputText = outputText.slice(0, -6);
-                        ifActive[level] = false;
-                    } else if (removeEndDiv === false || isComment === true) {
-                        outputText = outputText.slice(0, -6);
-                    }
-                }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Check if public or something like that is used
                 if (line.match(beforeRegex)) {
@@ -182,35 +170,36 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             if ("/" + dbline.regex + "/" == currentRegex) {
                                 // capture groups are saved in currentMatch
                                 const currentMatch = line.match(currentRegex);
-                                // splits answer form json by ' and is stored in answerArray[]
+                                // splits explanations form json by ' and store them in answerArray[]
                                 var answerArray = dbline.answer.split("'");
+
+                                // CATCH, ELSE-IF, ELSE
                                 if (dbline.name !== "catchRegex" && dbline.name !== "elseIfRegex" && dbline.name !== "elseRegex") {
                                     if (dbline.link != "") {
-                                        outputText += "<div onclick=\"window.open('" + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv ' + dbline.cssClasses;
-                                    } else {
-                                        outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv ' + dbline.cssClasses;
-                                    }
-                                    // If keepLevel is set to "false", this line or block of code will be indented.
-                                    if (level > 0 && dbline.keepLevel == "false") {
-                                        outputText += ' level">';
-                                    } else if (level == 0) {
-                                        outputText += ' level0">';
-                                    } else {
-                                        outputText += '">';
+                                        // outputText += dbline.link;
                                     }
                                 }
+
+                                // SCANNER AND RANDOM
                                 if (dbline.name === "newScannerRegex" || dbline.name === "newRandomRegex") {
                                     if (importMap.has(currentMatch[2])) {
                                         matched = false;
                                     } else {
                                         importMap.set(currentMatch[2], currentMatch[1]);
                                     }
+                                    console.log(importMap.get(currentMatch[2]));
                                 }
+
+                                // METHOD CREATION
                                 if (dbline.name === "methodRegex" || dbline.name === "methodVoidRegex") {
                                     // Check if static
                                     if (line.match(staticRegex)) {
+                                        // add "Die statische" to the beginning of the array
                                         answerArray.unshift("Die statische ");
-                                    } else answerArray.unshift("Die ");
+                                    } else {
+                                        // add "Die " to the beginning of the array
+                                        answerArray.unshift("Die ");
+                                    }
                                     // check if parameter
                                     if (currentMatch[3].match(paraRegex)) {
                                         // split parameter
@@ -238,14 +227,15 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                 }
 
+                                // METHOD CALL
                                 if (dbline.name === "callMethodNoInputRegex" || dbline.name === "callMethodInputRegex") {
                                     // loops through all the splitted answers
                                     for (let j = 0; j < answerArray.length; j++) {
                                         // checks if output out of the captured groups from the regex is needed
                                         if (answerArray[j].match(/^1$/)) {
-                                            // position on which regex is stored in database.json
+                                            // store position on which regex is stored in database.json
                                             const currentNumber = answerArray[j].match(/^1$/);
-                                            // stores the text from "answer" in database.json to the outputText
+                                            // stores the text from "answer" in database.json
                                             outputText += currentMatch[currentNumber];
                                         } else {
                                             // gets output from answer field in json
@@ -269,9 +259,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                     outputText += " aufgerufen";
                                 } else {
-                                    if (dbline.looksCssClasses !== "") {
-                                        outputText += '<div class="' + dbline.looksCssClasses + '">';
-                                    }
                                     // loops through all the splitted answers
                                     for (let j = 0; j < answerArray.length; j++) {
                                         // checks if output out of the captured groups from the regex is needed
@@ -301,7 +288,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     level += 1;
                                     blockActive[level] = true;
                                 }
-                                outputText += "</div>";
                                 if (line.match(/}/) && (dbline.name === "catchRegex" || dbline.name === "elseIfRegex" || dbline.name === "elseRegex")) {
                                     blockNotReallyEnded = true;
                                 }
@@ -313,7 +299,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Check if explaining a condition is needed
                 data.notCheckedLines.forEach(function (dbline) {
-                    // loops over the notchecked objets from the json file
+                    // loops the code from code-editor over the notchecked objets from the json file
                     if (line.match(dbline.regex) && isComment == false) {
                         // checks if the line matches this regex
                         var condition = line.match(dbline.regex);
@@ -345,14 +331,12 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     aceEditor.session.addMarker(new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2), startwertMatch[2], "text");
                                     variableCount++;
 
-                                    outputText = outputText.slice(0, -6);
-                                    outputText += " mit Startwert " + newCondition[0] + "; </div>";
+                                    outputText += " mit Startwert " + newCondition[0];
                                 }
                             }
                         }
                         // splits the things inside the () of a expression
                         var conditionArr = condition[2].split(" ");
-                        outputText = outputText.slice(0, -6);
                         // solange oder falls
                         outputText += " " + dbline.answer + " ";
                         // loops through words of expression
@@ -375,7 +359,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                                 }
                                                 if (conditionArr[i].match(/\;/)) {
                                                     // put the ";" back in place
-                                                    outputText = outputText.slice(0, -1);
                                                     outputText += "; ";
                                                 }
                                             }
@@ -405,7 +388,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
                             });
                         }
-                        outputText += "</div>";
                     }
                 });
 
@@ -422,17 +404,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         matched = true;
                         var matchedPrintExpression = false;
                         if (dbline.link != "") {
-                            // div mit oder ohne Link und Klasse hinzufügen
-                            outputText += "<div onclick=\"window.open('" + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv ' + dbline.cssClasses;
-                        } else {
-                            outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv ' + dbline.cssClasses;
-                        }
-                        if (level > 0 && dbline.keepLevel == "false") {
-                            outputText += ' level">';
-                        } else if (level == 0) {
-                            outputText += ' level0">';
-                        } else {
-                            outputText += '">';
+                            // outputText += dbline.link;
                         }
                         // store print statement in new variable "printStatement"
                         var printStatement = currentMatch[1];
@@ -463,7 +435,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                     if (currentExpression.name === "callMethodInputRegex") {
                                         let inputPara = checkPrintStatement[2].split(",");
-                                        //console.log(printExpressionAnswerArray);
                                         if (inputPara.length == 1) {
                                             printExpressionAnswerArray.splice(2, 0, ' mit dem Parameter "' + inputPara[0] + '"');
                                         } else if (inputPara.length > 1) {
@@ -486,7 +457,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 outputText += answerArray[j] + " ";
                             }
                         }
-                        outputText += "</div>";
                     }
                 });
 
@@ -571,25 +541,23 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 // increase variableCount -> different color & outputid for every variable
                                 variableCount++;
 
-                                outputText += "<div onclick=\"window.open('" + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv '; // create outputtext div with genereted keyoutput as id
-                                varScopeText += '<div id= "' + currentMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container '; // create variable scope div with variable name as id
+                                // create outputtext div with genereted keyoutput as id
+                                // outputText += dbline.link;
+
+                                // create variable scope div with variable name as id
+                                varScopeText += '<div id= "' + currentMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ';
 
                                 // check if level is bigger then 0 and if the code is indented
                                 if (level > 0 && dbline.keepLevel == "false") {
                                     if (line.match(data.varScope.regex)) {
-                                        // .level in css --> padding-left: 15px;
-                                        outputText += ' level">';
                                         varScopeText += ' varScope">';
                                     }
                                 } // check if level is equals to 0
                                 else if (level == 0) {
                                     if (line.match(data.varScope.regex)) {
-                                        // .level in css --> min-widht: 100%;
-                                        outputText += ' level0">';
                                         varScopeText += ' varScope">';
                                     }
                                 } else {
-                                    outputText += '">';
                                     varScopeText += '">';
                                 }
                                 if (dbline.name === "newVarCallMethodRegex") {
@@ -673,8 +641,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
 
                                 // varScopeText += linelevel;
                                 varScopeText += "</div>";
-                                // code-block gets closed
-                                outputText += "</div>";
                             } else if (variableMap.has(currentMatch[2]) == true || wrongRandomScanner == true) {
                                 matched = false;
                             }
@@ -702,8 +668,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                     }
                     if (matched == false) {
                         if (ifActive[level] == true) {
-                            // outputText += '<div class="looksNice">Code-Block wird beendet</div></div>';
-                            outputText += '<div class="looksNice"></div></div>';
                             variableMap.forEach(function (value, key) {
                                 // loops over all variables in map
                                 if (value.blockLevel == level && value.lineLevelEnd == 0) {
@@ -718,8 +682,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
                             });
                         } else {
-                            // outputText += '<div class="looksNiceEnd">Code-Block wird beendet</div></div>'; // when if / else or for- / while- loop code block ends#
-                            outputText += '<div class="looksNiceEnd"></div></div>';
                             variableMap.forEach(function (value, key) {
                                 // loops over all variables in map
                                 if (value.blockLevel == level && value.lineLevelEnd == 0) {
@@ -734,14 +696,10 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
                             });
                         }
-                    } else {
-                        outputText += "</div>";
                     }
                     blockActive[level] = false;
                     level -= 1;
                     matched = true;
-                } else if (line.match(/}/) && blockActive[level] == true && level - braceLevel == 1 && blockNotReallyEnded == true && matched == true && braceLevel == 0) {
-                    outputText += "</div>";
                 }
                 if (blockNotReallyEnded == true) {
                     //if the block didnt really end we stil have to reduce the level by 1 because its gonna add 1 more again
@@ -773,7 +731,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         var wrongRandomScanner = false;
                         var randomScannerMatch = false;
                         if (dbline.name === "randomOrScannerRegex") {
-                            //console.log(currentMatch);
                             if (importMap.has(currentMatch[2])) {
                                 if (importMap.get(currentMatch[2]) === "Random") {
                                     data.randomExpressions.forEach(function (rnExpression) {
@@ -818,24 +775,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             // add marker
                             aceEditor.session.addMarker(new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine), currentMatch[1], "text");
 
-                            // create outputtext div with genereted keyoutput as id
-                            outputText += "<div onclick=\"window.open('" + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv ' + dbline.cssClasses;
-
-                            if (level > 0 && dbline.keepLevel == "false") {
-                                // check if level is bigger then 0 and if the code is indented
-                                if (line.match(data.redeclareVar.regex)) {
-                                    // .level in css --> padding-left: 15px;
-                                    outputText += ' level">';
-                                }
-                            } else if (level == 0) {
-                                // check if level is equals to 0
-                                if (line.match(data.redeclareVar.regex)) {
-                                    // .level in css --> min-widht: 100%;
-                                    outputText += ' level0">';
-                                }
-                            } else {
-                                outputText += '">';
-                            }
+                            // outputText += dbline.link;
 
                             if (dbline.name === "redeclareVariableCallMethodRegex") {
                                 if (currentMatch[3] !== "") {
@@ -913,8 +853,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                 });
                             }
-                            // code-block gets closed
-                            outputText += "</div>";
                         }
                     }
                 });
@@ -930,11 +868,14 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                     // checks if level is higher then 0 and if there is something typed that does not get recognized --> highlight code red
                     if (line.match(/^\s*[a-zA-Z0-9]+/)) {
                         outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown-error looksNice level">' + line + "\u200B</div>";
-                    } else { // if nothing is typed in the line it will not highlight anything
+                    } else {
+                        // if nothing is typed in the line it will not highlight anything
                         outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown looksNice level">' + line + "\u200B</div>";
                     }
                 }
             });
+            // explanations.push(outputText);
+            console.log(explanations);
             return outputText;
         };
     },
