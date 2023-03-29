@@ -10,8 +10,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
     "$http",
     function ($http) {
         var service = this;
+
+        // fetch the json data from "explanations.json"
         service.getJsonData = function () {
-            // fetch the json data from "explanations.json"
             return $http.get("../db_codingassistant/explanations.json").then(
                 function (response) {
                     return response.data;
@@ -22,8 +23,8 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             );
         };
 
+        // fetch the json data from "colors.json"
         service.getJsonColors = function () {
-            // fetch the json data from "colors.json"
             return $http.get("../db_codingassistant/colors.json").then(
                 function (response) {
                     return response.data;
@@ -45,10 +46,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             // Regexes needed for further check
             const beforeRegex = /^(public|private|protected)/;
             const staticRegex = /.* static/;
-            const ifRegex = /^\s*if\s?\(.*\)\s?{/;
-            const elseifRegex = /else\sif\s?\(.*\)\s?{/;
-            const elseRegex = /else\s?{/;
-            const catchRegex = /catch\s?/;
             const paraRegex = /(int|String|boolean|long|double|char)\s(\w+)+/;
             const newArrayDeclarationRegex = /(int|String|boolean|long|double|char)\[\]\s*(\w+);\s*$/;
             const newArrayRegex = /(int|String|boolean|long|double|char)\s*\[\]\s*(\w+)\s*=?\s*\{(.*)\};\s*$/;
@@ -65,16 +62,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             // store colors from colors.json
             var colors = [];
             var aceEditor = aceEditor;
-            // var editorLineHeight;
-
-            // Variables to highlight the code in the Code-Editor
-            var currLine;
-            var wholeLineTxt;
-            var countWhiteSpacesLine;
-            var countWhiteSpaces1;
-            var countWhiteSpaces2;
-            var countWhiteSpaceArray;
-            var countWhiteSpace2DArray;
+            var editorLineHeight;
 
             for (let i = 0; i < data.lines.length; i++) {
                 var currentString = new RegExp(data.lines[i].regex);
@@ -94,7 +82,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             });
 
             // check line height from codeEditor
-            // editorLineHeight = codeEditor.renderer.lineHeight;
+            editorLineHeight = aceEditor.renderer.lineHeight;
             // console.log(editorLineHeight);
 
             // reset output that it wont add up
@@ -103,11 +91,22 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             var explanationParts = [];
             // variable to append a new explanation to existing one
             var lastLineIndex = -1;
-            // array to store row-numbers, explanations and links
+            // array to store explanations, row-numbers and links
             var explanations = [];
+            // array to store explanations for syntax-errors and links
+            var explanationErrors = [];
 
             // variable for varScope-blocks
             var varScopeText = "";
+
+            // Variables to highlight the code in the Code-Editor
+            var currLine;
+            var wholeLineTxt;
+            var countWhiteSpacesLine;
+            var countWhiteSpaces1;
+            var countWhiteSpaces2;
+            var countWhiteSpaceArray;
+            var countWhiteSpace2DArray;
 
             // other used variables
             var level = 0;
@@ -127,6 +126,12 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             // Loop trough every line of code (from Code-Editor)
             inputCodeArray.forEach(function (line) {
                 var matched = false;
+                // used for variables declaration errors
+                var declareVarErr = false;
+
+                // used for variables redeclaration errors
+                var redeclareVarErr = false;
+                
                 // remove the marker - due to interval
                 // var markers = aceEditor.session.getMarkers(linelevel);
                 // if (markers) {
@@ -328,7 +333,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 condition[2] = newCondition[1];
                                 if (newCondition[0].match(/(int|double)\s(\w+)\s?\=\s?[0-9]+/)) {
                                     // calculate Margin & convert to string
-                                    var margin = "" + (linelevel - 1); // * editorLineHeight;
+                                    var margin = "" + (linelevel - 1) * editorLineHeight;
                                     margin += "px";
                                     // create object with linelevel at the start, linelevel at the end, blocklevel, margin, color, keyoutput, height
                                     var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: "", margin: margin, color: colors[variableCount].hexacode };
@@ -503,6 +508,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         //check if variableName starts with a number or sc else --> highlight it as error
                         if (currentMatch[2].match(/^[0-9_.&$"!*+'#]+/)) {
                             matched = false;
+                            declareVarErr = true;
                         } else {
                             var wrongRandomScanner = false;
                             var randomScannerMatch = false;
@@ -531,12 +537,12 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     wrongRandomScanner = true;
                                 }
                             }
-                            // check if variable is already declared
+                            // check if variable is not already declared
                             if (variableMap.has(currentMatch[2]) == false && wrongRandomScanner == false) {
                                 // set matched on true to not get recognize as not identify
                                 matched = true;
                                 // calculate Margin & convert to string
-                                var margin = "" + (linelevel - 1); // * editorLineHeight;
+                                var margin = "" + (linelevel - 1) * editorLineHeight;
                                 // add pixel
                                 margin += "px";
                                 // create object with linelevel at the start, linelevel at the end, blocklevel, margin, color, keyoutput, height
@@ -668,18 +674,22 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
 
                                 // varScopeText += linelevel;
                                 varScopeText += "</div>";
-                            } else if (variableMap.has(currentMatch[2]) == true || wrongRandomScanner == true) {
-                                matched = false;
-                            }
-                            // add explanations to explanations array
-                            explanations.push({
-                                answer: explanationParts.join(""),
-                                link: dbline.link,
-                                lineLevel: linelevel,
-                            });
 
-                            // reset the explanationParts array for the next line
-                            explanationParts = [];
+                                // add explanations to explanations array
+                                explanations.push({
+                                    answer: explanationParts.join(""),
+                                    link: dbline.link,
+                                    lineLevel: linelevel,
+                                });
+
+                                // reset the explanationParts array for the next line
+                                explanationParts = [];
+                            }
+                            // check if variable is already declared
+                            else if (variableMap.has(currentMatch[2]) == true || wrongRandomScanner == true) {
+                                matched = false;
+                                declareVarErr = true;
+                            }
                         }
                     }
                 });
@@ -710,7 +720,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     // checks if current variable has the same blocklevel and has no linelevelend
                                     value.lineLevelEnd = linelevel;
                                     // calculate height and convert to string
-                                    var height = "" + (value.lineLevelEnd - value.lineLevelStart); // * editorLineHeight;
+                                    var height = "" + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
                                     // add px (pixel) to height
                                     height += "px";
                                     // height is assigned to height of current variable
@@ -724,7 +734,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     // checks if current variable has the same blocklevel and has no linelevelend
                                     value.lineLevelEnd = linelevel;
                                     // calculate height and convert to string
-                                    var height = "" + (value.lineLevelEnd - value.lineLevelStart); // * editorLineHeight;
+                                    var height = "" + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
                                     // add px (pixel) to height
                                     height += "px";
                                     // height is assigned to height of current variable
@@ -749,7 +759,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         // actual linelevel is assigned to linelevelend of current variable
                         value.lineLevelEnd = linelevel;
                         // calculate height and convert to string
-                        var height = "" + (value.lineLevelEnd - value.lineLevelStart + 1); // * editorLineHeight;
+                        var height = "" + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
                         // add px (pixel) to height
                         height += "px";
                         // height is assigned to height of current variable
@@ -791,15 +801,25 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             }
                         }
                         if (variableMap.has(currentMatch[1]) && wrongRandomScanner == false) {
+                            // checks if variable redeclaration comes after variable declaration and inside the scope
                             if (linelevel == variableMap.get(currentMatch[1]).lineLevelEnd && variableMap.get(currentMatch[1]).blockLevel == 0) {
                                 matched = true;
-                            } else if (variableMap.get(currentMatch[1]).blockLevel <= level && variableMap.get(currentMatch[1]).lineLevelEnd == 0) {
-                                matched = true;
-                            } else {
-                                matched = false;
                             }
-                        } else {
+                            // checks if variable redeclaration comes after variable declaration and inside the scope
+                            else if (variableMap.get(currentMatch[1]).blockLevel <= level && variableMap.get(currentMatch[1]).lineLevelEnd == 0) {
+                                matched = true;
+                            }
+                            // if variable is in variableMap but redeclared outside scope (matched = false)
+                            else {
+                                matched = false;
+                                redeclareVarErr = true;
+                            }
+                        }
+                        // if variable is not inside variableMap it must be declared first (matched = false)
+                        else {
+                            // another boolean variable could be used to make another explanation
                             matched = false;
+                            redeclareVarErr = true;
                         }
 
                         if (matched == true) {
@@ -887,38 +907,55 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                 });
                             }
-                        }
-                        // add explanations to explanations array
-                        explanations.push({
-                            answer: explanationParts.join(""),
-                            link: dbline.link,
-                            lineLevel: linelevel,
-                        });
+                            // add explanations to explanations array
+                            explanations.push({
+                                answer: explanationParts.join(""),
+                                link: dbline.link,
+                                lineLevel: linelevel,
+                            });
 
-                        // reset the explanationParts array for the next line
-                        explanationParts = [];
+                            // reset the explanationParts array for the next line
+                            explanationParts = [];
+                        }
                     }
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // checks if something is a comment --> if so the comment does not get highlighted
-                if (isComment == true) {
-                    matched = true;
-                    outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown looksNice level">' + line + "\u200B</div>";
-                }
+                // if (isComment == true) {
+                //     matched = true;
+                //     outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown looksNice level">' + line + "\u200B</div>";
+                // }
+
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Stuff that doesnt get recognized by an array from the json file
                 if (matched == false) {
-                    // checks if level is higher then 0 and if there is something typed that does not get recognized --> highlight code red
                     if (line.match(/^\s*[a-zA-Z0-9]+/)) {
-                        outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown-error looksNice level">' + line + "\u200B</div>";
-                    } else {
-                        // if nothing is typed in the line it will not highlight anything
-                        outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown looksNice level">' + line + "\u200B</div>";
+                        if (redeclareVarErr) {
+                            console.log("!!!!!!REDECLARE VAR ERROR!!!!!!");
+                            explanationErrors.push({
+                                answer: "Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!",
+                                lineLevel: linelevel,
+                            });
+                        } else if (declareVarErr) {
+                            console.log("!!!!!!DECLARE VAR ERROR!!!!!!");
+                            explanationErrors.push({
+                                answer: "Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration!",
+                                lineLevel: linelevel,
+                            });
+                        } else {
+                            explanationErrors.push({
+                                answer: "In dieser Zeile hat sich ein Fehler eingeschlichen. Bitte korrigiere den Code, damit ich ihn erklären kann!",
+                                lineLevel: linelevel,
+                            });
+                        }
                     }
                 }
             });
-            console.log(explanations);
-            return explanations;
+            return {
+                explanations: explanations,
+                explanationErrors: explanationErrors,
+            };
         };
     },
 ]);

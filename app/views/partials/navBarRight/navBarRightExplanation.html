@@ -6,11 +6,15 @@
             <before-chat>
                 <li class="clear chat-line my-4 clearfix text">
                     <chat-line author="Roby" avatar-size="" alignment="left">
-                        <div ng-repeat="explanation in explanations">
-                            <chat-line-simple>
+                        <div ng-repeat="explanation in combinedExplanations">
+                            <!-- Regular explanation chatbox -->
+                            <chat-line-simple ng-if="explanation.link">
                                 {{explanation.answer}} {{"(lineLevel: "+explanation.lineLevel+")"}}
                                 <a ng-href="{{explanation.link}}" target="_blank">docs</a>
                             </chat-line-simple>
+
+                            <!-- Error explanation chatbox -->
+                            <chat-line-simple ng-if="!explanation.link"> {{explanation.answer}} {{"(lineLevel: "+explanation.lineLevel+")"}} </chat-line-simple>
                         </div>
                     </chat-line>
                 </li>

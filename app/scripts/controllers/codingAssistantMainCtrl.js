@@ -30,7 +30,9 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
                             .replace(/ +/g, " ")
                             .replace(/\s*\;\s*$/g, ";");
                         var inputCodeArray = inputCode.split("\n");
-                        $scope.explanations = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
+                        var result = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
+                        // combine the explanation and explanationError array and sort the explanation via line-level
+                        $scope.combinedExplanations = result.explanations.concat(result.explanationErrors).sort((a, b) => a.lineLevel - b.lineLevel);
                     }
                     // execute updateExplanations() function every 500 miliseconds
                     var intervalPromise = $interval(updateExplanations, 500);
