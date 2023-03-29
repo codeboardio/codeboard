@@ -101,6 +101,8 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             var outputText = "";
             // array to store part of explanations to combine them at the end
             var explanationParts = [];
+            // variable to append a new explanation to existing one
+            var lastLineIndex = -1;
             // array to store row-numbers, explanations and links
             var explanations = [];
 
@@ -178,13 +180,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 // splits explanations form json by ' and store them in answerArray[] to get capture groups
                                 var answerArray = dbline.answer.split("'");
 
-                                // EVERYTHING EXCEPT CATCH, ELSE-IF, ELSE
-                                if (dbline.name !== "catchRegex" && dbline.name !== "elseIfRegex" && dbline.name !== "elseRegex") {
-                                    if (dbline.link != "") {
-                                        // outputText += dbline.link;
-                                    }
-                                }
-
                                 // SCANNER AND RANDOM
                                 if (dbline.name === "newScannerRegex" || dbline.name === "newRandomRegex") {
                                     if (importMap.has(currentMatch[2])) {
@@ -194,7 +189,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                 }
 
-                                // METHOD CREATION
+                                // METHOD CREATION (explanation for static/not static, >=1 inputParameter)
                                 if (dbline.name === "methodRegex" || dbline.name === "methodVoidRegex") {
                                     // Check if static
                                     if (line.match(staticRegex)) {
@@ -240,11 +235,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                             // store position on which regex is stored in database.json
                                             const currentNumber = answerArray[j].match(/^1$/);
                                             // stores the text from "answer" in database.json
-                                            outputText += currentMatch[currentNumber];
                                             explanationParts.push(currentMatch[currentNumber]);
                                         } else {
                                             // gets output from answer field in json
-                                            outputText += answerArray[j];
                                             explanationParts.push(answerArray[j]);
                                         }
                                     }
@@ -253,38 +246,28 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     if (dbline.name === "callMethodInputRegex") {
                                         let inputPara = currentMatch[2].split(",");
                                         if (inputPara.length == 1) {
-                                            outputText += ' mit dem Parameter "' + inputPara[0] + '"';
                                             explanationParts.push(' mit dem Parameter "' + inputPara[0] + '"');
                                         } else if (inputPara.length > 1) {
-                                            outputText += ' mit den Parametern "';
                                             explanationParts.push(' mit den Parametern "');
                                             for (let j = 0; j < inputPara.length; j++) {
                                                 if (j == inputPara.length - 1) {
-                                                    outputText += inputPara[j] + '"';
                                                     explanationParts.push(inputPara[j] + '"');
                                                 } else {
-                                                    outputText += inputPara[j] + ", ";
                                                     explanationParts.push(inputPara[j] + ", ");
                                                 }
                                             }
                                         }
                                     }
-                                    outputText += " aufgerufen";
                                     explanationParts.push(" aufgerufen");
-                                    explanations.push({
-                                        answer: explanationParts.join(""),
-                                        link: dbline.link,
-                                        lineLevel: linelevel,
-                                    });
-                                    // reset the explanationParts array for the next line
-                                    explanationParts = [];
-                                } else {
+                                }
+                                // check all the other objects in "lines" in json-file
+                                else {
                                     // loops through all the splitted answers
                                     for (let j = 0; j < answerArray.length; j++) {
                                         // checks if output out of the captured groups from the regex is needed
                                         if (answerArray[j].match(/^[0-9]*$/)) {
                                             const currentNumber = answerArray[j].match(/^[0-9]*$/);
-                                            outputText += currentMatch[currentNumber];
+                                            explanationParts.push(currentMatch[currentNumber]);
                                         } else {
                                             // gets output from answer field in json
                                             if (j + 1 == answerArray.length && before == true) {
@@ -292,14 +275,26 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                                 if (answerArray[j].match(/<\/div>/)) {
                                                     answerArray[j] = answerArray[j].replaceAll("</div>", "");
                                                 }
-                                                outputText += answerArray[j] + " und ist " + currentRegex2[1];
+                                                explanationParts.push(answerArray[j] + " und ist " + currentRegex2[1]);
                                             } else {
                                                 // just adds answer text
-                                                outputText += answerArray[j];
+                                                explanationParts.push(answerArray[j]);
                                             }
                                         }
                                     }
                                 }
+                                // add explanations to explanations array
+                                explanations.push({
+                                    answer: explanationParts.join(""),
+                                    link: dbline.link,
+                                    lineLevel: linelevel,
+                                });
+
+                                // Store the index of the last explanation for the current line (is needed e.g. for explaining a condition)
+                                lastLineIndex = explanations.length - 1;
+                                // reset the explanationParts array for the next line
+                                explanationParts = [];
+
                                 if (dbline.keepBlock == "true") {
                                     // makes sure that the next line gets checked further
                                     ifActive[level] = true;
@@ -317,13 +312,14 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Check if explaining a condition is needed
+                // Check if explaining a condition is needed (things inside ())
                 data.notCheckedLines.forEach(function (dbline) {
                     // loops the code from code-editor over the notchecked objets from the json file
                     if (line.match(dbline.regex) && isComment == false) {
                         // checks if the line matches this regex
                         var condition = line.match(dbline.regex);
                         var update;
+                        // expression for foor-loop
                         if (dbline.name == "expressionforRegex") {
                             if (condition[2].match(/;/)) {
                                 // stores the capture groups in condition
@@ -340,7 +336,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     variableMap.set(startwertMatch[2], variableObject);
                                     // create variable scope div with variable name as id
                                     varScopeText += '<div id= "' + startwertMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ' + dbline.cssClasses + ' varScope"></div>';
-
                                     currLine = linelevel; // codeEditor.getSelectionRange().start.row;
 
                                     var Range = ace.require("ace/range").Range;
@@ -351,35 +346,35 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     aceEditor.session.addMarker(new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2), startwertMatch[2], "text");
                                     variableCount++;
 
-                                    outputText += " mit Startwert " + newCondition[0];
+                                    explanationParts.push(" mit Startwert " + newCondition[0] + "; ");
                                 }
                             }
                         }
                         // splits the things inside the () of a expression
                         var conditionArr = condition[2].split(" ");
                         // solange oder falls
-                        outputText += " " + dbline.answer + " ";
+                        explanationParts.push(" " + dbline.answer + " ");
                         // loops through words of expression
                         for (let i = 0; i < conditionArr.length; i++) {
                             var matchedExpression = false;
-                            // loops over all regex in expressions[]
+                            // loops over all regex in "expressions" in json-file
                             expressions.forEach(function (currentExpression) {
                                 if (conditionArr[i].match(currentExpression)) {
                                     // loops over all expression objects from the json file
                                     data.expressions.forEach(function (dbexpression) {
                                         // checks if the regex are the same to make sure its the right object in json => now we can use all the strings from the json file
                                         if (currentExpression == "/" + dbexpression.regex + "/") {
-                                            outputText += dbexpression.answer + " "; // input not needed (fe: == gets replaced)
-                                            if (outputText.match(/cg1/)) {
+                                            // input not needed (fe: == gets replaced)
+                                            explanationParts.push(dbexpression.answer + " ");
+                                            // checks if explanationParts contains a cg1 to replace it with the correct cg
+                                            if (explanationParts.some((cg) => cg.match(/cg1/))) {
                                                 const currentMatch = conditionArr[i].match(currentExpression);
                                                 // replace capturegroup 1 (cg1) with the captured content
-                                                outputText = outputText.replaceAll("cg1", currentMatch[1]);
-                                                if (outputText.match(/cg2/)) {
-                                                    outputText = outputText.replaceAll("cg2", currentMatch[2]);
-                                                }
-                                                if (conditionArr[i].match(/\;/)) {
-                                                    // put the ";" back in place
-                                                    outputText += "; ";
+                                                explanationParts = explanationParts.map((cg) => cg.replaceAll("cg1", currentMatch[1]));
+                                                // checks if explanationParts contains a cg2 to replace it with the correct cg
+                                                if (explanationParts.some((cg) => cg.match(/cg2/))) {
+                                                    // replace capturegroup 2 (cg2) with the captured content
+                                                    explanationParts = explanationParts.map((cg) => cg.replaceAll("cg2", currentMatch[2]));
                                                 }
                                             }
                                             matchedExpression = true;
@@ -389,30 +384,38 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             });
 
                             if (matchedExpression == false) {
-                                outputText += conditionArr[i] + " ";
+                                explanationParts.push(conditionArr[i] + " ");
                             }
                         }
                         if (condition[2].match(/^[A-z0-9]+$/)) {
-                            outputText += "true ist";
+                            explanationParts.push("true ist");
                         } else if (condition[2].match(/^![A-z0-9]+$/)) {
-                            outputText = outputText.replace("!", "");
-                            outputText += "false ist";
+                            // replace the "!" with "" in explanation
+                            explanationParts = explanationParts.map((exp) => exp.replaceAll("!", ""));
+                            explanationParts.push("false ist");
                         } else if (condition[2].match(/!/)) {
-                            outputText = outputText.replaceAll("!", "NOT");
+                            // replace the "!" with "NOT" in explanation
+                            explanationParts = explanationParts.map((exp) => exp.replaceAll("!", "NOT"));
                         }
                         if (dbline.name === "expressionforRegex") {
                             data.expressions.forEach(function (expression) {
                                 if (update.match(expression.regex)) {
                                     var updateMatch = update.match(expression.regex);
-                                    outputText += "; " + expression.answer.replaceAll("cg1", updateMatch[1]);
+                                    explanationParts.push("; " + expression.answer.replaceAll("cg1", updateMatch[1]));
                                 }
                             });
                         }
+
+                        // Append the new explanation to the existing one
+                        explanations[lastLineIndex].answer += " " + explanationParts.join("");
+
+                        // reset the explanationParts array for the next line
+                        explanationParts = [];
                     }
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Check if it is a Print-Statement
+                // Check if it is a Print-Statement (standard explanations ("wird auf der Konsole ausgegeben"))
                 data.print.forEach(function (dbline) {
                     // check if print statement
                     if (line.match(dbline.regex) && matched == false && isComment == false) {
@@ -423,21 +426,19 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         // matched true setzen um nicht als "nicht erkannt" klassifiziert zu werden
                         matched = true;
                         var matchedPrintExpression = false;
-                        if (dbline.link != "") {
-                            // outputText += dbline.link;
-                        }
+
                         // store print statement in new variable "printStatement"
                         var printStatement = currentMatch[1];
                         var checkPrintStatement;
                         if (printStatement == "") {
                             for (let j = 0; j < printAnswerArray.length; j++) {
-                                // add "printAnswerArray" to outputTextPrint
-                                outputText += printAnswerArray[j] + " ";
+                                // add "printAnswerArray" to explanationParts array
+                                explanationParts.push(printAnswerArray[j] + " ");
                             }
                         } else {
                             // initialize "anserArray"
                             var answerArray;
-                            // loop trough all printExpressions
+                            // loop trough all printExpressions (used for things inside ())
                             data.printExpressions.forEach(function (currentExpression) {
                                 // check if printExpression gets matched
                                 if (printStatement.match(currentExpression.regex) && matchedPrintExpression == false) {
@@ -473,10 +474,19 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
                             });
                             for (let j = 0; j < answerArray.length; j++) {
-                                // add answerArray to outputText
-                                outputText += answerArray[j] + " ";
+                                // add answerArray to explanationParts
+                                explanationParts.push(answerArray[j] + " ");
                             }
                         }
+                        // add explanations to explanations array
+                        explanations.push({
+                            answer: explanationParts.join(""),
+                            link: dbline.link,
+                            lineLevel: linelevel,
+                        });
+
+                        // reset the explanationParts array for the next line
+                        explanationParts = [];
                     }
                 });
 
@@ -561,9 +571,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 // increase variableCount -> different color & outputid for every variable
                                 variableCount++;
 
-                                // create outputtext div with genereted keyoutput as id
-                                // outputText += dbline.link;
-
                                 // create variable scope div with variable name as id
                                 varScopeText += '<div id= "' + currentMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ';
 
@@ -603,11 +610,11 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     if (varScopeAnswerArray[j].match(/^[0-9]*$/)) {
                                         // checks if output out of the captured groups from the regex is needed (with position on which regex is stored in database.json)
                                         const currentNumber = varScopeAnswerArray[j].match(/^[0-9]*$/);
-                                        // stores the text from "answer" in database.json to the outputText
-                                        outputText += currentMatch[currentNumber];
+                                        // stores the text from "answer" in database.json to the explanationParts array
+                                        explanationParts.push(currentMatch[currentNumber]);
                                     } else {
-                                        // gets output from answer field in json & just adds answer text
-                                        outputText += varScopeAnswerArray[j];
+                                        // get "answer" in json-file & just adds answer text
+                                        explanationParts.push(varScopeAnswerArray[j]);
                                     }
                                 }
                                 // checks if inputtext is a declare boolean text
@@ -618,7 +625,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         if (currentMatch[4].match(currentExpression.regex)) {
                                             answerArray = currentExpression.answer;
                                             // replace word expr in database.json with the correct value
-                                            outputText = outputText.replace("expr", answerArray);
+                                            explanationParts = explanationParts.map((expr) => expr.replaceAll("expr", answerArray));
                                         }
                                     });
                                 }
@@ -630,7 +637,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         if (currentMatch[4].match(currentExpression.regex)) {
                                             // split answer of print expression and stroe it in bitOpExprAnswerArray
                                             bitOpExprAnswerArray = currentExpression.answer;
-                                            outputText = outputText.replace("operation", bitOpExprAnswerArray);
+                                            explanationParts = explanationParts.map((op) => op.replaceAll("operation", bitOpExprAnswerArray));
                                         }
                                     });
                                 }
@@ -642,7 +649,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         if (currentMatch[4].match(currentExpression.regex)) {
                                             // split answer of print expression and store it in LogicOpExprAnswerArray
                                             LogicOpExprAnswerArray = currentExpression.answer;
-                                            outputText = outputText.replace("logic", LogicOpExprAnswerArray);
+                                            explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpExprAnswerArray));
                                         }
                                     });
                                 }
@@ -654,7 +661,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         if (currentMatch[3].match(currentExpression.regex)) {
                                             // split answer of print expression and store it in LogicOpNOTExprAnswerArray
                                             LogicOpNOTExprAnswerArray = currentExpression.answer;
-                                            outputText = outputText.replace("logic", LogicOpNOTExprAnswerArray);
+                                            explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpNOTExprAnswerArray));
                                         }
                                     });
                                 }
@@ -664,6 +671,15 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             } else if (variableMap.has(currentMatch[2]) == true || wrongRandomScanner == true) {
                                 matched = false;
                             }
+                            // add explanations to explanations array
+                            explanations.push({
+                                answer: explanationParts.join(""),
+                                link: dbline.link,
+                                lineLevel: linelevel,
+                            });
+
+                            // reset the explanationParts array for the next line
+                            explanationParts = [];
                         }
                     }
                 });
@@ -795,8 +811,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             // add marker
                             aceEditor.session.addMarker(new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine), currentMatch[1], "text");
 
-                            // outputText += dbline.link;
-
                             if (dbline.name === "redeclareVariableCallMethodRegex") {
                                 if (currentMatch[3] !== "") {
                                     let inputPara = currentMatch[3].split(",");
@@ -820,11 +834,11 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 if (redeclarVarAnswerArray[j].match(/^[0-9]*$/)) {
                                     // checks if output out of the captured groups from the regex is needed (with position on which regex is stored in database.json)
                                     const currentNumber = redeclarVarAnswerArray[j].match(/^[0-9]*$/);
-                                    // stores the text from "answer" in database.json to the outputText
-                                    outputText += currentMatch[currentNumber];
+                                    // stores the text from "answer" in explanations.json in explanationParts
+                                    explanationParts.push(currentMatch[currentNumber]);
                                 } else {
-                                    // gets output from answer field in json and just adds answer text
-                                    outputText += redeclarVarAnswerArray[j];
+                                    // get "answer" in json-file and just adds answer text
+                                    explanationParts.push(redeclarVarAnswerArray[j]);
                                 }
                             }
                             if (line.match(redeclareVarComparisationRegex)) {
@@ -835,8 +849,8 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         answerArray = currentExpression.answer;
                                     }
                                 });
-                                // replace word expr in database.json with the correct value
-                                outputText = outputText.replace("expr", answerArray);
+                                // replace word expr in explanations.json with the correct value
+                                explanationParts = explanationParts.map((expr) => expr.replaceAll("expr", answerArray));
                             }
                             if (dbline.name === "redeclareVariableBitOperationRegex") {
                                 var bitOpExprAnswerArray;
@@ -845,7 +859,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     if (currentMatch[3].match(currentExpression.regex)) {
                                         // split answer of print expression and store it in bitOpExprAnswerArray
                                         bitOpExprAnswerArray = currentExpression.answer;
-                                        outputText = outputText.replace("operation", bitOpExprAnswerArray);
+                                        explanationParts = explanationParts.map((op) => op.replaceAll("operation", bitOpExprAnswerArray));
                                     }
                                 });
                             }
@@ -857,7 +871,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     if (currentMatch[3].match(currentExpression.regex)) {
                                         // split answer of print expression and store it in LogicOpExprAnswerArray
                                         LogicOpExprAnswerArray = currentExpression.answer;
-                                        outputText = outputText.replace("logic", LogicOpExprAnswerArray);
+                                        explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpExprAnswerArray));
                                     }
                                 });
                             }
@@ -869,11 +883,20 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     if (currentMatch[2].match(currentExpression.regex)) {
                                         // split answer of print expression and store it in LogicOpNOTExprAnswerArray
                                         LogicOpNOTExprAnswerArray = currentExpression.answer;
-                                        outputText = outputText.replace("logic", LogicOpNOTExprAnswerArray);
+                                        explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpNOTExprAnswerArray));
                                     }
                                 });
                             }
                         }
+                        // add explanations to explanations array
+                        explanations.push({
+                            answer: explanationParts.join(""),
+                            link: dbline.link,
+                            lineLevel: linelevel,
+                        });
+
+                        // reset the explanationParts array for the next line
+                        explanationParts = [];
                     }
                 });
 
@@ -894,8 +917,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                     }
                 }
             });
-            // explanations.push(outputText);
-            // console.log(outputText);
+            console.log(explanations);
             return explanations;
         };
     },
