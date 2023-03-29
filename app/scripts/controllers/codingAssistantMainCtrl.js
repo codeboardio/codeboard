@@ -12,35 +12,34 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
     "codingAssistantCodeMatchSrv",
     function ($scope, $interval, codingAssistantCodeMatchSrv) {
         $scope.explanationsString = "";
-        // Automatic function executed every 500 milliseconds
-        function updateExplanations() {
-            codingAssistantCodeMatchSrv
-                .getJsonData()
-                .then(function (res) {
-                    var db = res;
-                    return codingAssistantCodeMatchSrv.getJsonColors().then(function (colors) {
-                        return { db: db, colors: colors };
-                    });
+        codingAssistantCodeMatchSrv.getJsonData().then(function (res) {
+            var db = res;
+            return codingAssistantCodeMatchSrv
+                .getJsonColors()
+                .then(function (colors) {
+                    return { db: db, colors: colors };
                 })
                 .then(function (result) {
                     var db = result.db;
                     var colors = result.colors;
-                    var inputCode = $scope.ace.editor
-                        .getSession()
-                        .getValue()
-                        .replace(/ +/g, " ")
-                        .replace(/\s*\;\s*$/g, ";");
-                    var inputCodeArray = inputCode.split("\n");
-                    $scope.explanations = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
-                });
-        }
+                    // Automatic function executed every 500 milliseconds
+                    function updateExplanations() {
+                        var inputCode = $scope.ace.editor
+                            .getSession()
+                            .getValue()
+                            .replace(/ +/g, " ")
+                            .replace(/\s*\;\s*$/g, ";");
+                        var inputCodeArray = inputCode.split("\n");
+                        $scope.explanations = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
+                    }
+                    // execute updateExplanations() function every 500 miliseconds
+                    var intervalPromise = $interval(updateExplanations, 500);
 
-        // execute updateExplanations() function every 500 miliseconds
-        var intervalPromise = $interval(updateExplanations, 500);
-        
-        // Cancel the interval when the scope is destroyed
-        $scope.$on("$destroy", function () {
-            $interval.cancel(intervalPromise);
+                    // Cancel the interval when the scope is destroyed
+                    $scope.$on("$destroy", function () {
+                        $interval.cancel(intervalPromise);
+                    });
+                });
         });
     },
 ]);
