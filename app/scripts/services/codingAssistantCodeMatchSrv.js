@@ -128,10 +128,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 var matched = false;
                 // used for variables declaration errors
                 var declareVarErr = false;
-
                 // used for variables redeclaration errors
                 var redeclareVarErr = false;
-                
+
                 // remove the marker - due to interval
                 // var markers = aceEditor.session.getMarkers(linelevel);
                 // if (markers) {
@@ -949,9 +948,15 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 lineLevel: linelevel,
                             });
                         }
+                    } else if (inputCodeArray.every((line) => line === "")) {
+                        explanationErrors.push({
+                            answer: "Bitte schreibe etwas in die Java-Datei, damit ich den Code darin erklären kann!",
+                            lineLevel: 1,
+                        });
                     }
                 }
             });
+            console.log(inputCodeArray);
             return {
                 explanations: explanations,
                 explanationErrors: explanationErrors,
