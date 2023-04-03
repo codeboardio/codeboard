@@ -8,10 +8,9 @@
 "use strict";
 angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
     "$scope",
-    "$interval",
+    "$timeout",
     "codingAssistantCodeMatchSrv",
-    function ($scope, $interval, codingAssistantCodeMatchSrv) {
-        $scope.explanationsString = "";
+    function ($scope, $timeout, codingAssistantCodeMatchSrv) {
         codingAssistantCodeMatchSrv.getJsonData().then(function (res) {
             var db = res;
             return codingAssistantCodeMatchSrv
@@ -24,22 +23,44 @@ angular.module("codeboardApp").controller("codingAssistantMainCtrl", [
                     var colors = result.colors;
                     // Automatic function executed every 500 milliseconds
                     function updateExplanations() {
+                        $scope.chatLines = [];
                         var inputCode = $scope.ace.editor
                             .getSession()
                             .getValue()
                             .replace(/ +/g, " ")
                             .replace(/\s*\;\s*$/g, ";");
                         var inputCodeArray = inputCode.split("\n");
-                        var result = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
-                        // combine the explanation and explanationError array and sort the explanation via line-level
-                        $scope.combinedExplanations = result.explanations.concat(result.explanationErrors).sort((a, b) => a.lineLevel - b.lineLevel);
-                    }
-                    // execute updateExplanations() function every 500 miliseconds
-                    var intervalPromise = $interval(updateExplanations, 500);
+                        var explanations = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, $scope.ace.editor, colors);
 
-                    // Cancel the interval when the scope is destroyed
-                    $scope.$on("$destroy", function () {
-                        $interval.cancel(intervalPromise);
+                        // Iterate through the combinedExplanations array for chatboxes
+                        explanations.forEach((explanation) => {
+                            let chatline = {
+                                type: explanation.isError ? "error" : "explanation",
+                                message: explanation.answer,
+                                link: explanation.link,
+                                author: "Roby erklärt Zeile " + explanation.lineLevel,
+                                avatar: explanation.isError ? "worried" : "idea", //
+                            };
+
+                            $scope.chatLines.push(chatline);
+                        });
+
+                        // Update showNoCodeMessage property based on combinedExplanations array length
+                        $scope.showNoCodeMessage = explanations.length === 0;
+                    }
+
+                    // MUST HAVE ANOTHER WAY TO IMPLEMENT THIS!!!! WAIT UNTIL ACE EDITOR IS LOADED
+                    // Call updateExplanations() with a slight delay to ensure the initial code is loaded
+                    $timeout(function () {
+                        updateExplanations();
+                    }, 100);
+
+                    // Listen to the 'change' event of the Ace Editor
+                    $scope.ace.editor.on("change", function () {
+                        // Apply the changes to the scope
+                        $scope.$apply(function () {
+                            updateExplanations();
+                        });
                     });
                 });
         });

@@ -37,11 +37,12 @@ angular.module('codeboardApp')
             transclude: true,
             scope: {
                 alignment: '@?',
-                type: '@?',
+                type: '=?',
                 avatar: '=?',
                 avatarSize: '@?',
                 author: '@?',
-                createdAt: '@?'
+                createdAt: '@?',
+                link: '@?'
             },
             controller: ['$scope', function chatController($scope) {
 
@@ -117,6 +118,31 @@ angular.module('codeboardApp')
             templateUrl: 'partials/chat/chatLineSimple'
         };
     });
+
+/**
+ * Directive used to display a explanation chat line.
+ */
+angular.module('codeboardApp')
+.directive('chatLineExplanation', function () {
+    return {
+        restrict: 'E',
+        transclude: true,
+        templateUrl: 'partials/chat/chatLineExplanation'
+    };
+});
+
+/**
+ * Directive used to display a error chat line.
+ */
+angular.module('codeboardApp')
+.directive('chatLineError', function () {
+    return {
+        restrict: 'E',
+        transclude: true,
+        templateUrl: 'partials/chat/chatLineError'
+    };
+});
+
 
 
 /**

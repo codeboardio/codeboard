@@ -292,6 +292,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     answer: explanationParts.join(""),
                                     link: dbline.link,
                                     lineLevel: linelevel,
+                                    isError: false
                                 });
 
                                 // Store the index of the last explanation for the current line (is needed e.g. for explaining a condition)
@@ -487,6 +488,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             answer: explanationParts.join(""),
                             link: dbline.link,
                             lineLevel: linelevel,
+                            isError: false
                         });
 
                         // reset the explanationParts array for the next line
@@ -679,6 +681,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     answer: explanationParts.join(""),
                                     link: dbline.link,
                                     lineLevel: linelevel,
+                                    isError: false
                                 });
 
                                 // reset the explanationParts array for the next line
@@ -822,7 +825,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         }
 
                         if (matched == true) {
-                            var Range = ace.require("ace/range").Range;
                             currLine = linelevel; //codeEditor.getSelectionRange().start.row;
                             wholeLineTxt = aceEditor.session.getLine(currLine - 1);
                             // count whitespaces before first character of code
@@ -911,6 +913,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 answer: explanationParts.join(""),
                                 link: dbline.link,
                                 lineLevel: linelevel,
+                                isError: false
                             });
 
                             // reset the explanationParts array for the next line
@@ -932,35 +935,29 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                     if (line.match(/^\s*[a-zA-Z0-9]+/)) {
                         if (redeclareVarErr) {
                             console.log("!!!!!!REDECLARE VAR ERROR!!!!!!");
-                            explanationErrors.push({
+                            explanations.push({
                                 answer: "Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!",
                                 lineLevel: linelevel,
+                                isError: true
                             });
                         } else if (declareVarErr) {
                             console.log("!!!!!!DECLARE VAR ERROR!!!!!!");
-                            explanationErrors.push({
+                            explanations.push({
                                 answer: "Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration!",
                                 lineLevel: linelevel,
+                                isError: true
                             });
                         } else {
-                            explanationErrors.push({
+                            explanations.push({
                                 answer: "In dieser Zeile hat sich ein Fehler eingeschlichen. Bitte korrigiere den Code, damit ich ihn erklären kann!",
                                 lineLevel: linelevel,
+                                isError: true
                             });
                         }
-                    } else if (inputCodeArray.every((line) => line === "")) {
-                        explanationErrors.push({
-                            answer: "Bitte schreibe etwas in die Java-Datei, damit ich den Code darin erklären kann!",
-                            lineLevel: 1,
-                        });
                     }
                 }
             });
-            console.log(inputCodeArray);
-            return {
-                explanations: explanations,
-                explanationErrors: explanationErrors,
-            };
+            return explanations
         };
     },
 ]);

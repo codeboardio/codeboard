@@ -1,4 +1,4 @@
-/* Variables */
+/* Explanations */
 :root {
     --editor-bg: #eee;
 }
@@ -28,6 +28,7 @@
     padding: 0%;
 }
 
+/* Variable Scope */
 .varScope {
     background-color: rgb(137, 1, 241);
     width: 20px;
