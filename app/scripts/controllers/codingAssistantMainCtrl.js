@@ -28,7 +28,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                         // Automatic function executed one time at the beginning and then every time the code in the editor changes
                         function updateExplanations() {
                             $scope.chatLines = [];
-                            var inputCode = $scope.ace.editor
+                            var inputCode = aceEditor
                                 .getSession()
                                 .getValue()
                                 .replace(/ +/g, ' ')
@@ -53,11 +53,16 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                             $scope.showNoCodeMessage = result.explanations.length === 0;
                         }
 
+                        // call updateExplanations() to show message, when no file is opened
+                        updateExplanations();
+
                         // MUST HAVE ANOTHER WAY TO IMPLEMENT THIS!!!! WAIT UNTIL ACE EDITOR IS LOADED
                         // Call updateExplanations() with a slight delay to ensure the initial code is loaded
-                        $timeout(function () {
-                            updateExplanations();
-                        }, 100);
+                        $scope.$on('fileOpenend', function () {
+                               $timeout(() => {
+                                updateExplanations();
+                               }, 2000);                          
+                        });
 
                         // Listen to the 'change' event of the Ace Editor / got the Code from the Ace Docs - https://ace.c9.io/#nav=howto
                         aceEditor.on('change', function () {

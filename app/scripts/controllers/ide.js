@@ -1732,6 +1732,8 @@ app.controller("TreeCtrl", [
          * Broadcasts a msg that a node was selected (only if selected node is not a folder).
          */
         $scope.nodeClick = function () {
+            // broadcast an event when a file is openend
+            $rootScope.$broadcast('fileOpenend')
             var lSelectedNode = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId);
 
             // ignore the click if the selected node is a folder
