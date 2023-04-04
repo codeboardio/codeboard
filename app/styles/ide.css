@@ -226,6 +226,12 @@ body {
   width: 100%;
 }
 
+#varScope_editor {
+  border-top: 0 !important;
+  height: 100%;
+  width: 100%;
+}
+
 /* Override Kendo, to prevent bootstrap grid */
 *[class^='col'] {
   box-sizing: border-box !important;

@@ -20,7 +20,8 @@ app.controller("IdeCtrl", [
     "UserSrv",
     "WebsocketSrv",
     "ChatSrv",
-    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv) {
+    "codingAssistantCodeMatchSrv",
+    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, codingAssistantCodeMatchSrv) {
         // First we handle all data that was injected as part of the app.js resolve.
         // set the ProjectFactory to contain the project loaded from the server
         ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
@@ -1058,6 +1059,8 @@ app.controller("IdeCtrl", [
          * prepare panes depending on hidden actions (Janick Michot)
          */
         $scope.kPanes = $scope.isActionHidden("tree-view") ? "[" : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
+        // variable Scope container
+        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: true, size: '5%' }, "; 
         $scope.kPanes += " {collapsible: false} ";
         $scope.kPanes += !angular.equals({}, $scope.rightBarTabs) ? ", { collapsible: true, resizable: true, collapsed: true, size: '35%' }" : "";
         $scope.kPanes += !angular.equals({}, $scope.rightBarTabs) ? ", { collapsible: false, resizable: false, collapsed: false, size: '26px' } ]" : "]";
@@ -1183,6 +1186,8 @@ app.controller("IdeCtrl", [
                         req = IdeMsgService.msgResetRequest();
                         $rootScope.$broadcast(req.msg);
                     }
+                case "show_var_scope":
+                    codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor)
                     break;
             }
         };

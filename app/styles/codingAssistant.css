@@ -10,42 +10,7 @@
     box-sizing: border-box;
 }
 
-.editor__exp {
-    position: relative;
-    overflow: auto;
-}
-
 .anyDiv {
     display: table;
 }
 
-.unknown {
-    background-color: #fff;
-}
-
-.unknown-error {
-    background-color: red;
-    padding: 0%;
-}
-
-/* Variable Scope */
-.varScope {
-    background-color: rgb(137, 1, 241);
-    width: 20px;
-    text-align: center;
-    border: 1px solid black;
-    float: right;
-}
-
-.var__scope {
-    position: relative;
-    height: 600px;
-    width: 10%;
-    border: 1px solid var(--editor-border);
-    overflow: auto;
-    margin-right: 1%;
-    background-color: #fff;
-    direction: rtl;
-    display: flex;
-    justify-content: flex-start;
-}

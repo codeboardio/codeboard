@@ -4,35 +4,79 @@
  * @author Samuel Truniger
  */
 
-"use strict";
+'use strict';
 
-angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
-    "$http",
+angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
+    '$http',
     function ($http) {
         var service = this;
 
         // fetch the json data from "explanations.json"
         service.getJsonData = function () {
-            return $http.get("../db_codingassistant/explanations.json").then(
+            return $http.get('../db_codingassistant/explanations.json').then(
                 function (response) {
                     return response.data;
                 },
                 function (error) {
-                    console.error("Error fetching JSON data:", error);
+                    console.error('Error fetching JSON data:', error);
                 }
             );
         };
 
         // fetch the json data from "colors.json"
         service.getJsonColors = function () {
-            return $http.get("../db_codingassistant/colors.json").then(
+            return $http.get('../db_codingassistant/colors.json').then(
                 function (response) {
                     return response.data;
                 },
                 function (error) {
-                    console.error("Error fetching JSON data:", error);
+                    console.error('Error fetching JSON data:', error);
                 }
             );
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Everything related to toggle markers - code implemented with help form stack overflow (https://stackoverflow.com/questions/65677814/how-to-remove-all-the-existing-highlight-markers-in-ace-editor-using-react) and Chat-GPT
+        // Indicates where markers are toggled on or off
+        var toggled = false;
+        // stores the markers
+        var storedMarkers = [];
+
+        // Stores the existing markers in the Code-Editor and removes them
+        function storeAndRemoveMarkers(aceEditor) {
+            const existMarkers = aceEditor.session.getMarkers();
+            for (let item in existMarkers) {
+                if (existMarkers[item].range) {
+                    storedMarkers.push({
+                        id: existMarkers[item].id,
+                        range: existMarkers[item].range.clone(),
+                        clazz: existMarkers[item].clazz,
+                        type: existMarkers[item].type,
+                    });
+                }
+                aceEditor.session.removeMarker(existMarkers[item].id);
+            }
+        }
+
+        // Show the stored markers in the Code-Editor and clears the storedMarkers array
+        function showStoredMarkers(aceEditor) {
+            for (let item of storedMarkers) {
+                if (item.range && item.range.start && item.range.end) {
+                    aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
+                }
+            }
+            storedMarkers = [];
+        }
+
+        // Toggles the markers on and off in the Code-Editor
+        service.toggleMarkers = function (aceEditor) {
+            if (toggled === false) {
+                showStoredMarkers(aceEditor);
+                toggled = true;
+            } else {
+                storeAndRemoveMarkers(aceEditor);
+                toggled = false;
+            }
         };
 
         /**
@@ -61,7 +105,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             var expressions = [];
             // store colors from colors.json
             var colors = [];
-            var aceEditor = aceEditor;
             var editorLineHeight;
 
             for (let i = 0; i < data.lines.length; i++) {
@@ -85,21 +128,18 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
             editorLineHeight = aceEditor.renderer.lineHeight;
             // console.log(editorLineHeight);
 
-            // reset output that it wont add up
-            var outputText = "";
             // array to store part of explanations to combine them at the end
             var explanationParts = [];
             // variable to append a new explanation to existing one
             var lastLineIndex = -1;
             // array to store explanations, row-numbers and links
             var explanations = [];
-            // array to store explanations for syntax-errors and links
-            var explanationErrors = [];
 
             // variable for varScope-blocks
-            var varScopeText = "";
+            var varScopeText = '';
 
             // Variables to highlight the code in the Code-Editor
+            var Range = ace.require('ace/range').Range;
             var currLine;
             var wholeLineTxt;
             var countWhiteSpacesLine;
@@ -130,15 +170,6 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 var declareVarErr = false;
                 // used for variables redeclaration errors
                 var redeclareVarErr = false;
-
-                // remove the marker - due to interval
-                // var markers = aceEditor.session.getMarkers(linelevel);
-                // if (markers) {
-                //     const prevMarkersArr = Object.keys(markers);
-                //     for (let item of prevMarkersArr) {
-                //         codeEditor.session.removeMarker(markers[item].id);
-                //     }
-                // }
 
                 // with every line of code/no code the linelevel increments by 1
                 linelevel++;
@@ -178,14 +209,14 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         // loops over all "lines"-objects from the json file
                         data.lines.forEach(function (dbline) {
                             // checks if the regex are the same to make sure its the right object in json => now we can use all the strings from the json file
-                            if ("/" + dbline.regex + "/" == currentRegex) {
+                            if ('/' + dbline.regex + '/' == currentRegex) {
                                 // capture groups are saved in currentMatch
                                 const currentMatch = line.match(currentRegex);
                                 // splits explanations form json by ' and store them in answerArray[] to get capture groups
                                 var answerArray = dbline.answer.split("'");
 
                                 // SCANNER AND RANDOM
-                                if (dbline.name === "newScannerRegex" || dbline.name === "newRandomRegex") {
+                                if (dbline.name === 'newScannerRegex' || dbline.name === 'newRandomRegex') {
                                     if (importMap.has(currentMatch[2])) {
                                         matched = false;
                                     } else {
@@ -194,19 +225,19 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
 
                                 // METHOD CREATION (explanation for static/not static, >=1 inputParameter)
-                                if (dbline.name === "methodRegex" || dbline.name === "methodVoidRegex") {
+                                if (dbline.name === 'methodRegex' || dbline.name === 'methodVoidRegex') {
                                     // Check if static
                                     if (line.match(staticRegex)) {
                                         // add "Die statische" to the beginning of the array
-                                        answerArray.unshift("Die statische ");
+                                        answerArray.unshift('Die statische ');
                                     } else {
                                         // add "Die " to the beginning of the array
-                                        answerArray.unshift("Die ");
+                                        answerArray.unshift('Die ');
                                     }
                                     // check if parameter
                                     if (currentMatch[3].match(paraRegex)) {
                                         // split parameter
-                                        const currentMatchPara = currentMatch[3].split(",");
+                                        const currentMatchPara = currentMatch[3].split(',');
                                         var currentRegexPara = [];
                                         currentMatchPara.forEach(function (para) {
                                             // match for each split
@@ -218,7 +249,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         }
                                         // if 1+ parameter
                                         else if (currentRegexPara.length > 1) {
-                                            answerArray.push(" mit den Parametern");
+                                            answerArray.push(' mit den Parametern');
                                             for (let i = 0; i < currentRegexPara.length; i++) {
                                                 if (i == currentRegexPara.length - 1) {
                                                     answerArray.push(' "' + currentRegexPara[i][0] + '"');
@@ -231,7 +262,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
 
                                 // METHOD CALL
-                                if (dbline.name === "callMethodNoInputRegex" || dbline.name === "callMethodInputRegex") {
+                                if (dbline.name === 'callMethodNoInputRegex' || dbline.name === 'callMethodInputRegex') {
                                     // loops through all the splitted answers
                                     for (let j = 0; j < answerArray.length; j++) {
                                         // checks if output out of the captured groups from the regex is needed
@@ -247,8 +278,8 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
 
                                     // add parameters to explanation if code match "callMethodInputRegex"
-                                    if (dbline.name === "callMethodInputRegex") {
-                                        let inputPara = currentMatch[2].split(",");
+                                    if (dbline.name === 'callMethodInputRegex') {
+                                        let inputPara = currentMatch[2].split(',');
                                         if (inputPara.length == 1) {
                                             explanationParts.push(' mit dem Parameter "' + inputPara[0] + '"');
                                         } else if (inputPara.length > 1) {
@@ -257,12 +288,12 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                                 if (j == inputPara.length - 1) {
                                                     explanationParts.push(inputPara[j] + '"');
                                                 } else {
-                                                    explanationParts.push(inputPara[j] + ", ");
+                                                    explanationParts.push(inputPara[j] + ', ');
                                                 }
                                             }
                                         }
                                     }
-                                    explanationParts.push(" aufgerufen");
+                                    explanationParts.push(' aufgerufen');
                                 }
                                 // check all the other objects in "lines" in json-file
                                 else {
@@ -277,9 +308,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                             if (j + 1 == answerArray.length && before == true) {
                                                 // adds "public" or "private" to description
                                                 if (answerArray[j].match(/<\/div>/)) {
-                                                    answerArray[j] = answerArray[j].replaceAll("</div>", "");
+                                                    answerArray[j] = answerArray[j].replaceAll('</div>', '');
                                                 }
-                                                explanationParts.push(answerArray[j] + " und ist " + currentRegex2[1]);
+                                                explanationParts.push(answerArray[j] + ' und ist ' + currentRegex2[1]);
                                             } else {
                                                 // just adds answer text
                                                 explanationParts.push(answerArray[j]);
@@ -289,10 +320,10 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 }
                                 // add explanations to explanations array
                                 explanations.push({
-                                    answer: explanationParts.join(""),
+                                    answer: explanationParts.join(''),
                                     link: dbline.link,
                                     lineLevel: linelevel,
-                                    isError: false
+                                    isError: false,
                                 });
 
                                 // Store the index of the last explanation for the current line (is needed e.g. for explaining a condition)
@@ -300,15 +331,15 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 // reset the explanationParts array for the next line
                                 explanationParts = [];
 
-                                if (dbline.keepBlock == "true") {
+                                if (dbline.keepBlock == 'true') {
                                     // makes sure that the next line gets checked further
                                     ifActive[level] = true;
                                 }
-                                if (dbline.block == "true") {
+                                if (dbline.block == 'true') {
                                     level += 1;
                                     blockActive[level] = true;
                                 }
-                                if (line.match(/}/) && (dbline.name === "catchRegex" || dbline.name === "elseIfRegex" || dbline.name === "elseRegex")) {
+                                if (line.match(/}/) && (dbline.name === 'catchRegex' || dbline.name === 'elseIfRegex' || dbline.name === 'elseRegex')) {
                                     blockNotReallyEnded = true;
                                 }
                             }
@@ -325,40 +356,45 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         var condition = line.match(dbline.regex);
                         var update;
                         // expression for foor-loop
-                        if (dbline.name == "expressionforRegex") {
+                        if (dbline.name == 'expressionforRegex') {
                             if (condition[2].match(/;/)) {
                                 // stores the capture groups in condition
-                                var newCondition = condition[2].split(";");
+                                var newCondition = condition[2].split(';');
                                 update = newCondition[2];
                                 condition[2] = newCondition[1];
                                 if (newCondition[0].match(/(int|double)\s(\w+)\s?\=\s?[0-9]+/)) {
                                     // calculate Margin & convert to string
-                                    var margin = "" + (linelevel - 1) * editorLineHeight;
-                                    margin += "px";
+                                    var margin = '' + (linelevel - 1) * editorLineHeight;
+                                    margin += 'px';
                                     // create object with linelevel at the start, linelevel at the end, blocklevel, margin, color, keyoutput, height
-                                    var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: "", margin: margin, color: colors[variableCount].hexacode };
+                                    var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount].hexacode };
                                     var startwertMatch = newCondition[0].match(/(int|double)\s(\w+)\s?\=\s?[0-9]+/);
                                     variableMap.set(startwertMatch[2], variableObject);
                                     // create variable scope div with variable name as id
                                     varScopeText += '<div id= "' + startwertMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ' + dbline.cssClasses + ' varScope"></div>';
-                                    currLine = linelevel; // codeEditor.getSelectionRange().start.row;
 
-                                    var Range = ace.require("ace/range").Range;
+                                    // Ace Marker
+                                    currLine = linelevel; // codeEditor.getSelectionRange().start.row;
                                     wholeLineTxt = aceEditor.session.getLine(currLine - 1);
                                     countWhiteSpacesLine = wholeLineTxt.search(/\S/);
-                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(?<=\w)\s+(?=\w)/gm, "").length;
-                                    countWhiteSpaces2 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\w+)\s+(\()\s*/gm, "").length;
-                                    aceEditor.session.addMarker(new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2), startwertMatch[2], "text");
+                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(?<=\w)\s+(?=\w)/gm, '').length;
+                                    countWhiteSpaces2 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\w+)\s+(\()\s*/gm, '').length;
+                                    storedMarkers.push({
+                                        range: new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2),
+                                        clazz: startwertMatch[2],
+                                        type: 'text',
+                                    });
+
                                     variableCount++;
 
-                                    explanationParts.push(" mit Startwert " + newCondition[0] + "; ");
+                                    explanationParts.push(' mit Startwert ' + newCondition[0] + '; ');
                                 }
                             }
                         }
                         // splits the things inside the () of a expression
-                        var conditionArr = condition[2].split(" ");
+                        var conditionArr = condition[2].split(' ');
                         // solange oder falls
-                        explanationParts.push(" " + dbline.answer + " ");
+                        explanationParts.push(' ' + dbline.answer + ' ');
                         // loops through words of expression
                         for (let i = 0; i < conditionArr.length; i++) {
                             var matchedExpression = false;
@@ -368,18 +404,18 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     // loops over all expression objects from the json file
                                     data.expressions.forEach(function (dbexpression) {
                                         // checks if the regex are the same to make sure its the right object in json => now we can use all the strings from the json file
-                                        if (currentExpression == "/" + dbexpression.regex + "/") {
+                                        if (currentExpression == '/' + dbexpression.regex + '/') {
                                             // input not needed (fe: == gets replaced)
-                                            explanationParts.push(dbexpression.answer + " ");
+                                            explanationParts.push(dbexpression.answer + ' ');
                                             // checks if explanationParts contains a cg1 to replace it with the correct cg
                                             if (explanationParts.some((cg) => cg.match(/cg1/))) {
                                                 const currentMatch = conditionArr[i].match(currentExpression);
                                                 // replace capturegroup 1 (cg1) with the captured content
-                                                explanationParts = explanationParts.map((cg) => cg.replaceAll("cg1", currentMatch[1]));
+                                                explanationParts = explanationParts.map((cg) => cg.replaceAll('cg1', currentMatch[1]));
                                                 // checks if explanationParts contains a cg2 to replace it with the correct cg
                                                 if (explanationParts.some((cg) => cg.match(/cg2/))) {
                                                     // replace capturegroup 2 (cg2) with the captured content
-                                                    explanationParts = explanationParts.map((cg) => cg.replaceAll("cg2", currentMatch[2]));
+                                                    explanationParts = explanationParts.map((cg) => cg.replaceAll('cg2', currentMatch[2]));
                                                 }
                                             }
                                             matchedExpression = true;
@@ -389,30 +425,30 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             });
 
                             if (matchedExpression == false) {
-                                explanationParts.push(conditionArr[i] + " ");
+                                explanationParts.push(conditionArr[i] + ' ');
                             }
                         }
                         if (condition[2].match(/^[A-z0-9]+$/)) {
-                            explanationParts.push("true ist");
+                            explanationParts.push('true ist');
                         } else if (condition[2].match(/^![A-z0-9]+$/)) {
                             // replace the "!" with "" in explanation
-                            explanationParts = explanationParts.map((exp) => exp.replaceAll("!", ""));
-                            explanationParts.push("false ist");
+                            explanationParts = explanationParts.map((exp) => exp.replaceAll('!', ''));
+                            explanationParts.push('false ist');
                         } else if (condition[2].match(/!/)) {
                             // replace the "!" with "NOT" in explanation
-                            explanationParts = explanationParts.map((exp) => exp.replaceAll("!", "NOT"));
+                            explanationParts = explanationParts.map((exp) => exp.replaceAll('!', 'NOT'));
                         }
-                        if (dbline.name === "expressionforRegex") {
+                        if (dbline.name === 'expressionforRegex') {
                             data.expressions.forEach(function (expression) {
                                 if (update.match(expression.regex)) {
                                     var updateMatch = update.match(expression.regex);
-                                    explanationParts.push("; " + expression.answer.replaceAll("cg1", updateMatch[1]));
+                                    explanationParts.push('; ' + expression.answer.replaceAll('cg1', updateMatch[1]));
                                 }
                             });
                         }
 
                         // Append the new explanation to the existing one
-                        explanations[lastLineIndex].answer += " " + explanationParts.join("");
+                        explanations[lastLineIndex].answer += ' ' + explanationParts.join('');
 
                         // reset the explanationParts array for the next line
                         explanationParts = [];
@@ -435,10 +471,10 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         // store print statement in new variable "printStatement"
                         var printStatement = currentMatch[1];
                         var checkPrintStatement;
-                        if (printStatement == "") {
+                        if (printStatement == '') {
                             for (let j = 0; j < printAnswerArray.length; j++) {
                                 // add "printAnswerArray" to explanationParts array
-                                explanationParts.push(printAnswerArray[j] + " ");
+                                explanationParts.push(printAnswerArray[j] + ' ');
                             }
                         } else {
                             // initialize "anserArray"
@@ -459,8 +495,8 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                             printExpressionAnswerArray[j] = '"' + checkPrintStatement[currentNumber] + '"';
                                         }
                                     }
-                                    if (currentExpression.name === "callMethodInputRegex") {
-                                        let inputPara = checkPrintStatement[2].split(",");
+                                    if (currentExpression.name === 'callMethodInputRegex') {
+                                        let inputPara = checkPrintStatement[2].split(',');
                                         if (inputPara.length == 1) {
                                             printExpressionAnswerArray.splice(2, 0, ' mit dem Parameter "' + inputPara[0] + '"');
                                         } else if (inputPara.length > 1) {
@@ -469,7 +505,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                                 if (j == inputPara.length - 1) {
                                                     callMethod += inputPara[j] + '"';
                                                 } else {
-                                                    callMethod += inputPara[j] + ", ";
+                                                    callMethod += inputPara[j] + ', ';
                                                 }
                                             }
                                             printExpressionAnswerArray.splice(2, 0, callMethod);
@@ -480,15 +516,15 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                             });
                             for (let j = 0; j < answerArray.length; j++) {
                                 // add answerArray to explanationParts
-                                explanationParts.push(answerArray[j] + " ");
+                                explanationParts.push(answerArray[j] + ' ');
                             }
                         }
                         // add explanations to explanations array
                         explanations.push({
-                            answer: explanationParts.join(""),
+                            answer: explanationParts.join(''),
                             link: dbline.link,
                             lineLevel: linelevel,
-                            isError: false
+                            isError: false,
                         });
 
                         // reset the explanationParts array for the next line
@@ -513,23 +549,23 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         } else {
                             var wrongRandomScanner = false;
                             var randomScannerMatch = false;
-                            if (dbline.name === "randomOrScannerRegex") {
+                            if (dbline.name === 'randomOrScannerRegex') {
                                 //console.log(currentMatch);
                                 if (importMap.has(currentMatch[3])) {
-                                    if (importMap.get(currentMatch[3]) === "Random") {
+                                    if (importMap.get(currentMatch[3]) === 'Random') {
                                         data.randomExpressions.forEach(function (rnExpression) {
                                             if (currentMatch[0].match(rnExpression.regex)) {
                                                 varScopeAnswerArray = rnExpression.answer.split("'");
                                                 randomScannerMatch = true;
-                                                dbline.link = "https://www.javatpoint.com/how-to-generate-random-number-in-java";
+                                                dbline.link = 'https://www.javatpoint.com/how-to-generate-random-number-in-java';
                                             }
                                         });
-                                    } else if (importMap.get(currentMatch[3]) === "Scanner") {
+                                    } else if (importMap.get(currentMatch[3]) === 'Scanner') {
                                         data.scannerExpressions.forEach(function (ksExpression) {
                                             if (currentMatch[0].match(ksExpression.regex)) {
                                                 varScopeAnswerArray = ksExpression.answer.split("'");
                                                 randomScannerMatch = true;
-                                                dbline.link = "https://www.w3schools.com/java/java_user_input.asp";
+                                                dbline.link = 'https://www.w3schools.com/java/java_user_input.asp';
                                             }
                                         });
                                     }
@@ -543,38 +579,51 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 // set matched on true to not get recognize as not identify
                                 matched = true;
                                 // calculate Margin & convert to string
-                                var margin = "" + (linelevel - 1) * editorLineHeight;
+                                var margin = '' + (linelevel - 1) * editorLineHeight;
                                 // add pixel
-                                margin += "px";
+                                margin += 'px';
                                 // create object with linelevel at the start, linelevel at the end, blocklevel, margin, color, keyoutput, height
-                                var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: "", margin: margin, color: colors[variableCount].hexacode };
+                                var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount].hexacode };
                                 // add object to variable map with variable name as key
                                 variableMap.set(currentMatch[2], variableObject);
-                                var Range = ace.require("ace/range").Range;
 
+                                // Ace Marker
                                 currLine = linelevel; //codeEditor.getSelectionRange().start.row;
                                 // get the code from the current line
                                 wholeLineTxt = aceEditor.session.getLine(currLine - 1);
                                 // count whitespaces before beginning of the code
                                 countWhiteSpacesLine = wholeLineTxt.search(/\S/);
                                 // count whitespaces between first and second word
-                                countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/\b\s+\b/, "").length;
+                                countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/\b\s+\b/, '').length;
                                 //(?<=\w)\s+(?=\w)
                                 //(?<=[\w\[\]])\s+(?=\w[^int\[\]]
                                 if (wholeLineTxt.match(newArrayDeclarationRegex) || wholeLineTxt.match(newArrayRegex) || wholeLineTxt.match(newArrayDeclarationAndInitializationRegex)) {
-                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/(?<=\w\[\])\s+(?=\w)/, "").length;
-                                    countWhiteSpaceArray = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\[)\s*(\])/gm, "").length;
+                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/(?<=\w\[\])\s+(?=\w)/, '').length;
+                                    countWhiteSpaceArray = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\[)\s*(\])/gm, '').length;
                                     // add marker to the variable name
-                                    aceEditor.session.addMarker(new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1), currentMatch[2], "text");
+                                    storedMarkers.push({
+                                        range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1),
+                                        clazz: currentMatch[2],
+                                        type: 'text',
+                                    });
                                 } else if (wholeLineTxt.match(newTwoDimensoinalArrayRegex) || wholeLineTxt.match(newStartValueTwoDimensoinalArrayRegex)) {
-                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/(?<=\w\[\]\[\])\s+(?=\w)/, "").length;
-                                    countWhiteSpace2DArray = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\[)\s*(\])/gm, "").length;
+                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/(?<=\w\[\]\[\])\s+(?=\w)/, '').length;
+                                    countWhiteSpace2DArray = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\[)\s*(\])/gm, '').length;
                                     // add marker to the variable name
-                                    aceEditor.session.addMarker(new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1), currentMatch[2], "text");
+                                    storedMarkers.push({
+                                        range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1),
+                                        clazz: currentMatch[2],
+                                        type: 'text',
+                                    });
                                 } else {
                                     // add marker to the variable name
-                                    aceEditor.session.addMarker(new Range(linelevel - 1, currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1), currentMatch[2]);
+                                    storedMarkers.push({
+                                        range: new Range(linelevel - 1, currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1),
+                                        clazz: currentMatch[2],
+                                        type: 'text',
+                                    });
                                 }
+
                                 // increase variableCount -> different color & outputid for every variable
                                 variableCount++;
 
@@ -582,7 +631,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 varScopeText += '<div id= "' + currentMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ';
 
                                 // check if level is bigger then 0 and if the code is indented
-                                if (level > 0 && dbline.keepLevel == "false") {
+                                if (level > 0 && dbline.keepLevel == 'false') {
                                     if (line.match(data.varScope.regex)) {
                                         varScopeText += ' varScope">';
                                     }
@@ -594,9 +643,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                 } else {
                                     varScopeText += '">';
                                 }
-                                if (dbline.name === "newVarCallMethodRegex") {
-                                    if (currentMatch[4] !== "") {
-                                        let inputPara = currentMatch[4].split(",");
+                                if (dbline.name === 'newVarCallMethodRegex') {
+                                    if (currentMatch[4] !== '') {
+                                        let inputPara = currentMatch[4].split(',');
                                         if (inputPara.length == 1) {
                                             varScopeAnswerArray.splice(2, 0, '" mit dem Parameter "' + inputPara[0]);
                                         } else if (inputPara.length > 1) {
@@ -605,7 +654,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                                 if (j == inputPara.length - 1) {
                                                     callMethod += inputPara[j];
                                                 } else {
-                                                    callMethod += inputPara[j] + ", ";
+                                                    callMethod += inputPara[j] + ', ';
                                                 }
                                             }
                                             varScopeAnswerArray.splice(2, 0, callMethod);
@@ -632,56 +681,56 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                         if (currentMatch[4].match(currentExpression.regex)) {
                                             answerArray = currentExpression.answer;
                                             // replace word expr in database.json with the correct value
-                                            explanationParts = explanationParts.map((expr) => expr.replaceAll("expr", answerArray));
+                                            explanationParts = explanationParts.map((expr) => expr.replaceAll('expr', answerArray));
                                         }
                                     });
                                 }
 
-                                if (dbline.name === "newVariableBitOperationRegex") {
+                                if (dbline.name === 'newVariableBitOperationRegex') {
                                     var bitOpExprAnswerArray;
                                     // loops over all expression objects from the json file
                                     data.bitOperationExpression.forEach(function (currentExpression) {
                                         if (currentMatch[4].match(currentExpression.regex)) {
                                             // split answer of print expression and stroe it in bitOpExprAnswerArray
                                             bitOpExprAnswerArray = currentExpression.answer;
-                                            explanationParts = explanationParts.map((op) => op.replaceAll("operation", bitOpExprAnswerArray));
+                                            explanationParts = explanationParts.map((op) => op.replaceAll('operation', bitOpExprAnswerArray));
                                         }
                                     });
                                 }
 
-                                if (dbline.name === "newVariableLogicOperatorRegex") {
+                                if (dbline.name === 'newVariableLogicOperatorRegex') {
                                     var LogicOpExprAnswerArray;
                                     // loops over all expression objects from the json file
                                     data.logicOperatorExpressions.forEach(function (currentExpression) {
                                         if (currentMatch[4].match(currentExpression.regex)) {
                                             // split answer of print expression and store it in LogicOpExprAnswerArray
                                             LogicOpExprAnswerArray = currentExpression.answer;
-                                            explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpExprAnswerArray));
+                                            explanationParts = explanationParts.map((logic) => logic.replaceAll('logic', LogicOpExprAnswerArray));
                                         }
                                     });
                                 }
 
-                                if (dbline.name === "newVariableLogicOperatorNOTRegex") {
+                                if (dbline.name === 'newVariableLogicOperatorNOTRegex') {
                                     var LogicOpNOTExprAnswerArray;
                                     // loops over all expression objects from the json file
                                     data.logicOperatorExpressions.forEach(function (currentExpression) {
                                         if (currentMatch[3].match(currentExpression.regex)) {
                                             // split answer of print expression and store it in LogicOpNOTExprAnswerArray
                                             LogicOpNOTExprAnswerArray = currentExpression.answer;
-                                            explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpNOTExprAnswerArray));
+                                            explanationParts = explanationParts.map((logic) => logic.replaceAll('logic', LogicOpNOTExprAnswerArray));
                                         }
                                     });
                                 }
 
                                 // varScopeText += linelevel;
-                                varScopeText += "</div>";
+                                varScopeText += '</div>';
 
                                 // add explanations to explanations array
                                 explanations.push({
-                                    answer: explanationParts.join(""),
+                                    answer: explanationParts.join(''),
                                     link: dbline.link,
                                     lineLevel: linelevel,
-                                    isError: false
+                                    isError: false,
                                 });
 
                                 // reset the explanationParts array for the next line
@@ -722,9 +771,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     // checks if current variable has the same blocklevel and has no linelevelend
                                     value.lineLevelEnd = linelevel;
                                     // calculate height and convert to string
-                                    var height = "" + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
                                     // add px (pixel) to height
-                                    height += "px";
+                                    height += 'px';
                                     // height is assigned to height of current variable
                                     value.height = height;
                                 }
@@ -736,9 +785,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     // checks if current variable has the same blocklevel and has no linelevelend
                                     value.lineLevelEnd = linelevel;
                                     // calculate height and convert to string
-                                    var height = "" + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
                                     // add px (pixel) to height
-                                    height += "px";
+                                    height += 'px';
                                     // height is assigned to height of current variable
                                     value.height = height;
                                 }
@@ -761,9 +810,9 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         // actual linelevel is assigned to linelevelend of current variable
                         value.lineLevelEnd = linelevel;
                         // calculate height and convert to string
-                        var height = "" + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
+                        var height = '' + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
                         // add px (pixel) to height
-                        height += "px";
+                        height += 'px';
                         // height is assigned to height of current variable
                         value.height = height;
                     }
@@ -778,22 +827,22 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         var redeclarVarAnswerArray = dbline.answer.split("'");
                         var wrongRandomScanner = false;
                         var randomScannerMatch = false;
-                        if (dbline.name === "randomOrScannerRegex") {
+                        if (dbline.name === 'randomOrScannerRegex') {
                             if (importMap.has(currentMatch[2])) {
-                                if (importMap.get(currentMatch[2]) === "Random") {
+                                if (importMap.get(currentMatch[2]) === 'Random') {
                                     data.randomExpressions.forEach(function (rnExpression) {
                                         if (currentMatch[0].match(rnExpression.regex)) {
                                             redeclarVarAnswerArray = rnExpression.answer.split("'");
                                             randomScannerMatch = true;
-                                            dbline.link = "https://www.javatpoint.com/how-to-generate-random-number-in-java";
+                                            dbline.link = 'https://www.javatpoint.com/how-to-generate-random-number-in-java';
                                         }
                                     });
-                                } else if (importMap.get(currentMatch[2]) === "Scanner") {
+                                } else if (importMap.get(currentMatch[2]) === 'Scanner') {
                                     data.scannerExpressions.forEach(function (ksExpression) {
                                         if (currentMatch[0].match(ksExpression.regex)) {
                                             redeclarVarAnswerArray = ksExpression.answer.split("'");
                                             randomScannerMatch = true;
-                                            dbline.link = "https://www.w3schools.com/java/java_user_input.asp";
+                                            dbline.link = 'https://www.w3schools.com/java/java_user_input.asp';
                                         }
                                     });
                                 }
@@ -825,16 +874,20 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                         }
 
                         if (matched == true) {
+                            // Ace Marker
                             currLine = linelevel; //codeEditor.getSelectionRange().start.row;
                             wholeLineTxt = aceEditor.session.getLine(currLine - 1);
                             // count whitespaces before first character of code
                             countWhiteSpacesLine = wholeLineTxt.search(/\S/);
                             // add marker
-                            aceEditor.session.addMarker(new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine), currentMatch[1], "text");
-
-                            if (dbline.name === "redeclareVariableCallMethodRegex") {
-                                if (currentMatch[3] !== "") {
-                                    let inputPara = currentMatch[3].split(",");
+                            storedMarkers.push({
+                                range: new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine),
+                                clazz: currentMatch[1],
+                                type: 'text',
+                            });
+                            if (dbline.name === 'redeclareVariableCallMethodRegex') {
+                                if (currentMatch[3] !== '') {
+                                    let inputPara = currentMatch[3].split(',');
                                     if (inputPara.length == 1) {
                                         redeclarVarAnswerArray.splice(2, 0, '" mit dem Parameter "' + inputPara[0]);
                                     } else if (inputPara.length > 1) {
@@ -843,7 +896,7 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                             if (j == inputPara.length - 1) {
                                                 callMethod += inputPara[j];
                                             } else {
-                                                callMethod += inputPara[j] + ", ";
+                                                callMethod += inputPara[j] + ', ';
                                             }
                                         }
                                         redeclarVarAnswerArray.splice(2, 0, callMethod);
@@ -871,49 +924,49 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                                     }
                                 });
                                 // replace word expr in explanations.json with the correct value
-                                explanationParts = explanationParts.map((expr) => expr.replaceAll("expr", answerArray));
+                                explanationParts = explanationParts.map((expr) => expr.replaceAll('expr', answerArray));
                             }
-                            if (dbline.name === "redeclareVariableBitOperationRegex") {
+                            if (dbline.name === 'redeclareVariableBitOperationRegex') {
                                 var bitOpExprAnswerArray;
                                 data.bitOperationExpression.forEach(function (currentExpression) {
                                     // loops over all expression objects from the json file
                                     if (currentMatch[3].match(currentExpression.regex)) {
                                         // split answer of print expression and store it in bitOpExprAnswerArray
                                         bitOpExprAnswerArray = currentExpression.answer;
-                                        explanationParts = explanationParts.map((op) => op.replaceAll("operation", bitOpExprAnswerArray));
+                                        explanationParts = explanationParts.map((op) => op.replaceAll('operation', bitOpExprAnswerArray));
                                     }
                                 });
                             }
 
-                            if (dbline.name === "redeclareVariableLogicOperatorRegex") {
+                            if (dbline.name === 'redeclareVariableLogicOperatorRegex') {
                                 var LogicOpExprAnswerArray;
                                 data.logicOperatorExpressions.forEach(function (currentExpression) {
                                     // loops over all expression objects from the json file
                                     if (currentMatch[3].match(currentExpression.regex)) {
                                         // split answer of print expression and store it in LogicOpExprAnswerArray
                                         LogicOpExprAnswerArray = currentExpression.answer;
-                                        explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpExprAnswerArray));
+                                        explanationParts = explanationParts.map((logic) => logic.replaceAll('logic', LogicOpExprAnswerArray));
                                     }
                                 });
                             }
 
-                            if (dbline.name === "redeclareVariableLogicOperatorNOTRegex") {
+                            if (dbline.name === 'redeclareVariableLogicOperatorNOTRegex') {
                                 var LogicOpNOTExprAnswerArray;
                                 data.logicOperatorExpressions.forEach(function (currentExpression) {
                                     //loops over all expression objects from the json file
                                     if (currentMatch[2].match(currentExpression.regex)) {
                                         // split answer of print expression and store it in LogicOpNOTExprAnswerArray
                                         LogicOpNOTExprAnswerArray = currentExpression.answer;
-                                        explanationParts = explanationParts.map((logic) => logic.replaceAll("logic", LogicOpNOTExprAnswerArray));
+                                        explanationParts = explanationParts.map((logic) => logic.replaceAll('logic', LogicOpNOTExprAnswerArray));
                                     }
                                 });
                             }
                             // add explanations to explanations array
                             explanations.push({
-                                answer: explanationParts.join(""),
+                                answer: explanationParts.join(''),
                                 link: dbline.link,
                                 lineLevel: linelevel,
-                                isError: false
+                                isError: false,
                             });
 
                             // reset the explanationParts array for the next line
@@ -923,41 +976,53 @@ angular.module("codeboardApp").service("codingAssistantCodeMatchSrv", [
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // checks if something is a comment --> if so the comment does not get highlighted
-                // if (isComment == true) {
-                //     matched = true;
-                //     outputText += '<div onclick="event.stopPropagation();" style="cursor: default;" class="anyDiv unknown looksNice level">' + line + "\u200B</div>";
-                // }
-
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Stuff that doesnt get recognized by an array from the json file
                 if (matched == false) {
                     if (line.match(/^\s*[a-zA-Z0-9]+/)) {
                         if (redeclareVarErr) {
-                            console.log("!!!!!!REDECLARE VAR ERROR!!!!!!");
                             explanations.push({
-                                answer: "Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!",
+                                answer: 'Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!',
                                 lineLevel: linelevel,
-                                isError: true
+                                isError: true,
                             });
                         } else if (declareVarErr) {
-                            console.log("!!!!!!DECLARE VAR ERROR!!!!!!");
                             explanations.push({
-                                answer: "Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration!",
+                                answer: 'Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration!',
                                 lineLevel: linelevel,
-                                isError: true
+                                isError: true,
                             });
                         } else {
                             explanations.push({
-                                answer: "In dieser Zeile hat sich ein Fehler eingeschlichen. Bitte korrigiere den Code, damit ich ihn erklären kann!",
+                                answer: 'In dieser Zeile hat sich ein Fehler eingeschlichen. Bitte korrigiere den Code, damit ich ihn erklären kann!',
                                 lineLevel: linelevel,
-                                isError: true
+                                isError: true,
                             });
                         }
                     }
                 }
             });
-            return explanations
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Everything related to markers
+
+            // get varScopeStyle.css
+            var styleCss = document.styleSheets[31];
+
+            // add inline Style to variable scope
+            for (let i = 0; i < styleCss.cssRules.length; i++) {
+                styleCss.deleteRule(i);
+            }
+
+            // loops over all variables in Map
+            variableMap.forEach(function (value, key) {
+                // add marker to the variable
+                styleCss.insertRule('.' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
+            });
+
+            return {
+                explanations: explanations,
+                varScopeText: varScopeText,
+            };
         };
     },
 ]);

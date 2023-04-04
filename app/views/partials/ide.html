@@ -97,8 +97,12 @@
                     <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" ng-click="navBarClick('submit')" title="Submit this project">
                       <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe gelöst</span>
                     </button>
-
                   </form>
+
+                  <form class="navbar-form navbar-left pull-left ml-3">
+                    <button id="varScopeButton" class="btn btn-info btn-sm" ng-click="navBarClick('show_var_scope')" title="Show variable scope"><span class="glyphicon glyphicon-resize-vertical"></span></button>
+                  </form>
+
                 </div>
 
                 <div class="col-xs-5 col-md-5">
@@ -177,6 +181,16 @@
               </div> <!-- end of splitter that splits everything related to the tree view (projectname, treeview, library select box -->
 
             </div> <!-- end of left-part split-->
+            
+            <!-- variable Scope container -->
+            <div id="variableScopeContainer" ng-hide="showVarScope">
+              <div class="ideEditor" id="varScope_editor" ui-ace="{
+                showGutter: false,
+                useWrapMode: false,
+                theme: 'eclipse',
+                onLoad: aceLoaded}">
+              </div>
+            </div>
 
             <div id="ideRightPartOfMiddlePart"> <!-- begin of right-part of the middle part, that is the editor and tabs -->
               <!-- everything related to the editor -->
