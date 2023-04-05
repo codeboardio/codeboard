@@ -45,7 +45,6 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                                     author: 'Roby erklärt Zeile ' + explanation.lineLevel,
                                     avatar: explanation.isError ? 'worried' : 'idea',
                                 };
-
                                 $scope.chatLines.push(chatline);
                             });
 

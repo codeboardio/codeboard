@@ -24,7 +24,7 @@
                 </div>
 
                 <div ng-switch-when="error">
-                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar" type="chatLine.type">
                         <chat-line-error>{{chatLine.message}}</chat-line-error>
                     </chat-line>
                 </div>

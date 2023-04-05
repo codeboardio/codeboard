@@ -77,6 +77,33 @@
     position: relative;
     box-sizing: border-box;
 }
+
+.chat-line-error {
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 1px 1px 6px red;
+    -webkit-box-shadow: 0px 1px 10px red;
+    width: 85%;
+    position: relative;
+    box-sizing: border-box;
+    animation: wiggle 2.5s infinite;
+}
+/* code from https://stackoverflow.com/questions/38132700/css-wiggle-shake-effect */
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+   80% { transform: rotate(0deg); }
+   85% { transform: rotate(5deg); }
+   95% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.chat-line.left .chat-line-error {
+    background: #f1f5f9;
+}
+.chat-line.right .chat-line-error {
+    background: #f1f5f9;
+    float: right;
+}
 .chat-line.left .chat-line-item,
 .chat-line.left .chat-line-card {
     background: #f1f5f9;
@@ -88,6 +115,8 @@
 }
 .chat-line.left .chat-line-item:before,
 .chat-line.right .chat-line-item:after,
+.chat-line.left .chat-line-error:before,
+.chat-line.right .chat-line-error:after,
 .chat-line.left .chat-line-card:before,
 .chat-line.right .chat-line-card:after {
     width: 0;
@@ -102,6 +131,16 @@
     left: -10px;
     border-width: 0 13px 13px 0;
     border-color: transparent #f1f5f9 transparent transparent;
+}
+.chat-line.left .chat-line-error:before {
+    left: -10px;
+    border-width: 0 13px 13px 0;
+    border-color: transparent #f1f5f9 transparent transparent;
+}
+.chat-line.right .chat-line-error:after {
+    right: -10px;
+    border-width: 13px 13px 0 0;
+    border-color: #f2f2f2 transparent transparent transparent;
 }
 .chat-line.right .chat-line-item:after,
 .chat-line.right .chat-line-card:after {
@@ -259,11 +298,6 @@
 .sendRequest .topic {
     height: 120px;
     border-radius: 5px;
-}
-
-/* Explanation Error */
-.exp-error {
-    color: red;
 }
 
 /** - - - Chat Line Modal - - - **/
