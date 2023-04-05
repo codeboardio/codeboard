@@ -150,12 +150,11 @@
       </div>
 
       <div id="ideMiddlePartId" class="ideSplitterOverflowVisible">
-        <!-- the inner split part; left is the tree view, right is the editor -->
+        <!-- the inner split part; left is the tree view, in the middle is the variable scope and right is the editor -->
         <div kendo-splitter="splitter" k-orientation="'horizontal'" k-panes='{{kPanes}}' id="innerSplitPart" ng-controller="RightBarCtrl" class="ideSplitterOverflowVisible ideSplitterFullHeight">
 
+            <!-- everything related to the tree view -->
             <div id="ideTreeviewPartOfMiddlePart" ng-if="!isActionHidden('tree-view')" class="ideSplitterOverflowVisible">
-              <!-- everything related to the tree view -->
-
               <div kendo-splitter k-orientation="'vertical'" k-panes="[{resizable: false, size: '29px'},{}]" class="ideSplitterOverflowVisible ideSplitterFullHeight">
 
                 <!-- the project name -->
@@ -176,23 +175,20 @@
                     data-node-click="nodeClick">
                   </div>
                 </div>
-
                 <!-- end of the select box that lists library interface files -->
-              </div> <!-- end of splitter that splits everything related to the tree view (projectname, treeview, library select box -->
-
-            </div> <!-- end of left-part split-->
+              </div> 
+              <!-- end of splitter that splits everything related to the tree view (projectname, treeview, library select box -->
+            </div> 
+            <!-- end of tree view pane-->
             
-            <!-- variable Scope container -->
-            <div id="variableScopeContainer" ng-hide="showVarScope">
-              <div class="ideEditor" id="varScope_editor" ui-ace="{
-                showGutter: false,
-                useWrapMode: false,
-                theme: 'eclipse',
-                onLoad: aceLoaded}">
-              </div>
+            <!-- variable Scope pane -->
+            <div id="ideVarScopePartOfMiddlePart" class="ideSplitterOverflowVisible">
+              <div class="ideEditor" id="varScope_editor" ui-ace="{showGutter: false, useWrapMode: false, theme: 'eclipse', onLoad: aceLoaded}"></div>
             </div>
-
-            <div id="ideRightPartOfMiddlePart"> <!-- begin of right-part of the middle part, that is the editor and tabs -->
+            <!-- end of variable Scope pane -->
+              
+            <!-- begin of right-part of the middle part, that is the editor and tabs -->
+            <div id="ideRightPartOfMiddlePart"> 
               <!-- everything related to the editor -->
                 <div ng-controller="TabCtrl" id="ideTabArea"> <!-- the tabs -->
                   <ul class="ideTabs">
@@ -231,8 +227,8 @@
                     </div>
                     <!-- end of everything related to the editor -->
 
-                    <div class="ideFooter"> <!-- the lower part of splitter area, where the terminal lives -->
-
+                    <!-- the lower part of splitter area, where the terminal lives -->
+                    <div class="ideFooter"> 
                         <div scroll-glue class="ideOutput ideOutputText ideOutputBorder" ng-focus-child="#idFooterUserInput">
                             <span class="console-output" ng-bind-html="output"></span>
                             <div class="ideUserInput">
@@ -245,14 +241,18 @@
                             </div>
                         </div>
                     </div>
+                    <!-- end of the lower part of splitter area, where the terminal lives -->
                 </div>
+            </div> 
+            <!-- end of right-part of the middle part, that is the editor and tabs -->
 
-            </div> <!-- end of right-part of the middle part, that is the editor and tabs -->
-
+            <!-- right bar content pane -->
             <div id="ideRighterPartOfMiddlePart" ng-if="isNavBarRightActive()" class="ideSplitterFullHeight" style="overflow: hidden">
               <div class="ide-tabs" ng-repeat="tab in rightBarTabs" ng-include="tab.contentURL" ng-show="isTabActive(tab.slug)"></div>
             </div>
+            <!-- end of right bar content pane -->  
 
+            <!-- right bar tabs pane -->
             <div id="ideRightestPartOfMiddlePart" ng-if="isNavBarRightActive()" class="ideSplitterFullHeight">
                 <div class="ideAdditionalTabs">
                     <a tab-click ng-repeat="tab in rightBarTabs" ng-hide="tab.disabled" ng-click="rightBarTabClick(tab.slug)" class="tab tab-{{tab.slug}}" id="rightBarTabs{{tab.slug}}">
@@ -260,10 +260,14 @@
                     </a>
                 </div>
             </div>
+            <!-- end of right bar tabs pane -->
 
-        </div><!-- closing the high-level splitter in the middle part-->
-      </div><!-- End of the middle part, where left is the tree view etc., right is the editor etc. -->
-    </div><!-- closing the outermost splitter that splits into header, middle, and footer -->
+        </div>
+        <!-- closing the high-level splitter in the middle part-->
+      </div>
+      <!-- End of the middle part, where left is the tree view etc., right is the editor etc. -->
+    </div>
+    <!-- closing the outermost splitter that splits into header, middle, and footer -->
 
     <!-- the status bar on the bottom of the page, showing username, role, info etc.-->
     <div style="height: 3px; background-color: #f5f5f5;"></div>

@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 
-var app = angular.module("codeboardApp");
+var app = angular.module('codeboardApp');
 
-app.controller("IdeCtrl", [
-    "$scope",
-    "$rootScope",
-    "$log",
-    "$sce",
-    "$location",
-    "$routeParams",
-    "$window",
-    "$http",
-    "$timeout",
-    "$uibModal",
-    "ProjectFactory",
-    "projectData",
-    "ltiData",
-    "IdeMsgService",
-    "UserSrv",
-    "WebsocketSrv",
-    "ChatSrv",
-    "codingAssistantCodeMatchSrv",
+app.controller('IdeCtrl', [
+    '$scope',
+    '$rootScope',
+    '$log',
+    '$sce',
+    '$location',
+    '$routeParams',
+    '$window',
+    '$http',
+    '$timeout',
+    '$uibModal',
+    'ProjectFactory',
+    'projectData',
+    'ltiData',
+    'IdeMsgService',
+    'UserSrv',
+    'WebsocketSrv',
+    'ChatSrv',
+    'codingAssistantCodeMatchSrv',
     function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, codingAssistantCodeMatchSrv) {
         // First we handle all data that was injected as part of the app.js resolve.
         // set the ProjectFactory to contain the project loaded from the server
@@ -37,7 +37,7 @@ app.controller("IdeCtrl", [
 
             // this function is called when closing or reloading the browser window
             $window.onbeforeunload = function (event) {
-                let message = "You currently have unsaved changes.";
+                let message = 'You currently have unsaved changes.';
 
                 // make sure we saved the content currently displayed before deciding if there are unsaved changes
                 saveCurrentlyDisplayedContent();
@@ -52,19 +52,19 @@ app.controller("IdeCtrl", [
             };
 
             // this function is called when the user clicks on some UI element (e.g. button) that changes the location
-            $scope.$on("$locationChangeStart", function (event) {
+            $scope.$on('$locationChangeStart', function (event) {
                 // make sure we saved the content currently displayed before deciding if there are unsaved changes
                 saveCurrentlyDisplayedContent();
 
                 // if the user has unsaved changes, show the message
                 if (ProjectFactory.isProjectModified()) {
-                    let message = "You currently have unsaved changes.\n\nAre you sure you want to leave this page?";
+                    let message = 'You currently have unsaved changes.\n\nAre you sure you want to leave this page?';
 
                     let answer = confirm(message);
                     if (!answer) {
                         event.preventDefault();
                     } else {
-                        console.log("leave page");
+                        console.log('leave page');
 
                         $scope.ace.editor.destroy();
 
@@ -88,11 +88,11 @@ app.controller("IdeCtrl", [
                 var viewSettings = [];
 
                 // split the "view" query string on all "-" characters
-                var queryStringElements = $routeParams.view.split("-");
+                var queryStringElements = $routeParams.view.split('-');
 
                 for (var i = 0; i < queryStringElements.length; i++) {
                     // split the element at the "dot" to get the nodeId and the active setting
-                    var details = queryStringElements[i].split(".");
+                    var details = queryStringElements[i].split('.');
 
                     // we expect that a details has 2 numbers (check via isNaN)
                     if (!(details.length == 2 && isNaN(details[0]) && isNaN(details[1]))) {
@@ -148,11 +148,11 @@ app.controller("IdeCtrl", [
          */
         let setOutput = function (outputToDisplay) {
             $scope.output = $sce.trustAsHtml(outputToDisplay);
-            $scope.htmlOutput = "";
+            $scope.htmlOutput = '';
         };
 
         // the output in the console of the ide
-        setOutput("This will display the output.", false);
+        setOutput('This will display the output.', false);
 
         /**
          * Adds the given aOutputToAdd to the existing output
@@ -185,10 +185,10 @@ app.controller("IdeCtrl", [
             if (saveProjectToServer) {
                 ProjectFactory.saveProjectToServer().then(
                     function (result) {
-                        console.log("Project saved");
+                        console.log('Project saved');
                     },
                     function (reason) {
-                        console.log("Save project failed");
+                        console.log('Save project failed');
                     }
                 );
             }
@@ -208,12 +208,12 @@ app.controller("IdeCtrl", [
             var maxNumOfMessageCharacters = 200;
 
             // clear the output
-            setOutput("");
+            setOutput('');
 
             var onWSOpenCallback = function () {
                 $http.get(aStartUrl).then(
                     function (success) {
-                        $log.debug("websocketSrvjs.onOpen: container successfully started");
+                        $log.debug('websocketSrvjs.onOpen: container successfully started');
 
                         if (ideState.actionAllowsForStopping) {
                             // send out a msg that now a container is running that could be stopped (e.g. by the user)
@@ -221,7 +221,7 @@ app.controller("IdeCtrl", [
                         }
                     },
                     function (errorResponse) {
-                        $log.debug("websocketSrvjs.onOpen: problem starting container.");
+                        $log.debug('websocketSrvjs.onOpen: problem starting container.');
                         $log.debug(errorResponse);
                     }
                 );
@@ -237,20 +237,20 @@ app.controller("IdeCtrl", [
                 }
 
                 // check for compilation errors and dont print the successful compilation message
-                if (aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, "") === "Compilation successful") {
+                if (aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '') === 'Compilation successful') {
                     compilationError = false;
                     return;
                 }
 
                 // replace line breaks with <br> and allow html
-                aNewlyReceivedData = aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, "<br>");
+                aNewlyReceivedData = aNewlyReceivedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
                 var outputLength = addToOutput(aNewlyReceivedData);
 
                 // account for the number of messages
                 numOfMessages += 1;
                 //if(numOfMessages > maxNumOfMessages) {
                 if (outputLength > maxNumOfMessageCharacters) {
-                    addToOutput("\n\nYour program output has more than " + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" + "For this reason, Codeboard has terminated your program.\n\n");
+                    addToOutput('\n\nYour program output has more than ' + maxNumOfMessageCharacters + " characters. That's quite a lot.\n" + 'For this reason, Codeboard has terminated your program.\n\n');
 
                     WebsocketSrv.close(true);
                 }
@@ -260,7 +260,7 @@ app.controller("IdeCtrl", [
             var onWSCloseCallback = function () {
                 // if no message was added via WS, we set a message that the action completed
                 if (numOfMessages === 0) {
-                    addToOutput("--Session ended without output.--", false);
+                    addToOutput('--Session ended without output.--', false);
                 }
 
                 // set focus back to the editor
@@ -288,10 +288,10 @@ app.controller("IdeCtrl", [
         };
 
         // check if Websockets are supported; if not, show a warning message
-        if ("WebSocket" in window && (typeof WebSocket === "function" || typeof WebSocket === "object")) {
-            $log.debug("Info: Browser supports WebSockets");
+        if ('WebSocket' in window && (typeof WebSocket === 'function' || typeof WebSocket === 'object')) {
+            $log.debug('Info: Browser supports WebSockets');
         } else {
-            setOutput("Warning: your browser does not support WebSockets.\n" + "This may cause Codeboard to not work properly.\n" + "Please consider updating to a newer browser.");
+            setOutput('Warning: your browser does not support WebSockets.\n' + 'This may cause Codeboard to not work properly.\n' + 'Please consider updating to a newer browser.');
         }
 
         /**
@@ -303,7 +303,7 @@ app.controller("IdeCtrl", [
             saveCurrentlyDisplayedContent(true);
 
             // remove previous compilation results
-            setOutput("Waiting for (previous) results...", false);
+            setOutput('Waiting for (previous) results...', false);
 
             // disable all actions till the compile request is completed
             setEnabledActions(0, 0, 0, 0, 0);
@@ -324,9 +324,9 @@ app.controller("IdeCtrl", [
                 },
                 function (reason) {
                     // the error callback
-                    $log.debug("Error while trying to run your program. The server responded:\n" + reason);
+                    $log.debug('Error while trying to run your program. The server responded:\n' + reason);
 
-                    setOutput("Error while trying to run your program. The server responded:\n" + reason, false);
+                    setOutput('Error while trying to run your program. The server responded:\n' + reason, false);
 
                     // disable the action to send another compile request
                     setEnabledActions(1, 0, 0, 1, 0);
@@ -342,7 +342,7 @@ app.controller("IdeCtrl", [
          */
         let runProject = function () {
             // remove previous output message
-            setOutput("Waiting for results...", false);
+            setOutput('Waiting for results...', false);
 
             // disable all actions while we wait for the request to complete
             setEnabledActions(0, 0, 0, 0, 0);
@@ -359,10 +359,10 @@ app.controller("IdeCtrl", [
                 },
                 function (reason) {
                     // the error callback
-                    $log.debug("Error when trying to run your program. The server responded:\n" + reason);
+                    $log.debug('Error when trying to run your program. The server responded:\n' + reason);
 
                     // display the error to the user
-                    setOutput("Error when trying to run your program. The server responded:\n" + reason, false);
+                    setOutput('Error when trying to run your program. The server responded:\n' + reason, false);
 
                     // something went wrong while trying to run the program (maybe it was deleted?)
                     // so we only allow the user to compile
@@ -387,7 +387,7 @@ app.controller("IdeCtrl", [
             saveCurrentlyDisplayedContent(true);
 
             // remove previous compilation results
-            setOutput("Waiting for (previous) results...", false);
+            setOutput('Waiting for (previous) results...', false);
 
             // disable all actions till the compile request is completed
             setEnabledActions(0, 0, 0, 0, 0);
@@ -410,25 +410,25 @@ app.controller("IdeCtrl", [
                                 stream: false,
                             };
 
-                            $http.post("/api/" + $routeParams.projectId + "/help/compilation", payload).then(
+                            $http.post('/api/' + $routeParams.projectId + '/help/compilation', payload).then(
                                 function (result) {
-                                    if (typeof result.data !== "undefined") {
-                                        let reqOpenHelpTab = IdeMsgService.msgNavBarRightOpenTab("help");
+                                    if (typeof result.data !== 'undefined') {
+                                        let reqOpenHelpTab = IdeMsgService.msgNavBarRightOpenTab('help');
                                         $rootScope.$broadcast(reqOpenHelpTab.msg, reqOpenHelpTab.data);
 
                                         let chatLineCard = {
-                                            cardHeader: "Fehler beim Kompilieren",
+                                            cardHeader: 'Fehler beim Kompilieren',
                                             cardBody: result.data,
-                                            cardType: "compHelp",
+                                            cardType: 'compHelp',
                                         };
 
-                                        let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, "card", "Roby", "worried");
+                                        let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, 'card', 'Roby', 'worried');
                                         $rootScope.$broadcast(reqAddMsg.msg, reqAddMsg.data);
                                     }
                                 },
                                 function (error) {
                                     console.log(error);
-                                    $log.debug("An error occurred while trying to create help message for compilation error.");
+                                    $log.debug('An error occurred while trying to create help message for compilation error.');
                                 }
                             );
                         }
@@ -439,17 +439,17 @@ app.controller("IdeCtrl", [
                     // Note: doing the DOM manipulation in the controller is not "the Angular way"
                     // However, we would need 2 more directives otherwise (one for enter-click, one for send-button click)
                     // About element selection see: http://mlen.io/angular-js/get-element-by-id.html
-                    var domElem = angular.element(document.querySelector("#idFooterUserInput"));
+                    var domElem = angular.element(document.querySelector('#idFooterUserInput'));
                     if (domElem) {
                         domElem.focus();
                     }
                 })
                 .catch(function (reason) {
                     // the error callback
-                    $log.debug("Error when trying to compile and run your program. The server responded:\n" + reason);
+                    $log.debug('Error when trying to compile and run your program. The server responded:\n' + reason);
 
                     // display the error to the user
-                    setOutput("Error when trying to compile and run your program. The server responded:\n" + reason, false);
+                    setOutput('Error when trying to compile and run your program. The server responded:\n' + reason, false);
 
                     // something went wrong while trying to run the program (maybe it was deleted?)
                     // so we only allow the user to compile
@@ -468,7 +468,7 @@ app.controller("IdeCtrl", [
             saveCurrentlyDisplayedContent(true);
 
             // update the message in the console
-            setOutput("Analyzing your project. This might take a few seconds. Please wait...", false);
+            setOutput('Analyzing your project. This might take a few seconds. Please wait...', false);
 
             // disable all other actions while we wait for the test to complete
             setEnabledActions(0, 0, 0, 0, 0);
@@ -477,12 +477,12 @@ app.controller("IdeCtrl", [
             var promise = ProjectFactory.toolAction();
             promise.then(
                 function (data) {
-                    $log.debug("Tool action successful.");
+                    $log.debug('Tool action successful.');
 
                     if (data.compilationError) {
                         // a compilation error occured and thus the tests will not have been run
                         // we display the compilation error
-                        setOutput("Analysis failed. Your program does not compile.\nFix all compilation errors and try again.\n\n--- Details ---\n\n" + data.outputCompiler, false);
+                        setOutput('Analysis failed. Your program does not compile.\nFix all compilation errors and try again.\n\n--- Details ---\n\n' + data.outputCompiler, false);
                     } else {
                         // setOutput('Number of passing tests: ' + data.numTestsPassing + '\nNumber of failing tests: ' + data.numTestsFailing + '\n\n--- Details ---\n\n' + data.output, false);
                         setOutput(data.output, false);
@@ -492,9 +492,9 @@ app.controller("IdeCtrl", [
                     setEnabledActions(1, 0, 1, 1, 1);
                 },
                 function (reason) {
-                    $log.debug("Error while running the tool-action on your program. The server responded:\n" + reason);
+                    $log.debug('Error while running the tool-action on your program. The server responded:\n' + reason);
 
-                    setOutput("Error while running the requested action on your program. The server responded:\n" + reason, false);
+                    setOutput('Error while running the requested action on your program. The server responded:\n' + reason, false);
 
                     // something went wrong so we only enable compilation and testing again
                     setEnabledActions(1, 0, 1, 1, 0);
@@ -510,7 +510,7 @@ app.controller("IdeCtrl", [
             saveCurrentlyDisplayedContent(true);
 
             // update the message in the console
-            setOutput("Submitting your solution. This might take a few seconds. Please wait...", false);
+            setOutput('Submitting your solution. This might take a few seconds. Please wait...', false);
 
             // disable all other actions while we wait for the submission to complete
             setEnabledActions(0, 0, 0, 0, 0);
@@ -520,9 +520,9 @@ app.controller("IdeCtrl", [
              * @type {*[]}
              */
             let submitModalInstanceCtrl = [
-                "$rootScope",
-                "$scope",
-                "$uibModalInstance",
+                '$rootScope',
+                '$scope',
+                '$uibModalInstance',
                 function ($rootScope, $scope, $uibModalInstance) {
                     // init scope variables
                     $scope.numTestsFailed = $scope.numTestsPassed = $scope.numTests = 0;
@@ -533,9 +533,9 @@ app.controller("IdeCtrl", [
                     $scope.hasResult = false;
 
                     // default texts
-                    $scope.title = "Deine Lösung wird überprüft";
-                    $scope.textAfterResult = "Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!";
-                    $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
+                    $scope.title = 'Deine Lösung wird überprüft';
+                    $scope.textAfterResult = 'Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!';
+                    $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg';
 
                     /**
                      * Defines what to do when no tests passed
@@ -543,16 +543,16 @@ app.controller("IdeCtrl", [
                      * todo Differentiate texts depending on whether they are dynamic or not
                      */
                     let noTestsPassed = function () {
-                        $scope.textBeforeResult = "Sehr wahrscheinlich hat deine Lösung einen Kompilier-Fehler. Versuche diesen zu beheben, damit du deine Lösung erfolgreich abgeben kannst.";
-                        $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+                        $scope.textBeforeResult = 'Sehr wahrscheinlich hat deine Lösung einen Kompilier-Fehler. Versuche diesen zu beheben, damit du deine Lösung erfolgreich abgeben kannst.';
+                        $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg';
                     };
 
                     /**
                      * Defines what to do when no tests passed
                      */
                     let notEnoughTestsPassed = function (numTests) {
-                        $scope.textBeforeResult = "Gut gemacht! Deine Lösung erfüllt bereits " + $scope.numTestsPassed + " von " + $scope.numTests + " Tests.";
-                        $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
+                        $scope.textBeforeResult = 'Gut gemacht! Deine Lösung erfüllt bereits ' + $scope.numTestsPassed + ' von ' + $scope.numTests + ' Tests.';
+                        $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg';
                     };
 
                     /**
@@ -560,10 +560,10 @@ app.controller("IdeCtrl", [
                      * When the passRates is reached we trigger the msgSuccessfulSubmission event
                      */
                     let enoughTestsPassed = function () {
-                        $scope.title = "Deine Lösung wurde erfolgreich übermittelt";
-                        $scope.textBeforeResult = "Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!";
-                        $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
-                        $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
+                        $scope.title = 'Deine Lösung wurde erfolgreich übermittelt';
+                        $scope.textBeforeResult = 'Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!';
+                        $scope.textAfterResult = 'Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!';
+                        $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg';
 
                         // trigger successful submission event
                         let req = IdeMsgService.msgSuccessfulSubmission();
@@ -574,8 +574,8 @@ app.controller("IdeCtrl", [
                      * Defines what to do when a submission went wrong
                      */
                     let submissionFailed = function () {
-                        $scope.title = "Submission fehlgeschlagen";
-                        $scope.textBeforeResult = "Bitte versuche deine Aufgabe erneut abzugeben. Wenn die Submission erneut fehlschlägt, wennde dich bitte an deinen Kursleiter";
+                        $scope.title = 'Submission fehlgeschlagen';
+                        $scope.textBeforeResult = 'Bitte versuche deine Aufgabe erneut abzugeben. Wenn die Submission erneut fehlschlägt, wennde dich bitte an deinen Kursleiter';
                     };
 
                     /**
@@ -585,7 +585,7 @@ app.controller("IdeCtrl", [
                         // submit the project
                         ProjectFactory.submitProject().then(
                             function (result) {
-                                $log.debug("Submission successful."); // todo nope stimmt nicht
+                                $log.debug('Submission successful.'); // todo nope stimmt nicht
 
                                 setOutput(result.msg, false);
 
@@ -631,7 +631,7 @@ app.controller("IdeCtrl", [
                                 setEnabledActions(1, 0, 1, 1, 1);
                             },
                             function (reason) {
-                                $log.debug("Submission failed." + reason.data.msg);
+                                $log.debug('Submission failed.' + reason.data.msg);
                                 setOutput(reason.data.msg, false);
 
                                 // show an error message in modal
@@ -683,7 +683,7 @@ app.controller("IdeCtrl", [
                         $uibModalInstance.close();
 
                         // trigger open help tab
-                        let req = IdeMsgService.msgNavBarRightOpenTab("help");
+                        let req = IdeMsgService.msgNavBarRightOpenTab('help');
                         $rootScope.$broadcast(req.msg, req.data);
                     };
 
@@ -695,7 +695,7 @@ app.controller("IdeCtrl", [
                         $uibModalInstance.close();
 
                         // trigger open help tab
-                        let req = IdeMsgService.msgNavBarRightOpenTab("sampleSolution");
+                        let req = IdeMsgService.msgNavBarRightOpenTab('sampleSolution');
                         $rootScope.$broadcast(req.msg, req.data);
                     };
                 },
@@ -706,11 +706,11 @@ app.controller("IdeCtrl", [
              * this call as we don't need to access any data from the modal)
              */
             $uibModal.open({
-                appendTo: angular.element(document.querySelector("#modalAppendTo")),
-                templateUrl: "ideSubmitModal.html",
+                appendTo: angular.element(document.querySelector('#modalAppendTo')),
+                templateUrl: 'ideSubmitModal.html',
                 controller: submitModalInstanceCtrl,
-                windowClass: "avatar-modal",
-                size: "md",
+                windowClass: 'avatar-modal',
+                size: 'md',
             });
         };
 
@@ -719,11 +719,11 @@ app.controller("IdeCtrl", [
             if (ideState.stopUrl) {
                 $http.get(ideState.stopUrl).then(
                     function (result) {
-                        setOutput("\n\n--Program stopped--", true);
+                        setOutput('\n\n--Program stopped--', true);
                     },
                     function (error) {
-                        $log.debug("An error occurred while trying to stop your program.");
-                        setOutput("\n\nAn error occurred while trying to stop your program.", true);
+                        $log.debug('An error occurred while trying to stop your program.');
+                        setOutput('\n\nAn error occurred while trying to stop your program.', true);
                     }
                 );
             }
@@ -735,28 +735,28 @@ app.controller("IdeCtrl", [
          */
         let resetSolution = function () {
             let confirmResetModalInstanceCtrl = [
-                "$rootScope",
-                "$scope",
-                "$uibModalInstance",
+                '$rootScope',
+                '$scope',
+                '$uibModalInstance',
                 function ($rootScope, $scope, $uibModalInstance) {
                     /**
                      * If user confirms modal, load original files and overwrite current
                      */
                     $scope.ok = function () {
                         // the url from which to get the files of the project
-                        let _urlForProject = "/api/projects/" + $routeParams.projectId;
+                        let _urlForProject = '/api/projects/' + $routeParams.projectId;
 
                         // separator used to add courseId. If lti we need & otherwise ?
-                        var sep = "?";
+                        var sep = '?';
 
                         // if we have a Lti user, we need to attach the Lti parameters because the server checks if the user is an lti user and grants access accordingly
                         if ($routeParams.ltiSessionId && $routeParams.ltiUserId && $routeParams.ltiNonce) {
-                            _urlForProject += "?ltiSessionId=" + $routeParams.ltiSessionId + "&ltiUserId=" + $routeParams.ltiUserId + "&ltiNonce=" + $routeParams.ltiNonce;
-                            sep = "&";
+                            _urlForProject += '?ltiSessionId=' + $routeParams.ltiSessionId + '&ltiUserId=' + $routeParams.ltiUserId + '&ltiNonce=' + $routeParams.ltiNonce;
+                            sep = '&';
                         }
 
                         if (ProjectFactory.getCourseId()) {
-                            _urlForProject += sep + "courseId=" + ProjectFactory.getCourseId();
+                            _urlForProject += sep + 'courseId=' + ProjectFactory.getCourseId();
                         }
 
                         // load original
@@ -786,9 +786,9 @@ app.controller("IdeCtrl", [
 
             // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
             $uibModal.open({
-                templateUrl: "ideConfirmResetModal.html",
+                templateUrl: 'ideConfirmResetModal.html',
                 controller: confirmResetModalInstanceCtrl,
-                appendTo: angular.element(document.querySelector("#modalAppendTo")),
+                appendTo: angular.element(document.querySelector('#modalAppendTo')),
             });
         };
 
@@ -798,7 +798,7 @@ app.controller("IdeCtrl", [
          * Non-LTI-Users are redirected to their profile page
          */
         let takeMeHome = function () {
-            let url = "/";
+            let url = '/';
             if (ProjectFactory.getProject().hasLtiData) {
                 url = ProjectFactory.getProject().ltiData.ltiReturnUrl;
             }
@@ -810,7 +810,7 @@ app.controller("IdeCtrl", [
             // if the user clicks an action (e.g. compile, run), this variable can be set to indicate that the action supports user-stopping
             actionAllowsForStopping: false,
             // the Url that must be called to stop an action
-            stopUrl: "",
+            stopUrl: '',
         };
 
         $scope.projectName = ProjectFactory.getProject().name;
@@ -887,12 +887,12 @@ app.controller("IdeCtrl", [
          * Default settings of the editor
          */
         $scope.aceEditorSettings = {
-            theme: "eclipse",
-            fontSize: "12px",
-            handler: "ace",
+            theme: 'eclipse',
+            fontSize: '12px',
+            handler: 'ace',
             tabSize: 4,
-            invisibles: "Hide",
-            gutter: "Show",
+            invisibles: 'Hide',
+            gutter: 'Show',
         };
 
         var aceKeyboardHandler; // default ace keyword handler
@@ -916,7 +916,7 @@ app.controller("IdeCtrl", [
              * @return {string} the url for the signin with a 'redirect' query parameter
              */
             signinPathWithRedirect: function () {
-                return "/signin?redirect=" + encodeURIComponent($location.url());
+                return '/signin?redirect=' + encodeURIComponent($location.url());
             },
         };
 
@@ -925,32 +925,32 @@ app.controller("IdeCtrl", [
          * @returns {Boolean|void|boolean}
          */
         $scope.userAllowedToSave = function () {
-            return UserSrv.isAuthenticated() && (ProjectFactory.getProject().userRole === "user" || ProjectFactory.getProject().userRole === "owner");
+            return UserSrv.isAuthenticated() && (ProjectFactory.getProject().userRole === 'user' || ProjectFactory.getProject().userRole === 'owner');
         };
 
         /** Returns true if the current role is that of project 'owner' */
         $scope.currentRoleIsOwner = function () {
-            return ProjectFactory.getProject().userRole === "owner";
+            return ProjectFactory.getProject().userRole === 'owner';
         };
 
         /** Returns true if the current role is that of project 'user' */
         $scope.currentRoleIsUser = function () {
-            return ProjectFactory.getProject().userRole === "user";
+            return ProjectFactory.getProject().userRole === 'user';
         };
 
         /** Returns true if the current role is that of project 'submission' */
         $scope.currentRoleIsSubmission = function () {
-            return ProjectFactory.getProject().userRole === "submission";
+            return ProjectFactory.getProject().userRole === 'submission';
         };
 
         /** Returns true if the current role is that of project 'userproject' */
         $scope.currentRoleIsUserProject = function () {
-            return ProjectFactory.getProject().userRole === "userproject";
+            return ProjectFactory.getProject().userRole === 'userproject';
         };
 
         /** Returns true if the current role is that of project 'help' */
         $scope.currentRoleIsHelp = function () {
-            return ProjectFactory.getProject().userRole === "help";
+            return ProjectFactory.getProject().userRole === 'help';
         };
 
         /** Returns the current role */
@@ -977,7 +977,7 @@ app.controller("IdeCtrl", [
          */
         $scope.isActionHidden = function (action) {
             // if the current user is admin return false
-            if (UserSrv.isAuthenticated() && ProjectFactory.getProject().userRole !== "user") {
+            if (UserSrv.isAuthenticated() && ProjectFactory.getProject().userRole !== 'user') {
                 return false;
             }
 
@@ -986,15 +986,15 @@ app.controller("IdeCtrl", [
 
             // check for disabled action in the context of a course
             let courseData = ProjectFactory.getProject().courseData;
-            if (typeof courseData !== "undefined" && courseData.hasOwnProperty("courseOptions")) {
-                let courseUserDisabledActions = courseData.courseOptions.find((o) => o.option === "userDisabledActions");
-                if (typeof courseUserDisabledActions !== "undefined") {
-                    disabledActions = disabledActions.concat(courseUserDisabledActions.value.split("|"));
+            if (typeof courseData !== 'undefined' && courseData.hasOwnProperty('courseOptions')) {
+                let courseUserDisabledActions = courseData.courseOptions.find((o) => o.option === 'userDisabledActions');
+                if (typeof courseUserDisabledActions !== 'undefined') {
+                    disabledActions = disabledActions.concat(courseUserDisabledActions.value.split('|'));
                 }
             }
 
             // check for disabled actions in the context of a project
-            if (ProjectFactory.hasConfig("userDisabledActions")) {
+            if (ProjectFactory.hasConfig('userDisabledActions')) {
                 disabledActions = disabledActions.concat(ProjectFactory.getConfig().userDisabledActions);
             }
 
@@ -1008,7 +1008,7 @@ app.controller("IdeCtrl", [
          * @return {boolean}
          */
         $scope.isCompilationNeeded = function () {
-            var _dynamicLanguages = ["Python", "Python-UnitTest"];
+            var _dynamicLanguages = ['Python', 'Python-UnitTest'];
             var _compilationIsNeeded = true;
 
             if (_dynamicLanguages.indexOf(ProjectFactory.getProject().language) !== -1) {
@@ -1024,7 +1024,7 @@ app.controller("IdeCtrl", [
          * @return {boolean}
          */
         $scope.isTestSupported = function () {
-            return ProjectFactory.hasConfig("Testing", "ioTests");
+            return ProjectFactory.hasConfig('Testing', 'ioTests');
         };
 
         /**
@@ -1058,136 +1058,140 @@ app.controller("IdeCtrl", [
         /**
          * prepare panes depending on hidden actions (Janick Michot)
          */
-        $scope.kPanes = $scope.isActionHidden("tree-view") ? "[" : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
-        // variable Scope container
-        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: true, size: '5%' }, "; 
-        $scope.kPanes += " {collapsible: false} ";
-        $scope.kPanes += !angular.equals({}, $scope.rightBarTabs) ? ", { collapsible: true, resizable: true, collapsed: true, size: '35%' }" : "";
-        $scope.kPanes += !angular.equals({}, $scope.rightBarTabs) ? ", { collapsible: false, resizable: false, collapsed: false, size: '26px' } ]" : "]";
+        // kPane for treeView
+        $scope.kPanes = $scope.isActionHidden('tree-view') ? '[' : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
+        // kPane for varScopeDiv
+        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: false , size: '5%' }, ";
+        // kPane for aceEditor
+        $scope.kPanes += ' {collapsible: false} ';
+        // kPane for rightBarTabs (before actual tabs - content)
+        $scope.kPanes += !angular.equals({}, $scope.rightBarTabs) ? ", { collapsible: true, resizable: true, collapsed: true, size: '35%' }" : '';
+        // kPane for rightBarTabs
+        $scope.kPanes += !angular.equals({}, $scope.rightBarTabs) ? ", { collapsible: false, resizable: false, collapsed: false, size: '26px' } ]" : ']';
 
         /**
          * Function that broadcasts messages when an element in the NavBar is clicked by the user.
          * @param {string} aClickId the clickId that tells the code which element the user clicked
          */
         $scope.navBarClick = function (aClickId) {
-            $log.debug("NavBarClick with id: " + aClickId);
+            $log.debug('NavBarClick with id: ' + aClickId);
 
             var req;
 
             switch (aClickId) {
-                case "home":
+                case 'home':
                     req = IdeMsgService.msgTakeMeHomeRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "add_file":
-                    req = IdeMsgService.msgNewNodeRequest("file");
+                case 'add_file':
+                    req = IdeMsgService.msgNewNodeRequest('file');
                     $rootScope.$broadcast(req.msg, req.data);
                     break;
-                case "add_folder":
-                    req = IdeMsgService.msgNewNodeRequest("folder");
+                case 'add_folder':
+                    req = IdeMsgService.msgNewNodeRequest('folder');
                     $rootScope.$broadcast(req.msg, req.data);
                     break;
-                case "add_image":
+                case 'add_image':
                     req = IdeMsgService.msgNewImageNodeRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "rename_node":
+                case 'rename_node':
                     req = IdeMsgService.msgRenameNodeRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "remove_node":
+                case 'remove_node':
                     req = IdeMsgService.msgRemoveNodeRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "save_project":
+                case 'save_project':
                     req = IdeMsgService.msgSaveProjectRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "hide_file":
+                case 'hide_file':
                     req = IdeMsgService.msgHideNodeRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "make_file_static":
+                case 'make_file_static':
                     req = IdeMsgService.msgMakeNodeStaticNodeRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "show_share_project":
+                case 'show_share_project':
                     req = IdeMsgService.msgShowShareProjectModalRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "show_editor_settings":
+                case 'show_editor_settings':
                     req = IdeMsgService.msgShowEditorSettingsRequest($scope.aceEditorSettings);
                     $rootScope.$broadcast(req.msg, req.data);
                     break;
-                case "compile":
+                case 'compile':
                     if (!$scope.disabledActions.compile) {
                         req = IdeMsgService.msgCompileRequest();
                         $rootScope.$broadcast(req.msg);
                     }
                     break;
-                case "compileDynamic":
+                case 'compileDynamic':
                     if (!$scope.disabledActions.compile) {
                         req = IdeMsgService.msgCompileRequest();
                         $rootScope.$broadcast(req.msg);
                         ideState.actionAllowsForStopping = true;
                     }
                     break;
-                case "compile_clean":
+                case 'compile_clean':
                     if (!$scope.disabledActions.compile) {
                         req = IdeMsgService.msgCompileCleanRequest();
                         $rootScope.$broadcast(req.msg);
                     }
                     break;
-                case "run":
+                case 'run':
                     if (!$scope.disabledActions.run) {
                         req = IdeMsgService.msgRunRequest();
                         $rootScope.$broadcast(req.msg);
                         ideState.actionAllowsForStopping = true;
                     }
                     break;
-                case "compileAndRun":
+                case 'compileAndRun':
                     if (!$scope.disabledActions.compileAndRun) {
                         req = IdeMsgService.msgCompileAndRunRequest();
                         $rootScope.$broadcast(req.msg);
                         ideState.actionAllowsForStopping = true;
                     }
                     break;
-                case "stop":
+                case 'stop':
                     req = IdeMsgService.msgStopRequest();
                     $rootScope.$broadcast(req.msg);
                     break;
-                case "test":
+                case 'test':
                     if (!$scope.disabledActions.test) {
                         req = IdeMsgService.msgTestRequest();
                         $rootScope.$broadcast(req.msg);
                     }
                     break;
-                case "tool":
+                case 'tool':
                     if (!$scope.disabledActions.tool) {
                         req = IdeMsgService.msgToolRequest();
                         $rootScope.$broadcast(req.msg);
                     }
                     break;
-                case "submit":
+                case 'submit':
                     if (!($scope.disabledActions.submit || $scope.uiSettings.disableSubmissionBtn)) {
                         req = IdeMsgService.msgSubmitRequest();
                         $rootScope.$broadcast(req.msg);
                     }
                     break;
-                case "help":
+                case 'help':
                     if (!$scope.disabledActions.help) {
                         // todo getHelp in disabledActions definieren
-                        let req = IdeMsgService.msgNavBarRightOpenTab("help");
+                        let req = IdeMsgService.msgNavBarRightOpenTab('help');
                         $rootScope.$broadcast(req.msg, req.data);
                     }
                     break;
-                case "reset":
+                case 'reset':
                     if (!$scope.disabledActions.help) {
                         req = IdeMsgService.msgResetRequest();
                         $rootScope.$broadcast(req.msg);
                     }
-                case "show_var_scope":
-                    codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor)
+                case 'show_var_scope':
+                    codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
                     break;
             }
         };
@@ -1221,13 +1225,13 @@ app.controller("IdeCtrl", [
             var lFileContent = lNode.content;
 
             // the mode that should be used in this session
-            var lAceMode = "ace/mode/text";
+            var lAceMode = 'ace/mode/text';
 
             // get the file type
-            var lFileType = lNode.filename.split(".").pop();
+            var lFileType = lNode.filename.split('.').pop();
 
             // image file types
-            let imageFileTypes = ["png", "svg", "jpg", "gif"];
+            let imageFileTypes = ['png', 'svg', 'jpg', 'gif'];
 
             // if file type 'image' change editor behaviour
             $scope.ace.isImage = false;
@@ -1243,41 +1247,41 @@ app.controller("IdeCtrl", [
                 $scope.ace.editor.setSession(ProjectFactory.getNode(aMsgData.nodeId).session);
             } else {
                 switch (lFileType) {
-                    case "e":
-                        lAceMode = "ace/mode/eiffel";
+                    case 'e':
+                        lAceMode = 'ace/mode/eiffel';
                         break;
-                    case "ecf":
-                        lAceMode = "ace/mode/xml";
+                    case 'ecf':
+                        lAceMode = 'ace/mode/xml';
                         break;
-                    case "java":
-                        lAceMode = "ace/mode/java";
+                    case 'java':
+                        lAceMode = 'ace/mode/java';
                         break;
-                    case "html":
-                        lAceMode = "ace/mode/html";
+                    case 'html':
+                        lAceMode = 'ace/mode/html';
                         break;
-                    case "htm":
-                        lAceMode = "ace/mode/html";
+                    case 'htm':
+                        lAceMode = 'ace/mode/html';
                         break;
-                    case "py":
-                        lAceMode = "ace/mode/python";
+                    case 'py':
+                        lAceMode = 'ace/mode/python';
                         break;
-                    case "c":
-                        lAceMode = "ace/mode/c_cpp";
+                    case 'c':
+                        lAceMode = 'ace/mode/c_cpp';
                         break;
-                    case "h":
-                        lAceMode = "ace/mode/c_cpp";
+                    case 'h':
+                        lAceMode = 'ace/mode/c_cpp';
                         break;
-                    case "cpp":
-                        lAceMode = "ace/mode/c_cpp";
+                    case 'cpp':
+                        lAceMode = 'ace/mode/c_cpp';
                         break;
-                    case "hs":
-                        lAceMode = "ace/mode/haskell";
+                    case 'hs':
+                        lAceMode = 'ace/mode/haskell';
                         break;
-                    case "json":
-                        lAceMode = "ace/mode/json";
+                    case 'json':
+                        lAceMode = 'ace/mode/json';
                         break;
                     default:
-                        lAceMode = "ace/mode/text";
+                        lAceMode = 'ace/mode/text';
                 }
 
                 // set default font size
@@ -1290,10 +1294,10 @@ app.controller("IdeCtrl", [
                 aceKeyboardHandler = $scope.ace.editor.getKeyboardHandler();
 
                 // enable ACE autocompletion and snippets
-                var snippetManager = ace.require("ace/snippets").snippetManager;
-                var config = ace.require("ace/config");
+                var snippetManager = ace.require('ace/snippets').snippetManager;
+                var config = ace.require('ace/config');
 
-                ace.config.loadModule("ace/ext/language_tools", function () {
+                ace.config.loadModule('ace/ext/language_tools', function () {
                     $scope.ace.editor.setOptions({
                         enableBasicAutocompletion: true,
                         enableSnippets: true,
@@ -1303,7 +1307,7 @@ app.controller("IdeCtrl", [
             }
 
             // if the currently displayed node is static or action 'edit' hidden set editor to ready only (Janick Michot)
-            if ((ProjectFactory.getNode(aMsgData.nodeId).isStatic || $scope.isActionHidden("edit")) && !$scope.currentRoleIsOwner()) {
+            if ((ProjectFactory.getNode(aMsgData.nodeId).isStatic || $scope.isActionHidden('edit')) && !$scope.currentRoleIsOwner()) {
                 $scope.ace.editor.setReadOnly(true);
             } else {
                 $scope.ace.editor.setReadOnly(false);
@@ -1346,7 +1350,7 @@ app.controller("IdeCtrl", [
          * @date 30.12.2019
          */
         $scope.$on(IdeMsgService.msgSaveCurrentlyDisplayedContent().msg, function () {
-            $log.debug("Save request received");
+            $log.debug('Save request received');
 
             //  we need to store the current content first
             saveCurrentlyDisplayedContent(true);
@@ -1356,7 +1360,7 @@ app.controller("IdeCtrl", [
          * Triggers a save of the current project
          */
         $scope.$on(IdeMsgService.msgSaveProjectRequest().msg, function () {
-            $log.debug("Save request received");
+            $log.debug('Save request received');
 
             //  we need to store the current content first
             saveCurrentlyDisplayedContent();
@@ -1368,11 +1372,11 @@ app.controller("IdeCtrl", [
 
                     // the success message should disappear after some time
                     $timeout(function () {
-                        setOutput("This will display the output.", false);
+                        setOutput('This will display the output.', false);
                     }, 2500);
                 },
                 function (reason) {
-                    setOutput('<span style="color: red">' + "WARNING: Unable to save your changes.<br><br>" + "What now: maybe you're currently not logged in.<br>" + "Open a new browser tab for codeboard.io, login, and then come back to this tab and try to save your changes.<br>" + "If the problem persists, contact the course admin" + "</span>", true);
+                    setOutput('<span style="color: red">' + 'WARNING: Unable to save your changes.<br><br>' + "What now: maybe you're currently not logged in.<br>" + 'Open a new browser tab for codeboard.io, login, and then come back to this tab and try to save your changes.<br>' + 'If the problem persists, contact the course admin' + '</span>', true);
                 }
             );
 
@@ -1384,9 +1388,9 @@ app.controller("IdeCtrl", [
         $scope.$on(IdeMsgService.msgShowEditorSettingsRequest().msg, function (aEvent, aMsgData) {
             /** The controller for the modal */
             var editorSettingsModalInstanceCtrl = [
-                "$rootScope",
-                "$scope",
-                "$uibModalInstance",
+                '$rootScope',
+                '$scope',
+                '$uibModalInstance',
                 function ($rootScope, $scope, $uibModalInstance) {
                     var lastEditorSettings = angular.copy(aMsgData.settings);
 
@@ -1415,14 +1419,14 @@ app.controller("IdeCtrl", [
             /** Function to open the modal where the user must confirm the loading of the project */
             var openModal = function (closeAction, dismissAction) {
                 var modalInstance = $uibModal.open({
-                    templateUrl: "ideEditorSettingsModal.html",
+                    templateUrl: 'ideEditorSettingsModal.html',
                     controller: editorSettingsModalInstanceCtrl,
                 });
 
                 modalInstance.result.then(
                     function () {
                         // the user clicked ok
-                        $log.debug("User confirmed changes to editor settings.");
+                        $log.debug('User confirmed changes to editor settings.');
                         // run the closeAction function if it's defined
                         if (closeAction) {
                             closeAction();
@@ -1430,7 +1434,7 @@ app.controller("IdeCtrl", [
                     },
                     function () {
                         // the user canceled
-                        $log.debug("User canceled changes to editor settings.");
+                        $log.debug('User canceled changes to editor settings.');
                         // run the dissmissAction if it's defined
                         if (dismissAction) {
                             dismissAction();
@@ -1449,23 +1453,23 @@ app.controller("IdeCtrl", [
         /** Handles the event that changed the editor options. aMsgData has the selected settings for the editor */
         $scope.$on(IdeMsgService.msgEditorSettingsChanged().msg, function (aEvent, aMsgData) {
             $scope.aceEditorSettings = aMsgData.settings;
-            if ($scope.aceEditorSettings.handler != "ace") {
-                $scope.ace.editor.setKeyboardHandler("ace/keyboard/" + $scope.aceEditorSettings.handler);
+            if ($scope.aceEditorSettings.handler != 'ace') {
+                $scope.ace.editor.setKeyboardHandler('ace/keyboard/' + $scope.aceEditorSettings.handler);
             } else {
                 $scope.ace.editor.setKeyboardHandler(aceKeyboardHandler);
             }
 
             //console.log('You changed the editor');
-            $scope.ace.editor.setTheme("ace/theme/" + $scope.aceEditorSettings.theme);
+            $scope.ace.editor.setTheme('ace/theme/' + $scope.aceEditorSettings.theme);
 
             $scope.ace.editor.setFontSize($scope.aceEditorSettings.fontSize);
             $scope.ace.editor.getSession().setTabSize($scope.aceEditorSettings.tabSize);
-            if ($scope.aceEditorSettings.invisibles === "Show") {
+            if ($scope.aceEditorSettings.invisibles === 'Show') {
                 $scope.ace.editor.setShowInvisibles(true);
             } else {
                 $scope.ace.editor.setShowInvisibles(false);
             }
-            if ($scope.aceEditorSettings.gutter === "Show") {
+            if ($scope.aceEditorSettings.gutter === 'Show') {
                 $scope.ace.editor.renderer.setShowGutter(true);
             } else {
                 $scope.ace.editor.renderer.setShowGutter(false);
@@ -1474,7 +1478,7 @@ app.controller("IdeCtrl", [
 
         /** Handles a "compileReqeusted" event */
         $scope.$on(IdeMsgService.msgCompileRequest().msg, function () {
-            $log.debug("Compile request received");
+            $log.debug('Compile request received');
 
             compileProject(false);
             // set the focus on the editor so user can start typing right away
@@ -1483,7 +1487,7 @@ app.controller("IdeCtrl", [
 
         /** Handles a "cleanCompileRequest" event */
         $scope.$on(IdeMsgService.msgCompileCleanRequest().msg, function () {
-            $log.debug("Clean-compile request received");
+            $log.debug('Clean-compile request received');
             compileProject(true);
             // set the focus on the editor so user can start typing right away
             $scope.ace.editor.focus();
@@ -1491,19 +1495,19 @@ app.controller("IdeCtrl", [
 
         /** Handles a "runRequest" event */
         $scope.$on(IdeMsgService.msgRunRequest().msg, function () {
-            $log.debug("Run request received");
+            $log.debug('Run request received');
             runProject();
         });
 
         $scope.$on(IdeMsgService.msgStopRequest().msg, function () {
-            $log.debug("Stop request received");
+            $log.debug('Stop request received');
 
             stopAction();
         });
 
         /** Handles a "compileAndRunReqeusted" event */
         $scope.$on(IdeMsgService.msgCompileAndRunRequest().msg, function () {
-            $log.debug("Compile request received");
+            $log.debug('Compile request received');
             compileAndRunProject(false);
             // set the focus on the editor so user can start typing right away
             $scope.ace.editor.focus();
@@ -1511,10 +1515,10 @@ app.controller("IdeCtrl", [
 
         /** Handles a "testRequested" event */
         $scope.$on(IdeMsgService.msgTestRequest().msg, function () {
-            $log.debug("Test request received");
+            $log.debug('Test request received');
 
             // open navbar right.. this also triggers the event to start testing
-            let req = IdeMsgService.msgNavBarRightOpenTab("test");
+            let req = IdeMsgService.msgNavBarRightOpenTab('test');
             $rootScope.$broadcast(req.msg, req.data);
 
             // set the focus on the editor so user can start typing right away
@@ -1523,7 +1527,7 @@ app.controller("IdeCtrl", [
 
         /** Handles a "toolRequested" event */
         $scope.$on(IdeMsgService.msgToolRequest().msg, function () {
-            $log.debug("Tool request received");
+            $log.debug('Tool request received');
             toolAction();
             // set the focus on the editor so user can start typing right away
             $scope.ace.editor.focus();
@@ -1531,7 +1535,7 @@ app.controller("IdeCtrl", [
 
         /** Handles a "submitRequest" event */
         $scope.$on(IdeMsgService.msgSubmitRequest().msg, function () {
-            $log.debug("Submit request received");
+            $log.debug('Submit request received');
 
             if (UserSrv.isAuthenticated() || ProjectFactory.getProject().hasLtiData) {
                 // the user is authenticated or the project is using LTI, thus a submission is
@@ -1543,8 +1547,8 @@ app.controller("IdeCtrl", [
 
                 /** The controller for the modal */
                 var anonymousSubissionModalInstanceCtrl = [
-                    "$scope",
-                    "$uibModalInstance",
+                    '$scope',
+                    '$uibModalInstance',
                     function ($scope, $uibModalInstance) {
                         $scope.ok = function () {
                             $uibModalInstance.close();
@@ -1559,14 +1563,14 @@ app.controller("IdeCtrl", [
                 /** Function to open the modal where the user must confirm the loading of the project */
                 var openModal = function (closeAction, dismissAction) {
                     var modalInstance = $uibModal.open({
-                        templateUrl: "ideConfirmAnonymousSubmissionModal.html",
+                        templateUrl: 'ideConfirmAnonymousSubmissionModal.html',
                         controller: anonymousSubissionModalInstanceCtrl,
                     });
 
                     modalInstance.result.then(
                         function () {
                             // the user clicked ok
-                            $log.debug("User confirmed submit anonymously.");
+                            $log.debug('User confirmed submit anonymously.');
                             // run the closeAction function if it's defined
                             if (closeAction) {
                                 closeAction();
@@ -1574,7 +1578,7 @@ app.controller("IdeCtrl", [
                         },
                         function () {
                             // the user canceled
-                            $log.debug("User canceled anonymous submission.");
+                            $log.debug('User canceled anonymous submission.');
                             // run the dissmissAction if it's defined
                             if (dismissAction) {
                                 dismissAction();
@@ -1593,13 +1597,13 @@ app.controller("IdeCtrl", [
 
         /** Handles a "reset" event */
         $scope.$on(IdeMsgService.msgResetRequest().msg, function () {
-            $log.debug("Reset request received");
+            $log.debug('Reset request received');
             resetSolution();
         });
 
         /** Handles a "reset" event */
         $scope.$on(IdeMsgService.msgTakeMeHomeRequest().msg, function () {
-            $log.debug("Take me Home request received");
+            $log.debug('Take me Home request received');
             takeMeHome();
         });
 
@@ -1627,7 +1631,7 @@ app.controller("IdeCtrl", [
         });
 
         $scope.$on(IdeMsgService.msgStoppableActionAvailable().msg, function () {
-            $log.debug("Event received: Stoppable action available");
+            $log.debug('Event received: Stoppable action available');
 
             $scope.hiddenActions.compileDynamic = true;
             $scope.hiddenActions.run = true;
@@ -1638,7 +1642,7 @@ app.controller("IdeCtrl", [
         });
 
         $scope.$on(IdeMsgService.msgStoppableActionGone().msg, function () {
-            $log.debug("Event received: Stoppable action gone");
+            $log.debug('Event received: Stoppable action gone');
 
             // reset the state of hidden buttons to default
             $scope.hiddenActions.compileDynamic = false;
@@ -1677,20 +1681,20 @@ app.controller("IdeCtrl", [
             // wait for the user to hit the enter key
 
             // reset user input data
-            this.userInputData = "";
+            this.userInputData = '';
 
             if (!aUserInput) {
                 // aUserInput might be undefined if the ng-model never gets instanciated because the user doesn't enter
                 // any value
-                WebsocketSrv.sendData("\n");
+                WebsocketSrv.sendData('\n');
             } else {
-                WebsocketSrv.sendData(aUserInput + "\n");
+                WebsocketSrv.sendData(aUserInput + '\n');
             }
 
             // Note: doing the DOM manipulation in the controller is not "the Angular way"
             // However, we would need 2 more directives otherwise (one for enter-click, one for send-button click)
             // About element selection see: http://mlen.io/angular-js/get-element-by-id.html
-            var domElem = angular.element(document.querySelector("#" + aElementIdToSetFocus));
+            var domElem = angular.element(document.querySelector('#' + aElementIdToSetFocus));
             if (domElem) {
                 domElem.focus();
             }
@@ -1703,12 +1707,12 @@ app.controller("IdeCtrl", [
     },
 ]);
 
-app.controller("TreeCtrl", [
-    "$scope",
-    "$rootScope",
-    "$log",
-    "ProjectFactory",
-    "IdeMsgService",
+app.controller('TreeCtrl', [
+    '$scope',
+    '$rootScope',
+    '$log',
+    'ProjectFactory',
+    'IdeMsgService',
     function ($scope, $rootScope, $log, ProjectFactory, IdeMsgService) {
         $scope.projectNodes = ProjectFactory.getProject().files;
 
@@ -1716,7 +1720,7 @@ app.controller("TreeCtrl", [
          * Adds a new file to the project model (which feeds the tree view)
          */
         $scope.addFile = function () {
-            var req = IdeMsgService.msgNewNodeRequest("file");
+            var req = IdeMsgService.msgNewNodeRequest('file');
             $rootScope.$broadcast(req.msg, req.data);
         };
 
@@ -1724,7 +1728,7 @@ app.controller("TreeCtrl", [
          * Adds a new folder to the project model (which feeds the tree view)
          */
         $scope.addFolder = function () {
-            var req = IdeMsgService.msgNewNodeRequest("folder");
+            var req = IdeMsgService.msgNewNodeRequest('folder');
             $rootScope.$broadcast(req.msg, req.data);
         };
 
@@ -1733,7 +1737,7 @@ app.controller("TreeCtrl", [
          */
         $scope.nodeClick = function () {
             // broadcast an event when a file is openend
-            $rootScope.$broadcast('fileOpenend')
+            $rootScope.$broadcast('fileOpenend');
             var lSelectedNode = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId);
 
             // ignore the click if the selected node is a folder
@@ -1754,7 +1758,7 @@ app.controller("TreeCtrl", [
                 // get the file name and file type
                 var lNodeId = $scope.mytree.currentNode.uniqueId;
                 var lNodeName = ProjectFactory.getNode(lNodeId).filename;
-                var lNodeType = ProjectFactory.getNode(lNodeId).isFolder ? "folder" : "file";
+                var lNodeType = ProjectFactory.getNode(lNodeId).isFolder ? 'folder' : 'file';
 
                 var req = IdeMsgService.msgDisplayRenameNodeModalRequest(lNodeId, lNodeName, lNodeType);
                 $rootScope.$broadcast(req.msg, req.data);
@@ -1783,9 +1787,9 @@ app.controller("TreeCtrl", [
             } else {
                 // get the file name
                 var filename = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId).filename;
-                var type = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId).isFolder ? "folder" : "file";
+                var type = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId).isFolder ? 'folder' : 'file';
 
-                var confirmMsg = "Do you really want to delete " + type + " '" + filename + "'?";
+                var confirmMsg = 'Do you really want to delete ' + type + " '" + filename + "'?";
                 var confirmMsg = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId).isFolder ? confirmMsg + "\n\nNote: when deleting a folder, make sure it's empty." : confirmMsg;
 
                 // ask the user to confirm deletion.
@@ -1796,7 +1800,7 @@ app.controller("TreeCtrl", [
 
                     // Note: we need to select a new node; that's gonna be the root node
                     // set the root node to be selected
-                    ProjectFactory.getNode(0).selected = "selected";
+                    ProjectFactory.getNode(0).selected = 'selected';
                     // set the root node as the current node
                     $scope.mytree.currentNode = ProjectFactory.getNode(0);
 
@@ -1814,10 +1818,10 @@ app.controller("TreeCtrl", [
             var lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
 
             switch (aMsgData.nodeType) {
-                case "file":
+                case 'file':
                     ProjectFactory.addFile(lSelectedNodeUId, aMsgData.nodeName);
                     break;
-                case "folder":
+                case 'folder':
                     ProjectFactory.addFolder(lSelectedNodeUId, aMsgData.nodeName);
                     break;
             }
@@ -1859,14 +1863,14 @@ app.controller("TreeCtrl", [
          * If received the currently selected node will be hidden or unhidden, depending on its current status.
          */
         $scope.$on(IdeMsgService.msgHideNodeRequest().msg, function () {
-            $log.debug("Hide_node request received");
+            $log.debug('Hide_node request received');
 
             var lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
 
             if (lSelectedNodeUId > 0) {
-                $log.debug("Node is hidden: " + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
+                $log.debug('Node is hidden: ' + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
                 ProjectFactory.setNodeHidden(ProjectFactory.getNode(lSelectedNodeUId));
-                $log.debug("Node is hidden: " + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
+                $log.debug('Node is hidden: ' + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
             } else {
                 console.log("The root folder can't be hidden.");
             }
@@ -1878,13 +1882,13 @@ app.controller("TreeCtrl", [
          * @author Janick Michot
          */
         $scope.$on(IdeMsgService.msgMakeNodeStaticNodeRequest().msg, function () {
-            $log.debug("Uneditable_node request received");
+            $log.debug('Uneditable_node request received');
 
             var lSelectedNodeUId = $scope.mytree.currentNode.uniqueId;
 
             if (lSelectedNodeUId > 0) {
                 ProjectFactory.setNodeStatic(ProjectFactory.getNode(lSelectedNodeUId));
-                $log.debug("Node is hidden: " + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
+                $log.debug('Node is hidden: ' + ProjectFactory.getNode(lSelectedNodeUId).isHidden);
             } else {
                 console.log("The root folder can't be uneditable.");
             }
@@ -1892,13 +1896,13 @@ app.controller("TreeCtrl", [
     },
 ]);
 
-app.controller("TabCtrl", [
-    "$scope",
-    "$rootScope",
-    "$log",
-    "$uibModal",
-    "ProjectFactory",
-    "IdeMsgService",
+app.controller('TabCtrl', [
+    '$scope',
+    '$rootScope',
+    '$log',
+    '$uibModal',
+    'ProjectFactory',
+    'IdeMsgService',
     function ($scope, $rootScope, $log, $uibModal, ProjectFactory, IdeMsgService) {
         $scope.tabs = [];
 
@@ -1940,7 +1944,7 @@ app.controller("TabCtrl", [
          * @param aArrayIndex the array index at which position the tab is stored
          */
         $scope.closeClick = function (aArrayIndex) {
-            $log.debug("Close-tab clicked; array-index:" + aArrayIndex);
+            $log.debug('Close-tab clicked; array-index:' + aArrayIndex);
 
             // all tabs are to the right of the tab to-be-deleted need to update their arrayIndex position
             for (var i = aArrayIndex + 1; i < $scope.tabs.length; i++) {
@@ -1989,7 +1993,7 @@ app.controller("TabCtrl", [
                 // push a new tab to the list of tabs
                 $scope.tabs.push({
                     name: lRequestedNode.filename,
-                    title: lRequestedNode.path + "/" + lRequestedNode.filename,
+                    title: lRequestedNode.path + '/' + lRequestedNode.filename,
                     nodeIndex: aMsgData.nodeId,
                     arrayIndex: $scope.tabs.length,
                     isActive: false,
@@ -2039,15 +2043,15 @@ app.controller("TabCtrl", [
 
             /** The controller for the modal */
             var shareProjectModalInstanceCtrl = [
-                "$rootScope",
-                "$scope",
-                "$location",
-                "$uibModalInstance",
+                '$rootScope',
+                '$scope',
+                '$location',
+                '$uibModalInstance',
                 function ($rootScope, $scope, $location, $uibModalInstance) {
                     /** Function returns the full Url but with all query strings removed, i.e. after the '?' */
                     var getAbsUrlWithoutQueryString = function getAbsUrlWithoutQueryString() {
                         var result = $location.absUrl();
-                        var queryStartIndex = result.indexOf("?");
+                        var queryStartIndex = result.indexOf('?');
 
                         if (queryStartIndex >= 0) {
                             result = result.substr(0, queryStartIndex);
@@ -2073,19 +2077,19 @@ app.controller("TabCtrl", [
                         // append the view query string if the checkbox is selected
                         if ($scope.form.inputCheckbox) {
                             // by default the view query string is empty
-                            var viewQueryString = "";
+                            var viewQueryString = '';
 
                             // if tabs are open, we append to the veiw query string
                             if (tabs.length > 0) {
                                 // the key of the query string
-                                viewQueryString += "?view=";
+                                viewQueryString += '?view=';
                                 // calculates the values of the query string
                                 for (var i = 0; i < tabs.length; i++) {
                                     // get the nodeId and if the node is active or not
-                                    viewQueryString += tabs[i].nodeIndex + "." + (tabs[i].isActive ? "1" : "0");
+                                    viewQueryString += tabs[i].nodeIndex + '.' + (tabs[i].isActive ? '1' : '0');
 
                                     // add the separator "-", as in 2.1-3.0-4.0 (except after the last tab)
-                                    viewQueryString += i < tabs.length - 1 ? "-" : "";
+                                    viewQueryString += i < tabs.length - 1 ? '-' : '';
                                 }
                             }
 
@@ -2102,7 +2106,7 @@ app.controller("TabCtrl", [
 
             // call the function to open the modal (we ignore the modalInstance returned by this call as we don't need to access any data from the modal)
             $uibModal.open({
-                templateUrl: "ideShareProjectModal.html",
+                templateUrl: 'ideShareProjectModal.html',
                 controller: shareProjectModalInstanceCtrl,
             });
         });
@@ -2113,16 +2117,16 @@ app.controller("TabCtrl", [
  * Controller for the new right bar
  * @author Janick Michot
  */
-app.controller("RightBarCtrl", [
-    "$scope",
-    "$rootScope",
-    "$http",
-    "$uibModal",
-    "ProjectFactory",
-    "IdeMsgService",
+app.controller('RightBarCtrl', [
+    '$scope',
+    '$rootScope',
+    '$http',
+    '$uibModal',
+    'ProjectFactory',
+    'IdeMsgService',
     function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService) {
-        $scope.navBarRightContent = "";
-        $scope.activeTab = "";
+        $scope.navBarRightContent = '';
+        $scope.activeTab = '';
         $scope.rightBarTabs = {};
         $scope.showRightBarTabs = true;
 
@@ -2132,53 +2136,53 @@ app.controller("RightBarCtrl", [
         // can be adjusted in a controller via broadcast.
 
         // tab for project description
-        if (ProjectFactory.getProjectDescription() !== "") {
+        if (ProjectFactory.getProjectDescription() !== '') {
             $scope.rightBarTabs.description = {
-                slug: "description",
-                title: "Aufgabe",
+                slug: 'description',
+                title: 'Aufgabe',
                 disabled: false,
-                icon: "glyphicon-education",
-                contentURL: "partials/navBarRight/navBarRightProjectDescription",
+                icon: 'glyphicon-education',
+                contentURL: 'partials/navBarRight/navBarRightProjectDescription',
             };
         }
 
         // tab for test result
-        if (!$scope.isActionHidden("test") && ProjectFactory.hasConfig("Testing", "ioTests")) {
+        if (!$scope.isActionHidden('test') && ProjectFactory.hasConfig('Testing', 'ioTests')) {
             $scope.rightBarTabs.test = {
-                slug: "test",
-                title: "Test",
-                icon: "glyphicon-list-alt",
-                contentURL: "partials/navBarRight/navBarRightTest",
+                slug: 'test',
+                title: 'Test',
+                icon: 'glyphicon-list-alt',
+                contentURL: 'partials/navBarRight/navBarRightTest',
             };
         }
 
         // tab for help / chat
-        if (!$scope.isActionHidden("help")) {
+        if (!$scope.isActionHidden('help')) {
             $scope.rightBarTabs.help = {
-                slug: "help",
-                title: "Hilfe",
-                icon: "glyphicon-comment",
-                contentURL: "partials/navBarRight/navBarRightHelp",
+                slug: 'help',
+                title: 'Hilfe',
+                icon: 'glyphicon-comment',
+                contentURL: 'partials/navBarRight/navBarRightHelp',
             };
         }
 
         // tab for code explanation (coding-assistant)
-        if (!$scope.isActionHidden("explanation")) {
+        if (!$scope.isActionHidden('explanation')) {
             $scope.rightBarTabs.explanation = {
-                slug: "explanation",
-                title: "Erklärungen",
-                icon: "glyphicon-eye-open",
-                contentURL: "partials/navBarRight/navBarRightExplanation",
+                slug: 'explanation',
+                title: 'Erklärungen',
+                icon: 'glyphicon-eye-open',
+                contentURL: 'partials/navBarRight/navBarRightExplanation',
             };
         }
 
         // tab for sampleSolution
         if (ProjectFactory.hasSampleSolution()) {
             $scope.rightBarTabs.sampleSolution = {
-                slug: "sampleSolution",
-                title: "Musterlösung",
-                icon: "glyphicon-screenshot",
-                contentURL: "partials/navBarRight/navBarRightSampleSolution",
+                slug: 'sampleSolution',
+                title: 'Musterlösung',
+                icon: 'glyphicon-screenshot',
+                contentURL: 'partials/navBarRight/navBarRightSampleSolution',
             };
         }
 
@@ -2206,11 +2210,11 @@ app.controller("RightBarCtrl", [
          */
         $scope.rightBarTabClick = function (slug) {
             if ($scope.activeTab !== slug) {
-                $scope.splitter.expand("#ideRighterPartOfMiddlePart");
+                $scope.splitter.expand('#ideRighterPartOfMiddlePart');
                 $scope.activeTab = slug;
             } else {
-                $scope.splitter.collapse("#ideRighterPartOfMiddlePart");
-                $scope.activeTab = "";
+                $scope.splitter.collapse('#ideRighterPartOfMiddlePart');
+                $scope.activeTab = '';
             }
         };
 
@@ -2232,21 +2236,21 @@ app.controller("RightBarCtrl", [
          * Listens to open tab actions
          */
         $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
-            $scope.splitter.expand("#ideRighterPartOfMiddlePart");
+            $scope.splitter.expand('#ideRighterPartOfMiddlePart');
             $scope.activeTab = data.tab;
         });
     },
 ]);
 
-app.controller("IdeFooterStatusBarCtrl", [
-    "$scope",
-    "$routeParams",
-    "UserSrv",
-    "ProjectFactory",
+app.controller('IdeFooterStatusBarCtrl', [
+    '$scope',
+    '$routeParams',
+    'UserSrv',
+    'ProjectFactory',
     function ($scope, $routeParams, UserSrv, ProjectFactory) {
         /* Returns the username of the current user or '#anonymous' if user is not logged in */
         $scope.getUsername = function () {
-            var _msg = "User: ";
+            var _msg = 'User: ';
 
             if (UserSrv.isAuthenticated()) {
                 _msg += UserSrv.getUsername();
@@ -2259,19 +2263,19 @@ app.controller("IdeFooterStatusBarCtrl", [
 
         /* Returns a string that details the current user's role */
         $scope.getCourse = function () {
-            return ProjectFactory.getProject().courseData ? ProjectFactory.getProject().courseData.coursename : "";
+            return ProjectFactory.getProject().courseData ? ProjectFactory.getProject().courseData.coursename : '';
         };
 
         /* Returns a string that details the current user's role */
         $scope.getRole = function () {
             if ($scope.currentRoleIsLtiUser()) {
-                return "LTI User";
+                return 'LTI User';
             } else if ($scope.currentRoleIsOwner()) {
-                return "Project owner";
+                return 'Project owner';
             } else if ($scope.currentRoleIsUser()) {
-                return "Project user";
+                return 'Project user';
             } else if ($scope.currentRoleIsSubmission()) {
-                var _submissionRole = "Inspection of a submission";
+                var _submissionRole = 'Inspection of a submission';
 
                 // we check we now the name of the user we're inspecting; if yes, we use the name as part of the role description
                 if (ProjectFactory.getProject().userBeingInspected) {
@@ -2287,7 +2291,7 @@ app.controller("IdeFooterStatusBarCtrl", [
                 }
                 return _userProjectRole;
             } else if ($scope.currentRoleIsHelp()) {
-                var _helpRequestRole = "Inspection of a helprequest";
+                var _helpRequestRole = 'Inspection of a helprequest';
 
                 // we check we now the name of the user we're inspecting; if yes, we use the name as part of the role description
                 if (ProjectFactory.getProject().userBeingInspected) {
@@ -2303,7 +2307,7 @@ app.controller("IdeFooterStatusBarCtrl", [
         };
 
         $scope.hasCourse = function () {
-            return typeof ProjectFactory.getProject().courseData !== "undefined";
+            return typeof ProjectFactory.getProject().courseData !== 'undefined';
         };
     },
 ]);
