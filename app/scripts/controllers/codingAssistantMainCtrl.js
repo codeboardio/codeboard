@@ -60,7 +60,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                         $scope.$on('fileOpenend', function () {
                                $timeout(() => {
                                 updateExplanations();
-                               }, 2000);                          
+                               });                          
                         });
 
                         // Listen to the 'change' event of the Ace Editor / got the Code from the Ace Docs - https://ace.c9.io/#nav=howto
