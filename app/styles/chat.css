@@ -86,15 +86,6 @@
     width: 85%;
     position: relative;
     box-sizing: border-box;
-    animation: wiggle 2.5s infinite;
-}
-/* code from https://stackoverflow.com/questions/38132700/css-wiggle-shake-effect */
-@keyframes wiggle {
-    0% { transform: rotate(0deg); }
-   80% { transform: rotate(0deg); }
-   85% { transform: rotate(5deg); }
-   95% { transform: rotate(-5deg); }
-  100% { transform: rotate(0deg); }
 }
 
 .chat-line.left .chat-line-error {
@@ -121,7 +112,7 @@
 .chat-line.right .chat-line-card:after {
     width: 0;
     height: 0;
-    content: "";
+    content: '';
     top: 0;
     position: absolute;
     border-style: solid;
@@ -192,8 +183,8 @@
 
 /** Card Icons **/
 .chat-line .chat-line-card .card-header:before {
-    content: "";
-    font-family: "Glyphicons Halflings", serif;
+    content: '';
+    font-family: 'Glyphicons Halflings', serif;
     display: inline-block;
     width: 36px;
     font-size: 20px;
@@ -212,7 +203,7 @@
     border-right-color: #009788 !important;
 }
 .chat-line .chat-line-card.help .card-header:before {
-    content: "\e085";
+    content: '\e085';
 }
 
 /* Card Tip */
@@ -221,7 +212,7 @@
     background-color: #fe5722;
 }
 .chat-line-card.tip .card-header:before {
-    content: "\e086";
+    content: '\e086';
 }
 .chat-line.right .chat-line-card.tip:after {
     border-top-color: #fe5722 !important;
@@ -236,7 +227,7 @@
     background-color: #fe5722;
 }
 .chat-line-card.submission .card-header:before {
-    content: "\e233";
+    content: '\e233';
 }
 .chat-line.right.chat-line-card.submission:after {
     border-top-color: #fe5722 !important;
@@ -251,7 +242,7 @@
     background-color: #e44c42;
 }
 .chat-line-card.error .card-header:before {
-    content: "\e083";
+    content: '\e083';
 }
 .chat-line.right .chat-line-card.error:after {
     border-top-color: #e44c42 !important;
@@ -266,7 +257,7 @@
     background-color: #f0ad4e;
 }
 .chat-line-card.compHelp .card-header:before {
-    content: "\e019";
+    content: '\e019';
 }
 .chat-line.right .chat-line-card.compHelp:after {
     border-top-color: #f0ad4e !important;
