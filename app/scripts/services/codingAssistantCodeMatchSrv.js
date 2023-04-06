@@ -976,7 +976,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Stuff that doesnt get recognized by an array from the json file
+                // Stuff that doesnt get recognized by an array from the json file & comments
+                if (isComment == true) {
+                    matched = true;
+                }
                 if (matched == false) {
                     if (line.match(/^\s*[a-zA-Z0-9]+/)) {
                         if (redeclareVarErr) {
