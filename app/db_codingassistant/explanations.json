@@ -142,7 +142,7 @@
         },
         {
             "name": "elseIfRegex",
-            "regex": "^\\s*(else)\\sif\\s?\\(.*\\)\\s?{\\s*$",
+            "regex": "^\\s*}*\\s*(else)\\sif\\s?\\(.*\\)\\s?{\\s*$",
             "answer": "Weitere If-Condition wird gestartet",
             "link": "https://www.w3schools.com/java/java_conditions.asp",
             "keepLevel": "true",
@@ -172,7 +172,7 @@
         },
         {
             "name": "elseRegex",
-            "regex": "^\\s*else\\s?{\\s*$",
+            "regex": "^\\s*}*\\s*else\\s?{\\s*$",
             "answer": "Wird ausgeführt falls If-Condition nicht passt",
             "link": "https://www.w3schools.com/java/java_conditions.asp",
             "keepLevel": "true",

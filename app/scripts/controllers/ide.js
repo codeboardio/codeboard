@@ -1190,8 +1190,27 @@ app.controller('IdeCtrl', [
                         req = IdeMsgService.msgResetRequest();
                         $rootScope.$broadcast(req.msg);
                     }
+                    break;
                 case 'show_var_scope':
                     codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
+                    break;
+                case 'beautify_code':
+                    // part of code from https://stackoverflow.com/questions/45458330/how-to-format-java-code-in-ace-editor
+                    var code = $scope.ace.editor.getSession().getValue();
+                    var jsbOpts = {
+                        indent_size: 4,
+                    };
+                    function syncEditor() {
+                        $scope.ace.editor.getSession().setValue(code);
+                    }
+                    function formatCode() {
+                        var session = $scope.ace.editor.getSession();
+                        session.setValue(js_beautify(code, jsbOpts));
+                    }
+                    $timeout(() => {
+                        syncEditor();
+                        formatCode();
+                    });
                     break;
             }
         };

@@ -1,9 +1,9 @@
-/* Explanations */
+/* Explanations
 :root {
     --editor-bg: #eee;
 }
 
-/* Reset Styles */
+Reset Styles
 * {
     padding: 0;
     margin: 0;
@@ -13,4 +13,4 @@
 .anyDiv {
     display: table;
 }
-
+ */
