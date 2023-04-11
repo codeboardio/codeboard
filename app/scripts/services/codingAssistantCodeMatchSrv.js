@@ -1007,9 +1007,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Everything related to markers
+            document.getElementById('varScope_editor').innerHTML = varScopeText;
 
             // get varScopeStyle.css
-            var styleCss = document.styleSheets[31];
+            var styleCss = document.styleSheets[30];
 
             // add inline Style to variable scope
             for (let i = 0; i < styleCss.cssRules.length; i++) {
@@ -1018,8 +1019,12 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
 
             // loops over all variables in Map
             variableMap.forEach(function (value, key) {
+                document.getElementById(key).style.height = value.height;                                            // add inline Style height to variableScope div
+                document.getElementById(key).style.marginTop = value.margin;                                         // add inline Style margin to variableScope div                                  
+                document.getElementById(key).style.backgroundColor = value.color;                                    // add inline Style backgroundcolor to variableScope div
                 // add marker to the variable
                 styleCss.insertRule('.' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
+                console.log(styleCss);
             });
 
             return {

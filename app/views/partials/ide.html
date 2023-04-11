@@ -180,8 +180,11 @@
             <!-- end of tree view pane-->
             
             <!-- variable Scope pane -->
-            <div id="ideVarScopePartOfMiddlePart" class="ideSplitterOverflowVisible">
-              <div class="ideEditor" id="varScope_editor" ui-ace="{showGutter: false, useWrapMode: false, theme: 'eclipse', onLoad: aceLoaded}"></div>
+            <div id="ideVarScopePartOfMiddlePart">
+              <div id="varScopeTabArea"> 
+                  <div class="varScopeTitle">Gültigkeitsbereich von Variablen</div>
+              </div>
+              <div class="reset-this varScopeBlocks" id="varScope_editor"></div>
             </div>
             <!-- end of variable Scope pane -->
               

@@ -55,12 +55,11 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                         // call updateExplanations() to show message, when no file is opened
                         updateExplanations();
 
-                        // MUST HAVE ANOTHER WAY TO IMPLEMENT THIS!!!! WAIT UNTIL ACE EDITOR IS LOADED
                         // Call updateExplanations() with a slight delay to ensure the initial code is loaded
                         $scope.$on('fileOpenend', function () {
-                               $timeout(() => {
+                            $timeout(() => {
                                 updateExplanations();
-                               });                          
+                            });
                         });
 
                         // Listen to the 'change' event of the Ace Editor / got the Code from the Ace Docs - https://ace.c9.io/#nav=howto

@@ -1061,7 +1061,7 @@ app.controller('IdeCtrl', [
         // kPane for treeView
         $scope.kPanes = $scope.isActionHidden('tree-view') ? '[' : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
         // kPane for varScopeDiv
-        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: false , size: '5%' }, ";
+        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: false , size: '10%' }, ";
         // kPane for aceEditor
         $scope.kPanes += ' {collapsible: false} ';
         // kPane for rightBarTabs (before actual tabs - content)
