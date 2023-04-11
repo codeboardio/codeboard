@@ -184,7 +184,10 @@
               <div id="varScopeTabArea"> 
                   <div class="varScopeTitle">Gültigkeitsbereich von Variablen</div>
               </div>
-              <div class="reset-this varScopeBlocks" id="varScope_editor"></div>
+              <div class="varScopeBlocks" id="varScope_editor">
+                <div ng-repeat="(key, value) in variableMap" id="{{key}}" class="varScope" ng-style="{'height': value.height, 'marginTop': value.margin, 'backgroundColor': value.color}">
+                </div>             
+              </div>
             </div>
             <!-- end of variable Scope pane -->
               

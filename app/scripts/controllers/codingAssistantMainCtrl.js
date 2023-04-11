@@ -8,11 +8,11 @@
 'use strict';
 angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     '$scope',
+    '$rootScope',
     '$timeout',
     'codingAssistantCodeMatchSrv',
-    function ($scope, $timeout, codingAssistantCodeMatchSrv) {
+    function ($scope, $rootScope, $timeout, codingAssistantCodeMatchSrv) {
         var aceEditor = $scope.ace.editor;
-
         codingAssistantCodeMatchSrv
             .getJsonData()
             .then(function (res) {
@@ -35,6 +35,9 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                                 .replace(/\s*\;\s*$/g, ';');
                             var inputCodeArray = inputCode.split('\n');
                             var result = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, aceEditor, colors);
+
+                            // convert variableMap into an object
+                            $rootScope.variableMap = Object.fromEntries(result.variableMap);
 
                             // Iterate through the combinedExplanations array to generate the chatboxes
                             result.explanations.forEach((explanation) => {

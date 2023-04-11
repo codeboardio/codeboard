@@ -1,5 +1,6 @@
 /**
- * Responsible for fetching data from coding-assistant-db, matching lines (ace-editor) with regex, generating explanations, and handling line change events.
+ * Responsible for fetching data from db_codingassistant dir, matching lines (ace-editor) with regex, generating explanations,
+ * handling line change events and generate styles for variable scope blocks.
  *
  * @author Samuel Truniger
  */
@@ -11,6 +12,8 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
     function ($http) {
         var service = this;
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Fetching data
         // fetch the json data from "explanations.json"
         service.getJsonData = function () {
             return $http.get('../db_codingassistant/explanations.json').then(
@@ -79,6 +82,9 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             }
         };
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CODE MATCH AND VARIABLE SCOPE LOGIC
+
         /**
          * Process the data and return matched explanations
          * @param {Array} data the content from the explanations.json
@@ -103,9 +109,8 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             var regex = [];
             // store "regex" from "expressions" in explanations.json
             var expressions = [];
-            // store colors from colors.json
+            // store colors from colors.json --> markers and variable scope block styles
             var colors = [];
-            var editorLineHeight;
 
             for (let i = 0; i < data.lines.length; i++) {
                 var currentString = new RegExp(data.lines[i].regex);
@@ -125,18 +130,15 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             });
 
             // check line height from codeEditor
+            var editorLineHeight;
             editorLineHeight = aceEditor.renderer.lineHeight;
-            // console.log(editorLineHeight);
 
             // array to store part of explanations to combine them at the end
             var explanationParts = [];
             // variable to append a new explanation to existing one
             var lastLineIndex = -1;
-            // array to store explanations, row-numbers and links
+            // array to store explanations, row-numbers, links and explanation type
             var explanations = [];
-
-            // variable for varScope-blocks
-            var varScopeText = '';
 
             // Variables to highlight the code in the Code-Editor
             var Range = ace.require('ace/range').Range;
@@ -148,16 +150,21 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             var countWhiteSpaceArray;
             var countWhiteSpace2DArray;
 
-            // other used variables
+            // variable to check if code is intended
             var level = 0;
             var braceLevel = 0;
             var ifActive = [];
             var blockActive = [];
+            // variable to check if something a comment
             var isComment = false;
+            // variable to check if something a multi-line comment
             var stayComment = false;
             var blockNotReallyEnded = false;
+            // Map to store new declared variables
             var variableMap = new Map();
+            // Map for Scanner and Random
             var importMap = new Map();
+            // count new declared variables
             var variableCount = 0;
             // the rows in the ace-editor
             var linelevel = 0;
@@ -198,7 +205,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 }
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Loop all the regex from "line" over the Code from Code-Editor
+                // Loop trough all the regex from "line" over the Code from Code-Editor
                 regex.forEach(function (currentRegex) {
                     if (line.match(currentRegex) && matched == false && isComment == false) {
                         // matched == false to not go over it again once it matched
@@ -371,7 +378,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     var startwertMatch = newCondition[0].match(/(int|double)\s(\w+)\s?\=\s?[0-9]+/);
                                     variableMap.set(startwertMatch[2], variableObject);
                                     // create variable scope div with variable name as id
-                                    varScopeText += '<div id= "' + startwertMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ' + dbline.cssClasses + ' varScope"></div>';
 
                                     // Ace Marker
                                     currLine = linelevel; // codeEditor.getSelectionRange().start.row;
@@ -627,22 +633,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                 // increase variableCount -> different color & outputid for every variable
                                 variableCount++;
 
-                                // create variable scope div with variable name as id
-                                varScopeText += '<div id= "' + currentMatch[2] + '" onclick="window.open(\'' + dbline.link + '\', \'_blank\'); event.stopPropagation();" style="cursor: pointer;" class="anyDiv container ';
-
-                                // check if level is bigger then 0 and if the code is indented
-                                if (level > 0 && dbline.keepLevel == 'false') {
-                                    if (line.match(data.varScope.regex)) {
-                                        varScopeText += ' varScope">';
-                                    }
-                                } // check if level is equals to 0
-                                else if (level == 0) {
-                                    if (line.match(data.varScope.regex)) {
-                                        varScopeText += ' varScope">';
-                                    }
-                                } else {
-                                    varScopeText += '">';
-                                }
                                 if (dbline.name === 'newVarCallMethodRegex') {
                                     if (currentMatch[4] !== '') {
                                         let inputPara = currentMatch[4].split(',');
@@ -722,9 +712,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     });
                                 }
 
-                                // varScopeText += linelevel;
-                                varScopeText += '</div>';
-
                                 // add explanations to explanations array
                                 explanations.push({
                                     answer: explanationParts.join(''),
@@ -745,78 +732,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     }
                 });
 
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //Check how many open {} there are => only close a block when it actually gets closed
-                if (line.match(/{/) && isComment != true) {
-                    var count = line.match(/{/g).length;
-                    braceLevel += count;
-                }
-                if (line.match(/}/) && isComment != true) {
-                    var count = line.match(/}/g).length;
-                    braceLevel -= count;
-                }
-
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //End of any block
-                if (line.match(/}/) && blockActive[level] == true && level - braceLevel == 1 && blockNotReallyEnded != true) {
-                    if (ifActive[level + 1] == true) {
-                        //stops ifActive on level higher if this block is over
-                        ifActive[level + 1] = false;
-                    }
-                    if (matched == false) {
-                        if (ifActive[level] == true) {
-                            variableMap.forEach(function (value, key) {
-                                // loops over all variables in map
-                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    // checks if current variable has the same blocklevel and has no linelevelend
-                                    value.lineLevelEnd = linelevel;
-                                    // calculate height and convert to string
-                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
-                                    // add px (pixel) to height
-                                    height += 'px';
-                                    // height is assigned to height of current variable
-                                    value.height = height;
-                                }
-                            });
-                        } else {
-                            variableMap.forEach(function (value, key) {
-                                // loops over all variables in map
-                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    // checks if current variable has the same blocklevel and has no linelevelend
-                                    value.lineLevelEnd = linelevel;
-                                    // calculate height and convert to string
-                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
-                                    // add px (pixel) to height
-                                    height += 'px';
-                                    // height is assigned to height of current variable
-                                    value.height = height;
-                                }
-                            });
-                        }
-                    }
-                    blockActive[level] = false;
-                    level -= 1;
-                    matched = true;
-                }
-                if (blockNotReallyEnded == true) {
-                    //if the block didnt really end we stil have to reduce the level by 1 because its gonna add 1 more again
-                    level -= 1;
-                    blockNotReallyEnded = false;
-                }
-                // loops over all variables in map
-                variableMap.forEach(function (value, key) {
-                    // checks if current variable has the blocklevel = 0
-                    if (value.blockLevel == 0) {
-                        // actual linelevel is assigned to linelevelend of current variable
-                        value.lineLevelEnd = linelevel;
-                        // calculate height and convert to string
-                        var height = '' + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
-                        // add px (pixel) to height
-                        height += 'px';
-                        // height is assigned to height of current variable
-                        value.height = height;
-                    }
-                });
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
                 // Variables redeclaration
                 data.redeclareVar.forEach(function (dbline) {
@@ -976,6 +891,79 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //Check how many open {} there are => only close a block when it actually gets closed
+                if (line.match(/{/) && isComment != true) {
+                    var count = line.match(/{/g).length;
+                    braceLevel += count;
+                }
+                if (line.match(/}/) && isComment != true) {
+                    var count = line.match(/}/g).length;
+                    braceLevel -= count;
+                }
+
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //End of any block
+                if (line.match(/}/) && blockActive[level] == true && level - braceLevel == 1 && blockNotReallyEnded != true) {
+                    if (ifActive[level + 1] == true) {
+                        //stops ifActive on level higher if this block is over
+                        ifActive[level + 1] = false;
+                    }
+                    if (matched == false) {
+                        if (ifActive[level] == true) {
+                            variableMap.forEach(function (value, key) {
+                                // loops over all variables in map
+                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
+                                    // checks if current variable has the same blocklevel and has no linelevelend
+                                    value.lineLevelEnd = linelevel;
+                                    // calculate height and convert to string
+                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                    // add px (pixel) to height
+                                    height += 'px';
+                                    // height is assigned to height of current variable
+                                    value.height = height;
+                                }
+                            });
+                        } else {
+                            variableMap.forEach(function (value, key) {
+                                // loops over all variables in map
+                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
+                                    // checks if current variable has the same blocklevel and has no linelevelend
+                                    value.lineLevelEnd = linelevel;
+                                    // calculate height and convert to string
+                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                    // add px (pixel) to height
+                                    height += 'px';
+                                    // height is assigned to height of current variable
+                                    value.height = height;
+                                }
+                            });
+                        }
+                    }
+                    blockActive[level] = false;
+                    level -= 1;
+                    matched = true;
+                }
+                if (blockNotReallyEnded == true) {
+                    //if the block didnt really end we stil have to reduce the level by 1 because its gonna add 1 more again
+                    level -= 1;
+                    blockNotReallyEnded = false;
+                }
+                // loops over all variables in map
+                variableMap.forEach(function (value, key) {
+                    // checks if current variable has the blocklevel = 0
+                    if (value.blockLevel == 0) {
+                        // actual linelevel is assigned to linelevelend of current variable
+                        value.lineLevelEnd = linelevel;
+                        // calculate height and convert to string
+                        var height = '' + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
+                        // add px (pixel) to height
+                        height += 'px';
+                        // height is assigned to height of current variable
+                        value.height = height;
+                    }
+                });
+                
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Stuff that doesnt get recognized by an array from the json file & comments
                 if (isComment == true) {
                     matched = true;
@@ -1006,30 +994,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Everything related to markers
-            document.getElementById('varScope_editor').innerHTML = varScopeText;
-
-            // get varScopeStyle.css
-            var styleCss = document.styleSheets[30];
-
-            // add inline Style to variable scope
-            for (let i = 0; i < styleCss.cssRules.length; i++) {
-                styleCss.deleteRule(i);
-            }
-
-            // loops over all variables in Map
-            variableMap.forEach(function (value, key) {
-                document.getElementById(key).style.height = value.height;                                            // add inline Style height to variableScope div
-                document.getElementById(key).style.marginTop = value.margin;                                         // add inline Style margin to variableScope div                                  
-                document.getElementById(key).style.backgroundColor = value.color;                                    // add inline Style backgroundcolor to variableScope div
-                // add marker to the variable
-                styleCss.insertRule('.' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
-                console.log(styleCss);
-            });
-
+            // Return explanations and variableMap to use it in the codingAssistantMainCtrl
             return {
                 explanations: explanations,
-                varScopeText: varScopeText,
+                variableMap: variableMap,
             };
         };
     },

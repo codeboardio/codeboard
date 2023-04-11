@@ -252,14 +252,6 @@ body {
 }
 
 /* Variable Scope */
-/* Code from https://stackoverflow.com/questions/45943585/disable-exclude-bootstrap-for-one-div-on-a-page */
-.reset-this * {
-  padding-right: 0;
-  padding-left: 0;
-  margin-right: 0;
-  margin-left: 0;
-}
-
 #ideVarScopePartOfMiddlePart {
   background-color: #fff;
 }
