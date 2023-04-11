@@ -1191,9 +1191,6 @@ app.controller('IdeCtrl', [
                         $rootScope.$broadcast(req.msg);
                     }
                     break;
-                case 'show_var_scope':
-                    codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
-                    break;
                 case 'beautify_code':
                     // part of code from https://stackoverflow.com/questions/45458330/how-to-format-java-code-in-ace-editor
                     var code = $scope.ace.editor.getSession().getValue();
@@ -1211,6 +1208,11 @@ app.controller('IdeCtrl', [
                         syncEditor();
                         formatCode();
                     });
+                    break;
+                case 'show_var_scope':
+                    codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
+                    break;
+                case 'show_code_blocks':
                     break;
             }
         };
