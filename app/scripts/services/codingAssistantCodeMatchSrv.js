@@ -49,22 +49,24 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         function storeAndRemoveMarkers(aceEditor) {
             const existMarkers = aceEditor.session.getMarkers();
             for (let item in existMarkers) {
-                if (existMarkers[item].range) {
-                    storedMarkers.push({
-                        id: existMarkers[item].id,
-                        range: existMarkers[item].range.clone(),
-                        clazz: existMarkers[item].clazz,
-                        type: existMarkers[item].type,
-                    });
+                if (existMarkers[item].clazz.includes('marker')) {
+                    if (existMarkers[item].range) {
+                        storedMarkers.push({
+                            id: existMarkers[item].id,
+                            range: existMarkers[item].range.clone(),
+                            clazz: existMarkers[item].clazz,
+                            type: existMarkers[item].type,
+                        });
+                    }
+                    aceEditor.session.removeMarker(existMarkers[item].id);
                 }
-                aceEditor.session.removeMarker(existMarkers[item].id);
             }
         }
 
         // Show the stored markers in the Code-Editor and clears the storedMarkers array
         function showStoredMarkers(aceEditor) {
             for (let item of storedMarkers) {
-                if (item.range && item.range.start && item.range.end) {
+                if (item.clazz.includes('marker')) {
                     aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
                 }
             }
@@ -387,7 +389,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     countWhiteSpaces2 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\w+)\s+(\()\s*/gm, '').length;
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2),
-                                        clazz: startwertMatch[2],
+                                        clazz: 'marker ' + startwertMatch[2],
                                         type: 'text',
                                     });
 
@@ -609,7 +611,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     // add marker to the variable name
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1),
-                                        clazz: currentMatch[2],
+                                        clazz: 'marker ' + currentMatch[2],
                                         type: 'text',
                                     });
                                 } else if (wholeLineTxt.match(newTwoDimensoinalArrayRegex) || wholeLineTxt.match(newStartValueTwoDimensoinalArrayRegex)) {
@@ -618,14 +620,14 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     // add marker to the variable name
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1),
-                                        clazz: currentMatch[2],
+                                        clazz: 'marker ' + currentMatch[2],
                                         type: 'text',
                                     });
                                 } else {
                                     // add marker to the variable name
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1),
-                                        clazz: currentMatch[2],
+                                        clazz: 'marker ' + currentMatch[2],
                                         type: 'text',
                                     });
                                 }
@@ -732,6 +734,79 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     }
                 });
 
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //Check how many open {} there are => only close a block when it actually gets closed
+                if (line.match(/{/) && isComment != true) {
+                    var count = line.match(/{/g).length;
+                    braceLevel += count;
+                }
+                if (line.match(/}/) && isComment != true) {
+                    var count = line.match(/}/g).length;
+                    braceLevel -= count;
+                }
+
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //End of any block
+                if (line.match(/}/) && blockActive[level] == true && level - braceLevel == 1 && blockNotReallyEnded != true) {
+                    if (ifActive[level + 1] == true) {
+                        //stops ifActive on level higher if this block is over
+                        ifActive[level + 1] = false;
+                    }
+                    if (matched == false) {
+                        if (ifActive[level] == true) {
+                            variableMap.forEach(function (value, key) {
+                                // loops over all variables in map
+                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
+                                    // checks if current variable has the same blocklevel and has no linelevelend
+                                    value.lineLevelEnd = linelevel;
+                                    // calculate height and convert to string
+                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                    // add px (pixel) to height
+                                    height += 'px';
+                                    // height is assigned to height of current variable
+                                    value.height = height;
+                                }
+                            });
+                        } else {
+                            variableMap.forEach(function (value, key) {
+                                // loops over all variables in map
+                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
+                                    // checks if current variable has the same blocklevel and has no linelevelend
+                                    value.lineLevelEnd = linelevel;
+                                    // calculate height and convert to string
+                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                    // add px (pixel) to height
+                                    height += 'px';
+                                    // height is assigned to height of current variable
+                                    value.height = height;
+                                }
+                            });
+                        }
+                    }
+                    blockActive[level] = false;
+                    level -= 1;
+                    matched = true;
+                }
+                if (blockNotReallyEnded == true) {
+                    //if the block didnt really end we stil have to reduce the level by 1 because its gonna add 1 more again
+                    level -= 1;
+                    blockNotReallyEnded = false;
+                }
+                // loops over all variables in map
+                variableMap.forEach(function (value, key) {
+                    // checks if current variable has the blocklevel = 0
+                    if (value.blockLevel == 0) {
+                        // actual linelevel is assigned to linelevelend of current variable
+                        value.lineLevelEnd = linelevel;
+                        // calculate height and convert to string
+                        var height = '' + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
+                        // add px (pixel) to height
+                        height += 'px';
+                        // height is assigned to height of current variable
+                        value.height = height;
+                    }
+                });
+
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
                 // Variables redeclaration
                 data.redeclareVar.forEach(function (dbline) {
@@ -797,7 +872,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                             // add marker
                             storedMarkers.push({
                                 range: new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine),
-                                clazz: currentMatch[1],
+                                clazz: 'marker ' + currentMatch[1],
                                 type: 'text',
                             });
                             if (dbline.name === 'redeclareVariableCallMethodRegex') {
@@ -891,79 +966,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //Check how many open {} there are => only close a block when it actually gets closed
-                if (line.match(/{/) && isComment != true) {
-                    var count = line.match(/{/g).length;
-                    braceLevel += count;
-                }
-                if (line.match(/}/) && isComment != true) {
-                    var count = line.match(/}/g).length;
-                    braceLevel -= count;
-                }
-
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //End of any block
-                if (line.match(/}/) && blockActive[level] == true && level - braceLevel == 1 && blockNotReallyEnded != true) {
-                    if (ifActive[level + 1] == true) {
-                        //stops ifActive on level higher if this block is over
-                        ifActive[level + 1] = false;
-                    }
-                    if (matched == false) {
-                        if (ifActive[level] == true) {
-                            variableMap.forEach(function (value, key) {
-                                // loops over all variables in map
-                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    // checks if current variable has the same blocklevel and has no linelevelend
-                                    value.lineLevelEnd = linelevel;
-                                    // calculate height and convert to string
-                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
-                                    // add px (pixel) to height
-                                    height += 'px';
-                                    // height is assigned to height of current variable
-                                    value.height = height;
-                                }
-                            });
-                        } else {
-                            variableMap.forEach(function (value, key) {
-                                // loops over all variables in map
-                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    // checks if current variable has the same blocklevel and has no linelevelend
-                                    value.lineLevelEnd = linelevel;
-                                    // calculate height and convert to string
-                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
-                                    // add px (pixel) to height
-                                    height += 'px';
-                                    // height is assigned to height of current variable
-                                    value.height = height;
-                                }
-                            });
-                        }
-                    }
-                    blockActive[level] = false;
-                    level -= 1;
-                    matched = true;
-                }
-                if (blockNotReallyEnded == true) {
-                    //if the block didnt really end we stil have to reduce the level by 1 because its gonna add 1 more again
-                    level -= 1;
-                    blockNotReallyEnded = false;
-                }
-                // loops over all variables in map
-                variableMap.forEach(function (value, key) {
-                    // checks if current variable has the blocklevel = 0
-                    if (value.blockLevel == 0) {
-                        // actual linelevel is assigned to linelevelend of current variable
-                        value.lineLevelEnd = linelevel;
-                        // calculate height and convert to string
-                        var height = '' + (value.lineLevelEnd - value.lineLevelStart + 1) * editorLineHeight;
-                        // add px (pixel) to height
-                        height += 'px';
-                        // height is assigned to height of current variable
-                        value.height = height;
-                    }
-                });
-                
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Stuff that doesnt get recognized by an array from the json file & comments
                 if (isComment == true) {
                     matched = true;
@@ -991,6 +993,21 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                         }
                     }
                 }
+            });
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Markers for variable names
+            // get variableMarker.css
+            var styleCss = document.styleSheets[30];
+
+            // delete styles from variable variableMarker.css
+            for (let i = 0; i < styleCss.cssRules.length; i++) {
+                styleCss.deleteRule(i);
+            }
+
+            // loops over all variable and add marker style to variableMarker.css
+            variableMap.forEach(function (value, key) {
+                styleCss.insertRule('.' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
