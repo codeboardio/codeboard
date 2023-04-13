@@ -389,7 +389,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     countWhiteSpaces2 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\w+)\s+(\()\s*/gm, '').length;
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2),
-                                        clazz: 'marker ' + startwertMatch[2],
+                                        clazz: 'marker' + startwertMatch[2],
                                         type: 'text',
                                     });
 
@@ -611,7 +611,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     // add marker to the variable name
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1),
-                                        clazz: 'marker ' + currentMatch[2],
+                                        clazz: 'marker' + currentMatch[2],
                                         type: 'text',
                                     });
                                 } else if (wholeLineTxt.match(newTwoDimensoinalArrayRegex) || wholeLineTxt.match(newStartValueTwoDimensoinalArrayRegex)) {
@@ -620,14 +620,14 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     // add marker to the variable name
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1),
-                                        clazz: 'marker ' + currentMatch[2],
+                                        clazz: 'marker' + currentMatch[2],
                                         type: 'text',
                                     });
                                 } else {
                                     // add marker to the variable name
                                     storedMarkers.push({
                                         range: new Range(linelevel - 1, currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1),
-                                        clazz: 'marker ' + currentMatch[2],
+                                        clazz: 'marker' + currentMatch[2],
                                         type: 'text',
                                     });
                                 }
@@ -872,7 +872,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                             // add marker
                             storedMarkers.push({
                                 range: new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine),
-                                clazz: 'marker ' + currentMatch[1],
+                                clazz: 'marker' + currentMatch[1],
                                 type: 'text',
                             });
                             if (dbline.name === 'redeclareVariableCallMethodRegex') {
@@ -1007,7 +1007,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
 
             // loops over all variable and add marker style to variableMarker.css
             variableMap.forEach(function (value, key) {
-                styleCss.insertRule('.' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
+                styleCss.insertRule('.marker' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
