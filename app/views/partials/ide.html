@@ -98,8 +98,8 @@
                       <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe gelöst</span>
                     </button>
                     <button id="codeBeautifyButton" class="btn btn-info btn-sm ml-2" ng-click="navBarClick('beautify_code')" title="Beautify code"><span class="glyphicon glyphicon-flash"></span><span class="hidden-xs">Beautify</span></button>
-                    <button id="varScopeButton" class="btn btn-info btn-sm" ng-click="navBarClick('show_var_scope')" title="Show variable scope"><span class="glyphicon glyphicon-resize-vertical"></span></button>
-                    <button id="codeBlockButton" class="btn btn-info btn-sm" ng-click="navBarClick('show_code_blocks')" title="Show code blocks visualization"><span class="glyphicon glyphicon-eye-open"></span></button>
+                    <button id="varScopeButton" class="btn btn-info btn-sm" ng-click="navBarClick('show_var_scope')" title="Show variable scope" ng-disabled="pressedButton === 'show_code_blocks'"><span class="glyphicon glyphicon-resize-vertical"></span></button>
+                    <button id="codeBlockButton" class="btn btn-info btn-sm" ng-click="navBarClick('show_code_blocks')" title="Show code blocks visualization" ng-disabled="pressedButton === 'show_var_scope'"><span class="glyphicon glyphicon-eye-open"></span></button>
                   </form>
 
                 </div>

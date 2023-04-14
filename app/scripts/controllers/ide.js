@@ -26,6 +26,9 @@ app.controller('IdeCtrl', [
         // set the ProjectFactory to contain the project loaded from the server
         ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
 
+        // store name of pressed Button
+        $scope.pressedButton = '';
+
         /**
          * Contains functions and events to save the project automatically
          * Triggers msgProcessViewQueryStringRequest to open the correct files according to the passed query
@@ -1061,7 +1064,7 @@ app.controller('IdeCtrl', [
         // kPane for treeView
         $scope.kPanes = $scope.isActionHidden('tree-view') ? '[' : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
         // kPane for varScopeDiv
-        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: false , size: '10%' }, ";
+        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: true , size: '10%' }, ";
         // kPane for aceEditor
         $scope.kPanes += ' {collapsible: false} ';
         // kPane for rightBarTabs (before actual tabs - content)
@@ -1075,6 +1078,12 @@ app.controller('IdeCtrl', [
          */
         $scope.navBarClick = function (aClickId) {
             $log.debug('NavBarClick with id: ' + aClickId);
+            // disable variable scope and code block visualization buttons
+            if ($scope.pressedButton === aClickId) {
+                $scope.pressedButton = '';
+            } else {
+                $scope.pressedButton = aClickId;
+            }
 
             var req;
 
