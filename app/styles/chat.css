@@ -78,6 +78,11 @@
     box-sizing: border-box;
 }
 
+.highlight {
+    box-shadow: 0px 0px 10px 2px green;
+    -webkit-box-shadow: 0px 0px 5px 2px green;
+}
+
 .chat-line-error {
     border-radius: 5px;
     padding: 15px;
@@ -86,6 +91,11 @@
     width: 85%;
     position: relative;
     box-sizing: border-box;
+}
+
+.highlight-error {
+    box-shadow: 0px 0px 10px 3px red;
+    -webkit-box-shadow: 0px 0px 10px 3px red;
 }
 
 .chat-line.left .chat-line-error {

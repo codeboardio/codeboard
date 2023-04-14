@@ -13,6 +13,10 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     'codingAssistantCodeMatchSrv',
     function ($scope, $rootScope, $timeout, codingAssistantCodeMatchSrv) {
         var aceEditor = $scope.ace.editor;
+        var errorLine;
+        var currentLine;
+        $scope.cursorPosition = -1;
+
         codingAssistantCodeMatchSrv
             .getJsonData()
             .then(function (res) {
@@ -28,6 +32,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                         // Automatic function executed one time at the beginning and then every time the code in the editor changes
                         function updateExplanations() {
                             $scope.chatLines = [];
+
+                            // get current code from aceEditor
                             var inputCode = aceEditor
                                 .getSession()
                                 .getValue()
@@ -39,16 +45,36 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                             // convert variableMap into an object
                             $rootScope.variableMap = Object.fromEntries(result.variableMap);
 
-                            // Iterate through the combinedExplanations array to generate the chatboxes
+                            // Iterate through the explanations array to generate the chatboxes
                             result.explanations.forEach((explanation) => {
-                                let chatline = {
-                                    type: explanation.isError ? 'error' : 'explanation',
-                                    message: explanation.answer,
-                                    link: explanation.link,
-                                    author: 'Roby erklärt Zeile ' + explanation.lineLevel,
-                                    avatar: explanation.isError ? 'worried' : 'idea',
-                                };
-                                $scope.chatLines.push(chatline);
+                                if (explanation.isError) {
+                                    // lineLevel of error chatbox
+                                    errorLine = explanation.lineLevel;
+                                    // current lineLevel of cursor
+                                    currentLine = aceEditor.getSelectionRange().start.row + 1;
+                                    let chatline = {
+                                        type: 'error',
+                                        message: explanation.answer,
+                                        link: explanation.link,
+                                        lineLevel: explanation.lineLevel,
+                                        author: 'Roby erklärt Zeile ' + explanation.lineLevel,
+                                        avatar: 'worried',
+                                    };
+                                    // show checkbox when line changed
+                                    if (currentLine !== errorLine) {
+                                        $scope.chatLines.push(chatline);
+                                    }
+                                } else {
+                                    let chatline = {
+                                        type: 'explanation',
+                                        message: explanation.answer,
+                                        link: explanation.link,
+                                        lineLevel: explanation.lineLevel,
+                                        author: 'Roby erklärt Zeile ' + explanation.lineLevel,
+                                        avatar: 'idea',
+                                    };
+                                    $scope.chatLines.push(chatline);
+                                }
                             });
 
                             // Update showNoCodeMessage element based on combinedExplanations array length
@@ -71,6 +97,20 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                             $timeout(function () {
                                 updateExplanations();
                             });
+                        });
+                        // listen to the 'mousedown' event to get line of the click / got code from stackoverflow - https://stackoverflow.com/questions/41647661/how-to-check-if-the-mouse-is-down-in-aceeditor
+                        aceEditor.on('mousedown', function (e) {
+                            $rootScope.cursorPosition = e.getDocumentPosition().row + 1;
+                            $scope.$apply();
+                        });
+
+                        // listen to 'enter-keypress' event to reset cursorPosition / got part of code from stackoverflow - https://stackoverflow.com/questions/7060750/detect-the-enter-key-in-a-text-input-field
+                        aceEditor.container.addEventListener('keypress', function (e) {
+                            // Check if the key pressed is 'Enter'
+                            if (e.key === 'Enter' || e.keyCode === 13) {
+                                $rootScope.cursorPosition = -1;
+                                $scope.$apply();
+                            }
                         });
                     });
             })
