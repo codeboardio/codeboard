@@ -1220,6 +1220,7 @@ app.controller('IdeCtrl', [
                     break;
                 case 'show_var_scope':
                     codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
+                    $scope.toggleVarScope();
                     break;
                 case 'show_code_blocks':
                     break;
@@ -2159,6 +2160,7 @@ app.controller('RightBarCtrl', [
         $scope.activeTab = '';
         $scope.rightBarTabs = {};
         $scope.showRightBarTabs = true;
+        $scope.isCollapsed = true;
 
         // In the following all tabs are defined, which are displayed in the right bar. The definition consists of a title,
         // an icon and the ContentUrl. The ContentUrl specifies which template is to be loaded. These templates can in turn
@@ -2245,6 +2247,18 @@ app.controller('RightBarCtrl', [
             } else {
                 $scope.splitter.collapse('#ideRighterPartOfMiddlePart');
                 $scope.activeTab = '';
+            }
+        };
+
+        /**
+         * toggle variable scope kPane  
+         */
+        $rootScope.toggleVarScope = function () {
+            $scope.isCollapsed = !$scope.isCollapsed;
+            if ($scope.isCollapsed) {
+                $scope.splitter.collapse('#ideVarScopePartOfMiddlePart');
+            } else {
+                $scope.splitter.expand('#ideVarScopePartOfMiddlePart');
             }
         };
 
