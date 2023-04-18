@@ -1223,6 +1223,7 @@ app.controller('IdeCtrl', [
                     $scope.toggleVarScope();
                     break;
                 case 'show_code_blocks':
+                    codingAssistantCodeMatchSrv.toggleCodeBlocks($scope.ace.editor);
                     break;
             }
         };

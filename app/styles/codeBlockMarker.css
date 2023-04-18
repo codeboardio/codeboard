@@ -1,0 +1,54 @@
+.codeBlockClass {
+    position: absolute;
+    background-color: rgb(173, 105, 236);
+    z-index: 1;
+}
+
+.codeBlockMethod {
+    position: absolute;
+    background-color: rgb(248, 239, 114);
+    z-index: 2;
+    width: 100%;
+}
+
+.codeBlockVariable {
+    position: absolute;
+    background-color: rgb(137, 156, 241);
+    z-index: 3;
+    width: 100%;
+}
+
+.codeBlockCondition {
+    position: absolute;
+    background-color: rgb(206, 245, 184);
+    z-index: 4;
+    width: 100%;
+}
+
+.codeBlockLoop {
+    position: absolute;
+    background-color: rgb(245, 203, 155);
+    z-index: 5;
+    width: 100%;
+}
+
+.codeBlockPrint {
+    position: absolute;
+    background-color: rgb(156, 242, 248);
+    z-index: 6;
+    width: 100%;
+}
+
+.codeBlockTrycatch {
+    position: absolute;
+    background-color: rgb(248, 156, 156);
+    z-index: 7;
+    width: 100%;
+}
+
+.errorHighlight {
+  position: absolute;
+  background-color: red;
+  z-index: 7;
+  width: 100%;
+}

@@ -40,36 +40,37 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Everything related to toggle markers - code implemented with help form stack overflow (https://stackoverflow.com/questions/65677814/how-to-remove-all-the-existing-highlight-markers-in-ace-editor-using-react) and Chat-GPT
-        // Indicates where markers are toggled on or off
+        // Indicates if markers are toggled on or off
         var toggled = false;
-        // stores the markers
+        // store the markers
         var storedMarkers = [];
 
-        // Stores the existing markers in the Code-Editor and removes them
+        // Store the existing markers in the Code-Editor and removes them
         function storeAndRemoveMarkers(aceEditor) {
-            const existMarkers = aceEditor.session.getMarkers();
-            for (let item in existMarkers) {
-                if (existMarkers[item].clazz.includes('marker')) {
-                    if (existMarkers[item].range) {
+            var existMarkers = aceEditor.session.getMarkers();
+            if (existMarkers) {
+                var prevMarkersArr = Object.keys(existMarkers);
+                prevMarkersArr.forEach((item) => {
+                    if (existMarkers[item].clazz.includes('marker')) {
                         storedMarkers.push({
                             id: existMarkers[item].id,
-                            range: existMarkers[item].range.clone(),
+                            range: existMarkers[item].range,
                             clazz: existMarkers[item].clazz,
                             type: existMarkers[item].type,
                         });
                     }
                     aceEditor.session.removeMarker(existMarkers[item].id);
-                }
+                });
             }
         }
 
         // Show the stored markers in the Code-Editor and clears the storedMarkers array
         function showStoredMarkers(aceEditor) {
-            for (let item of storedMarkers) {
+            storedMarkers.forEach((item) => {
                 if (item.clazz.includes('marker')) {
                     aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
                 }
-            }
+            });
             storedMarkers = [];
         }
 
@@ -81,6 +82,32 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             } else {
                 storeAndRemoveMarkers(aceEditor);
                 toggled = false;
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Everything related to the code block visualization
+        // Indicates if markers for code-blocks are toggled on or off
+        var toggledBlock = false;
+        // store the markers
+        var storedBlockMarkers = [];
+        service.toggleCodeBlocks = function (aceEditor) {
+            var existMarkers = aceEditor.session.getMarkers();
+            if (toggledBlock === false) {
+                storedBlockMarkers.forEach((item) => {
+                    if (item.clazz.includes('codeBlock')) {
+                        aceEditor.session.addMarker(item.range, item.clazz, item.type);
+                    }
+                });
+                toggledBlock = true;
+            } else {
+                if (existMarkers) {
+                    var prevMarkersArr = Object.keys(existMarkers);
+                    prevMarkersArr.forEach((item) => {
+                        aceEditor.session.removeMarker(existMarkers[item].id);
+                    });
+                }
+                toggledBlock = false;
             }
         };
 
@@ -754,10 +781,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     }
                     if (matched == false) {
                         if (ifActive[level] == true) {
+                            // loops over all variables in map
                             variableMap.forEach(function (value, key) {
-                                // loops over all variables in map
+                                // checks if current variable has the same blocklevel and has no linelevelend
                                 if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    // checks if current variable has the same blocklevel and has no linelevelend
                                     value.lineLevelEnd = linelevel;
                                     // calculate height and convert to string
                                     var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
@@ -768,10 +795,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                 }
                             });
                         } else {
+                            // loops over all variables in map
                             variableMap.forEach(function (value, key) {
-                                // loops over all variables in map
+                                // checks if current variable has the same blocklevel and has no linelevelend
                                 if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    // checks if current variable has the same blocklevel and has no linelevelend
                                     value.lineLevelEnd = linelevel;
                                     // calculate height and convert to string
                                     var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;

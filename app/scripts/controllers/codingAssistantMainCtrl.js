@@ -15,7 +15,6 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
         var aceEditor = $scope.ace.editor;
         var errorLine;
         var currentLine;
-        $scope.cursorPosition = -1;
 
         codingAssistantCodeMatchSrv
             .getJsonData()
