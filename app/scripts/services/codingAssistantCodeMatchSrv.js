@@ -45,20 +45,28 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         // store the markers
         var storedMarkers = [];
 
+        // Toggles the markers on and off in the Code-Editor
+        service.toggleMarkers = function (aceEditor) {
+            if (!toggled) {
+                showStoredMarkers(aceEditor);
+                toggled = true;
+            } else {
+                storeAndRemoveMarkers(aceEditor);
+                toggled = false;
+            }
+        };
+
+        // clear the markers array every time the code changes to not get one marker multiple times in the array
+        service.clearMarkers = function () {
+            storedMarkers = [];
+        };
+
         // Store the existing markers in the Code-Editor and removes them
         function storeAndRemoveMarkers(aceEditor) {
             var existMarkers = aceEditor.session.getMarkers();
             if (existMarkers) {
                 var prevMarkersArr = Object.keys(existMarkers);
                 prevMarkersArr.forEach((item) => {
-                    if (existMarkers[item].clazz.includes('marker')) {
-                        storedMarkers.push({
-                            id: existMarkers[item].id,
-                            range: existMarkers[item].range,
-                            clazz: existMarkers[item].clazz,
-                            type: existMarkers[item].type,
-                        });
-                    }
                     aceEditor.session.removeMarker(existMarkers[item].id);
                 });
             }
@@ -71,19 +79,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
                 }
             });
-            storedMarkers = [];
         }
-
-        // Toggles the markers on and off in the Code-Editor
-        service.toggleMarkers = function (aceEditor) {
-            if (toggled === false) {
-                showStoredMarkers(aceEditor);
-                toggled = true;
-            } else {
-                storeAndRemoveMarkers(aceEditor);
-                toggled = false;
-            }
-        };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Everything related to the code block visualization

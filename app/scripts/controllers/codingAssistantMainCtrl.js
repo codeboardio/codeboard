@@ -96,6 +96,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                             $timeout(function () {
                                 updateExplanations();
                             });
+                            // call clearMarker function to clear the markers array every time the code changes
+                            codingAssistantCodeMatchSrv.clearMarkers();
                         });
                         // listen to the 'mousedown' event to get line of the click / got code from stackoverflow - https://stackoverflow.com/questions/41647661/how-to-check-if-the-mouse-is-down-in-aceeditor
                         aceEditor.on('mousedown', function (e) {
