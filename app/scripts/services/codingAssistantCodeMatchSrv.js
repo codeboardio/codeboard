@@ -11,6 +11,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
     '$http',
     function ($http) {
         var service = this;
+        var Range = ace.require('ace/range').Range;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Fetching data
@@ -48,10 +49,22 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         // Toggles the markers on and off in the Code-Editor
         service.toggleMarkers = function (aceEditor) {
             if (!toggled) {
-                showStoredMarkers(aceEditor);
+                // Show the stored markers in the Code-Editor
+                storedMarkers.forEach((item) => {
+                    if (item.clazz.includes('marker')) {
+                        aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
+                    }
+                });
                 toggled = true;
             } else {
-                storeAndRemoveMarkers(aceEditor);
+                // remove exisiting markers in the ace Editor
+                var existMarkers = aceEditor.session.getMarkers();
+                if (existMarkers) {
+                    var prevMarkersArr = Object.keys(existMarkers);
+                    prevMarkersArr.forEach((item) => {
+                        aceEditor.session.removeMarker(existMarkers[item].id);
+                    });
+                }
                 toggled = false;
             }
         };
@@ -61,26 +74,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             storedMarkers = [];
         };
 
-        // Store the existing markers in the Code-Editor and removes them
-        function storeAndRemoveMarkers(aceEditor) {
-            var existMarkers = aceEditor.session.getMarkers();
-            if (existMarkers) {
-                var prevMarkersArr = Object.keys(existMarkers);
-                prevMarkersArr.forEach((item) => {
-                    aceEditor.session.removeMarker(existMarkers[item].id);
-                });
-            }
-        }
-
-        // Show the stored markers in the Code-Editor and clears the storedMarkers array
-        function showStoredMarkers(aceEditor) {
-            storedMarkers.forEach((item) => {
-                if (item.clazz.includes('marker')) {
-                    aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
-                }
-            });
-        }
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Everything related to the code block visualization
         // Indicates if markers for code-blocks are toggled on or off
@@ -88,7 +81,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         // store the markers
         var storedBlockMarkers = [];
         service.toggleCodeBlocks = function (aceEditor) {
-            var existMarkers = aceEditor.session.getMarkers();
+            var existBlockMarkers = aceEditor.session.getMarkers();
             if (toggledBlock === false) {
                 storedBlockMarkers.forEach((item) => {
                     if (item.clazz.includes('codeBlock')) {
@@ -97,10 +90,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 });
                 toggledBlock = true;
             } else {
-                if (existMarkers) {
-                    var prevMarkersArr = Object.keys(existMarkers);
-                    prevMarkersArr.forEach((item) => {
-                        aceEditor.session.removeMarker(existMarkers[item].id);
+                if (existBlockMarkers) {
+                    var prevBlockMarkersArr = Object.keys(existBlockMarkers);
+                    prevBlockMarkersArr.forEach((item) => {
+                        aceEditor.session.removeMarker(existBlockMarkers[item].id);
                     });
                 }
                 toggledBlock = false;
@@ -166,7 +159,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             var explanations = [];
 
             // Variables to highlight the code in the Code-Editor
-            var Range = ace.require('ace/range').Range;
             var currLine;
             var wholeLineTxt;
             var countWhiteSpacesLine;
@@ -269,11 +261,15 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     // check if parameter
                                     if (currentMatch[3].match(paraRegex)) {
                                         // split parameter
-                                        const currentMatchPara = currentMatch[3].split(',');
+                                        var currentMatchPara = currentMatch[3].split(',');
                                         var currentRegexPara = [];
                                         currentMatchPara.forEach(function (para) {
                                             // match for each split
-                                            currentRegexPara.push(para.match(paraRegex));
+                                            var match = para.match(paraRegex);
+                                            // Ensure that the match is not null
+                                            if (match) {
+                                                currentRegexPara.push(match);
+                                            }
                                         });
                                         // if only one parameter
                                         if (currentRegexPara.length == 1) {
