@@ -257,8 +257,7 @@ body {
 }
 
 /* Make sure the kendo-splitter is not visible in the treeview where it splits the project-name and the LibraryCtrl */
-#ideVarScopePartOfMiddlePart + .k-splitbar {
-  background-color:  red;
+#ideVarScopePartOfMiddlePart + .k-splitbar .k-icon {
   display: none;
 }
 
@@ -267,7 +266,6 @@ body {
   height: 50px;
   background-color: #e7e7e7;
   margin-bottom: 0;
-  border-right: 1px solid #9f9f9f;
 }
 
 .varScopeTitle {
