@@ -1190,7 +1190,7 @@ app.controller('IdeCtrl', [
                 case 'help':
                     if (!$scope.disabledActions.help) {
                         // todo getHelp in disabledActions definieren
-                        let req = IdeMsgService.msgNavBarRightOpenTab('help');
+                        let req = IdeMsgService.msgNavBarRightOpenTab('info');
                         $rootScope.$broadcast(req.msg, req.data);
                     }
                     break;
@@ -2179,6 +2179,17 @@ app.controller('RightBarCtrl', [
             };
         }
 
+        // tab for project description
+        if (!$scope.isActionHidden('info')) {
+            $scope.rightBarTabs.info = {
+                slug: 'info',
+                title: 'Info',
+                disabled: false,
+                icon: 'glyphicon-info-sign',
+                contentURL: 'partials/navBarRight/navBarRightInfo',
+            };
+        }
+
         // tab for test result
         if (!$scope.isActionHidden('test') && ProjectFactory.hasConfig('Testing', 'ioTests')) {
             $scope.rightBarTabs.test = {
@@ -2204,6 +2215,7 @@ app.controller('RightBarCtrl', [
             $scope.rightBarTabs.explanation = {
                 slug: 'explanation',
                 title: 'Erklärungen',
+                disabled: false,
                 icon: 'glyphicon-eye-open',
                 contentURL: 'partials/navBarRight/navBarRightExplanation',
             };
