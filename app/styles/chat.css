@@ -330,3 +330,19 @@
 .avatar-modal .progress-loading-icon.ng-hide.ng-hide-animate {
     display: none !important;
 }
+
+/* Info - Tab */
+.button-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-top: 15px;
+  }
+  
+  .button-description {
+    margin-left: 10px;
+  }
+  
+  .info-heading {
+    text-align: center;
+  }
