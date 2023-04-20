@@ -10,8 +10,9 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     '$scope',
     '$rootScope',
     '$timeout',
+    '$document',
     'codingAssistantCodeMatchSrv',
-    function ($scope, $rootScope, $timeout, codingAssistantCodeMatchSrv) {
+    function ($scope, $rootScope, $timeout, $document, codingAssistantCodeMatchSrv) {
         var aceEditor = $scope.ace.editor;
         var errorLine;
         var currentLine;
@@ -29,7 +30,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                     console.error('An error occurred while fetching data:', error);
                 });
         }
-        
+
         fetchData().then(({ db, colors }) => {
             // call updateExplanations() to show message, when no file is opened
             updateExplanations(db, colors);
@@ -108,6 +109,15 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
         aceEditor.on('mousedown', function (e) {
             $rootScope.cursorPosition = e.getDocumentPosition().row + 1;
             $scope.$apply();
+
+            var chatBoxId = 'chatLine-' + $rootScope.cursorPosition;
+            // get corresponding chatbox
+            var chatBox = $document[0].getElementById(chatBoxId);
+            // check if the chat line with the corresponding line level exists
+            if (chatBox) {
+                // scroll the chatbox to the associated line in the codeEditor
+                chatBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         });
 
         // listen to 'enter-keypress' event to reset cursorPosition / got part of code from stackoverflow - https://stackoverflow.com/questions/7060750/detect-the-enter-key-in-a-text-input-field
