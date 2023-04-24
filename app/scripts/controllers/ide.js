@@ -852,6 +852,8 @@ app.controller('IdeCtrl', [
             test: false,
             tool: false,
             submit: false,
+            beautify: false,
+            varScope: false
         };
 
         // state variables to indicate which actions in the IDE are hidden
