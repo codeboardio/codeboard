@@ -404,7 +404,7 @@
                   <button class="btn btn-default" ng-click="close()">Zurück zur Aufgabe</button>
                   <button class="btn btn-info" ng-show="hasSampleSolution() && passed" ng-click="openSampleSolution()">Musterlösung anzeigen</button>
                   <button class="btn btn-success" ng-show="passed" ng-click="goToCourse()">Zur Kursübersicht</button>
-                  <button class="btn btn-info" ng-if="!isActionHidden('help')" ng-show="!passed" ng-click="requestHelp()">Hilfe Anfordern</button>
+                  <button class="btn btn-info" ng-if="!isActionHidden('info')" ng-show="!passed" ng-click="requestHelp()">Hilfe Anfordern</button>
                 </div>
               </div>
             </div>

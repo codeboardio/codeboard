@@ -416,8 +416,8 @@ app.controller('IdeCtrl', [
                             $http.post('/api/' + $routeParams.projectId + '/help/compilation', payload).then(
                                 function (result) {
                                     if (typeof result.data !== 'undefined') {
-                                        let reqOpenHelpTab = IdeMsgService.msgNavBarRightOpenTab('help');
-                                        $rootScope.$broadcast(reqOpenHelpTab.msg, reqOpenHelpTab.data);
+                                        let reqOpenCompilerTab = IdeMsgService.msgNavBarRightOpenTab('compiler');
+                                        $rootScope.$broadcast(reqOpenCompilerTab.msg, reqOpenCompilerTab.data);
 
                                         let chatLineCard = {
                                             cardHeader: 'Fehler beim Kompilieren',
@@ -679,14 +679,14 @@ app.controller('IdeCtrl', [
                     };
 
                     /**
-                     * Open help tab
+                     * Open info tab
                      */
                     $scope.requestHelp = function () {
                         // first we close the modal
                         $uibModalInstance.close();
 
-                        // trigger open help tab
-                        let req = IdeMsgService.msgNavBarRightOpenTab('help');
+                        // trigger open info tab
+                        let req = IdeMsgService.msgNavBarRightOpenTab('info');
                         $rootScope.$broadcast(req.msg, req.data);
                     };
 
@@ -697,7 +697,7 @@ app.controller('IdeCtrl', [
                         // first we close the modal
                         $uibModalInstance.close();
 
-                        // trigger open help tab
+                        // trigger open sample solution tab
                         let req = IdeMsgService.msgNavBarRightOpenTab('sampleSolution');
                         $rootScope.$broadcast(req.msg, req.data);
                     };
@@ -2204,7 +2204,7 @@ app.controller('RightBarCtrl', [
 
         // tab for tips
         if (!$scope.isActionHidden('tips')) {
-            $scope.rightBarTabs.help = {
+            $scope.rightBarTabs.tips = {
                 slug: 'tips',
                 title: 'Tipps',
                 disabled: false,
