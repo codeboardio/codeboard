@@ -35,9 +35,15 @@
                     </chat-line>
                 </div>
 
+                <div ng-switch-when="info">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar" type="chatLine.type" tab="chatLine.tab">
+                        <chat-line-simple><span ng-bind-html="chatLine.message"></span></chat-line-simple>
+                    </chat-line>
+                </div>
+
                 <div ng-switch-default>
                     <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="chatLine.avatar">
-                        <chat-line-simple><span ng-bind-html="chatLine.message"></span></chat-line-simple>
+                        <chat-line-simple>{{chatLine.message}}</chat-line-simple>
                     </chat-line>
                 </div>
             </div>

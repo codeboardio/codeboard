@@ -6,60 +6,61 @@
 
 'use strict';
 
-
 /**
  * Directive used to display a chat conversation.
  * This directive takes a list of chatLines and adds for each value a <chat-line>.
  * Before the actual chat content, additional content can be inserted using the transclude 'beforeChat'.
  */
-angular.module('codeboardApp')
-    .directive('chat', function () {
-        return {
-            restrict: 'E',
-            transclude: {
-                beforeChat: '?beforeChat'
-            },
-            scope: {
-                chatLines: "="
-            },
-            templateUrl: 'partials/chat/chat',
-        };
-    });
-
+angular.module('codeboardApp').directive('chat', function () {
+    return {
+        restrict: 'E',
+        transclude: {
+            beforeChat: '?beforeChat',
+        },
+        scope: {
+            chatLines: '=',
+        },
+        templateUrl: 'partials/chat/chat',
+    };
+});
 
 /**
  * Directive used to display a single chat line
  */
-angular.module('codeboardApp')
-    .directive('chatLine', function () {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: {
-                alignment: '@?',
-                type: '=?',
-                avatar: '=?',
-                avatarSize: '@?',
-                author: '@?',
-                createdAt: '@?',
-                link: '@?'
-            },
-            controller: ['$scope', function chatController($scope) {
-
+angular.module('codeboardApp').directive('chatLine', function () {
+    return {
+        restrict: 'E',
+        transclude: true,
+        scope: {
+            alignment: '@?',
+            type: '=?',
+            tab: '=?',
+            avatar: '=?',
+            avatarSize: '@?',
+            author: '@?',
+            createdAt: '@?',
+            link: '@?',
+        },
+        controller: [
+            '$scope',
+            '$rootScope',
+            'IdeMsgService',
+            function chatController($scope, $rootScope, IdeMsgService) {
                 $scope.avatarSize = $scope.avatarSize || 'sm';
+                var req;
 
                 /**
                  * Returns a well formed date
                  * @param date
                  * @returns {string}
                  */
-                $scope.postedAt = function(date) {
+                $scope.postedAt = function (date) {
                     let postedAt = new Date(date);
                     let options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-                    if(postedAt instanceof Date && !isNaN(postedAt)) {
-                        return postedAt.toLocaleString("de-DE", options);
+                    if (postedAt instanceof Date && !isNaN(postedAt)) {
+                        return postedAt.toLocaleString('de-DE', options);
                     }
-                    return "";
+                    return '';
                 };
 
                 /**
@@ -67,98 +68,124 @@ angular.module('codeboardApp')
                  * @param avatarName
                  * @returns {string}
                  */
-                $scope.getAvatarUri = function(avatarName) {
+                $scope.getAvatarUri = function (avatarName) {
                     switch (avatarName) {
-                        case 'idea': return "../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg";
-                        case 'neutral': return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
-                        case 'thumbUp': return "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
-                        case 'almostRight': return "../../../images/avatars/Avatar_RobyCoder_RZ_almost-right_2020.svg";
-                        case 'worried': return "../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg";
-                        case 'student': return "../../../images/avatars/Avatar_Student_RZ_2020.svg";
-                        case 'teacher': return "../../../images/avatars/Avatar_Teacher_RZ_2020.svg";
-                        default: return "../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg";
+                        case 'idea':
+                            return '../../../images/avatars/Avatar_RobyCoder_RZ_idea_2020.svg';
+                        case 'neutral':
+                            return '../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg';
+                        case 'thumbUp':
+                            return '../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg';
+                        case 'almostRight':
+                            return '../../../images/avatars/Avatar_RobyCoder_RZ_almost-right_2020.svg';
+                        case 'worried':
+                            return '../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg';
+                        case 'student':
+                            return '../../../images/avatars/Avatar_Student_RZ_2020.svg';
+                        case 'teacher':
+                            return '../../../images/avatars/Avatar_Teacher_RZ_2020.svg';
+                        default:
+                            return '../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg';
                     }
                 };
-            }],
-            templateUrl: 'partials/chat/chatLine'
-        };
-    });
 
+                $scope.openHelpTab = function (type) {
+                    switch (type) {
+                        case 'explanation':
+                            // open explanation tab
+                            req = IdeMsgService.msgNavBarRightOpenTab('explanation');
+                            console.log(req);
+                            $rootScope.$broadcast(req.msg, req.data);
+                            break;
+                        case 'tips':
+                            // open tips tab
+                            req = IdeMsgService.msgNavBarRightOpenTab('tips');
+                            $rootScope.$broadcast(req.msg, req.data);
+                            break;
+                        case 'compiler':
+                            // open compiler tab
+                            req = IdeMsgService.msgNavBarRightOpenTab('compiler');
+                            $rootScope.$broadcast(req.msg, req.data);
+                            break;
+                    }
+                };
+            },
+        ],
+        templateUrl: 'partials/chat/chatLine',
+    };
+});
 
 /**
  * Directive used to display a chat line card
  */
-angular.module('codeboardApp')
-    .directive('chatLineCard', function () {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: {
-                cardType: "@?",
-                cardReference: "@?",
-                cardTitle: "@?"
-            },
-            controller: ['$scope', function chatController($scope) {
+angular.module('codeboardApp').directive('chatLineCard', function () {
+    return {
+        restrict: 'E',
+        transclude: true,
+        scope: {
+            cardType: '@?',
+            cardReference: '@?',
+            cardTitle: '@?',
+        },
+        controller: [
+            '$scope',
+            function chatController($scope) {
                 $scope.alignment = $scope.alignment || 'left';
-            }],
-            templateUrl: 'partials/chat/chatLineCard'
-        };
-    });
-
+            },
+        ],
+        templateUrl: 'partials/chat/chatLineCard',
+    };
+});
 
 /**
  * Directive used to display a simple chat line.
  * This can be used for both html and simple text.
  */
-angular.module('codeboardApp')
-    .directive('chatLineSimple', function () {
-        return {
-            restrict: 'E',
-            transclude: true,
-            templateUrl: 'partials/chat/chatLineSimple'
-        };
-    });
+angular.module('codeboardApp').directive('chatLineSimple', function () {
+    return {
+        restrict: 'E',
+        transclude: true,
+        templateUrl: 'partials/chat/chatLineSimple',
+    };
+});
 
 /**
  * Directive used to display a explanation chat line.
  */
-angular.module('codeboardApp')
-.directive('chatLineExplanation', function () {
+angular.module('codeboardApp').directive('chatLineExplanation', function () {
     return {
         restrict: 'E',
         transclude: true,
-        templateUrl: 'partials/chat/chatLineExplanation'
+        templateUrl: 'partials/chat/chatLineExplanation',
     };
 });
 
 /**
  * Directive used to display a error chat line.
  */
-angular.module('codeboardApp')
-.directive('chatLineError', function () {
+angular.module('codeboardApp').directive('chatLineError', function () {
     return {
         restrict: 'E',
         transclude: true,
-        templateUrl: 'partials/chat/chatLineError'
+        templateUrl: 'partials/chat/chatLineError',
     };
 });
-
-
 
 /**
  * An additional directive that can be used to display chat message rating.
  */
-angular.module('codeboardApp')
-    .directive('chatLineRating', ['$window', '$timeout', function ($window, $timeout) {
+angular.module('codeboardApp').directive('chatLineRating', [
+    '$window',
+    '$timeout',
+    function ($window, $timeout) {
         return {
             restrict: 'E',
             scope: {
                 askUserText: '@?',
-                onRateMessage: "&",
-                messageId: "="
+                onRateMessage: '&',
+                messageId: '=',
             },
             link: function ($scope, element) {
-
                 // set defaults
                 $scope.askUserText = $scope.askUserText || 'Wie hilfreich war dieser Tipp?';
                 $scope.grading = ['Überhaupt nicht hilfreich', 'Nicht hilfreich', 'Einigermassen hilfreich', 'Hilfreich', 'Sehr hilfreich'];
@@ -168,26 +195,25 @@ angular.module('codeboardApp')
                  * @param messageId
                  * @param rate
                  */
-                $scope.onRateSend = function(messageId, rate) {
-                    if(angular.isDefined($scope.onRateMessage)) {
-                        $scope.onRateMessage({messageId: messageId, rating: rate});
+                $scope.onRateSend = function (messageId, rate) {
+                    if (angular.isDefined($scope.onRateMessage)) {
+                        $scope.onRateMessage({ messageId: messageId, rating: rate });
                     }
 
                     // show thank you message for certain seconds
                     $scope.showThankYou = true;
-                    $timeout(function() {
+                    $timeout(function () {
                         $scope.showThankYou = false;
                     }, 2000);
-
                 };
 
                 /**
                  * Mark all lower stars on hover
                  * @param index
                  */
-                $scope.onRateHover = function(index) {
-                    for(let i = 1; i <= index; i++) {
-                        angular.element(element[0].querySelector('.star'+i)).addClass('active');
+                $scope.onRateHover = function (index) {
+                    for (let i = 1; i <= index; i++) {
+                        angular.element(element[0].querySelector('.star' + i)).addClass('active');
                     }
                 };
 
@@ -196,20 +222,22 @@ angular.module('codeboardApp')
                  * @param index
                  */
                 $scope.onRateLeave = function (index) {
-                    for(let i = 1; i <= index; i++) {
-                        angular.element(element[0].querySelector('.star'+i)).removeClass('active');
+                    for (let i = 1; i <= index; i++) {
+                        angular.element(element[0].querySelector('.star' + i)).removeClass('active');
                     }
                 };
 
-
                 // Watchers
 
-                $scope.$watch('val', function(newValue, oldValue) {
-                    if (newValue)
-                        console.log("I see a data change!");
-                }, true);
-
+                $scope.$watch(
+                    'val',
+                    function (newValue, oldValue) {
+                        if (newValue) console.log('I see a data change!');
+                    },
+                    true
+                );
             },
-            templateUrl: 'partials/chat/chatLineRating'
+            templateUrl: 'partials/chat/chatLineRating',
         };
-    }]);
+    },
+]);
