@@ -2197,18 +2197,19 @@ app.controller('RightBarCtrl', [
                 slug: 'explanation',
                 title: 'Erklärungen',
                 disabled: false,
-                icon: 'glyphicon-eye-open',
+                icon: 'glyphicon-comment',
                 contentURL: 'partials/navBarRight/navBarRightExplanation',
             };
         }
 
-        // tab for help / chat
-        if (!$scope.isActionHidden('help')) {
+        // tab for tips
+        if (!$scope.isActionHidden('tips')) {
             $scope.rightBarTabs.help = {
-                slug: 'help',
-                title: 'Hilfe',
-                icon: 'glyphicon-comment',
-                contentURL: 'partials/navBarRight/navBarRightHelp',
+                slug: 'tips',
+                title: 'Tipps',
+                disabled: false,
+                icon: 'glyphicon-gift',
+                contentURL: 'partials/navBarRight/navBarRightTips',
             };
         }
 
