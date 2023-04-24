@@ -178,24 +178,12 @@
               <!-- end of splitter that splits everything related to the tree view (projectname, treeview, library select box -->
             </div> 
             <!-- end of tree view pane-->
-            
-            <!-- variable Scope pane -->
-            <div id="ideVarScopePartOfMiddlePart">
-              <div id="varScopeTabArea"> 
-                  <div class="varScopeTitle">Gültigkeitsbereich von Variablen</div>
-              </div>
-              <div class="varScopeBlocks" id="varScope_editor">
-                <div ng-repeat="(key, value) in variableMap" id="{{key}}" class="varScope" ng-style="{'height': value.height, 'marginTop': value.margin, 'backgroundColor': value.color}">
-                </div>             
-              </div>
-            </div>
-            <!-- end of variable Scope pane -->
-              
+                          
             <!-- begin of right-part of the middle part, that is the editor and tabs -->
             <div id="ideRightPartOfMiddlePart"> 
               <!-- everything related to the editor -->
                 <div ng-controller="TabCtrl" id="ideTabArea"> <!-- the tabs -->
-                  <ul class="ideTabs">
+                  <ul class="ideTabs" ng-style="ideTabsStyle">
                     <li ng-repeat="tab in tabs" ng-class="{ideTabActive: tab.isActive, ideTabStatic: tab.isStatic}" ng-click="selectClick(tab.arrayIndex)" style="float: left;">
                       <i ng-show="tab.isStatic" title="Dieser Tab kann nicht bearbeitet werden" class="isStatic-icon glyphicon glyphicon-eye-open"></i>
                       <span title="{{tab.title}}">{{tab.name}}</span>
@@ -204,31 +192,39 @@
                   </ul>
                 </div>
 
-                <div id="ideEditorAndConsole" kendo-splitter="splitter" k-orientation="'vertical'" k-panes="[{ collapsible: false }, { collapsible: false, size: '120px' }]">
-
-                    <div class="ideEditorArea">
-
-                      <div class="ideEditorImage" ng-show="ace.isImage">
-                        <img alt="{{ace.image}}" ng-src="{{ace.image}}" /><br>
-                        <input class="image-src-field" type="text" value="{{ace.image}}" />
-                      </div>
-
-                      <div ng-hide="ace.isVisible" id="ideAceNotVisible">
-                        <div id="ideMsgNoFilesOpen">No files are open.<br>Click on a file from the project tree.</div>
-                        <div id="ideMsgNotSignedIn" class="alert alert-warning" ng-hide="signinSettings.userIsAuthenticated()">
-                          <strong>You're not signed in.</strong><br><a ng-href="{{signinSettings.signinPathWithRedirect()}}">Sign in now </a> to save your progress or load your previously saved version.
-                        </div>
-                      </div>
-
-                      <!-- the ace editor -->
-                      <!-- note: don't use ng-model as it updates too slowly. Access the session value directly instead. -->
-                      <div class="ideEditor" ng-show="ace.isVisible" ng-hide="ace.isImage" id="ace_editor" ui-ace="{
-                        showGutter: true,
-                        useWrapMode: false,
-                        theme: 'eclipse',
-                        onLoad: aceLoaded}">
+                <div id="ideEditorAndConsole" kendo-splitter="splitter" k-orientation="'vertical'" k-panes="[{ collapsible: false }, { collapsible: false, size: '120px' }]" sync-scroll>
+                  <div kendo-splitter="innerSplitter" k-orientation="'horizontal'" k-panes="[{ collapsible: true, resizable: false, collapsed: true , size: '10%' }, { collapsible: true }]">
+                    <!-- variable Scope pane -->
+                    <div id="ideVarScopePartOfMiddlePart">
+                      <div class="varScopeBlocks" id="varScope_editor">
+                        <div ng-repeat="(key, value) in variableMap" id="{{key}}" class="varScope" ng-style="{'height': value.height, 'marginTop': value.margin, 'backgroundColor': value.color}">
+                        </div>             
                       </div>
                     </div>
+                    <!-- end of variable Scope pane -->
+                      <div class="ideEditorArea">
+                        <div class="ideEditorImage" ng-show="ace.isImage">
+                          <img alt="{{ace.image}}" ng-src="{{ace.image}}" /><br>
+                          <input class="image-src-field" type="text" value="{{ace.image}}" />
+                        </div>
+
+                        <div ng-hide="ace.isVisible" id="ideAceNotVisible">
+                          <div id="ideMsgNoFilesOpen">No files are open.<br>Click on a file from the project tree.</div>
+                          <div id="ideMsgNotSignedIn" class="alert alert-warning" ng-hide="signinSettings.userIsAuthenticated()">
+                            <strong>You're not signed in.</strong><br><a ng-href="{{signinSettings.signinPathWithRedirect()}}">Sign in now </a> to save your progress or load your previously saved version.
+                          </div>
+                        </div>
+
+                        <!-- the ace editor -->
+                        <!-- note: don't use ng-model as it updates too slowly. Access the session value directly instead. -->
+                        <div class="ideEditor" ng-show="ace.isVisible" ng-hide="ace.isImage" id="ace_editor" ui-ace="{
+                          showGutter: true,
+                          useWrapMode: false,
+                          theme: 'eclipse',
+                          onLoad: aceLoaded}">
+                        </div>
+                      </div>
+                  </div>
                     <!-- end of everything related to the editor -->
 
                     <!-- the lower part of splitter area, where the terminal lives -->

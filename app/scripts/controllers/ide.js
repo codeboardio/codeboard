@@ -1065,8 +1065,6 @@ app.controller('IdeCtrl', [
          */
         // kPane for treeView
         $scope.kPanes = $scope.isActionHidden('tree-view') ? '[' : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
-        // kPane for varScopeDiv
-        $scope.kPanes += "{ collapsible: true, resizable: false, collapsed: true , size: '10%' }, ";
         // kPane for aceEditor
         $scope.kPanes += ' {collapsible: false} ';
         // kPane for rightBarTabs (before actual tabs - content)
@@ -2262,9 +2260,11 @@ app.controller('RightBarCtrl', [
         $rootScope.toggleVarScope = function () {
             $scope.isCollapsed = !$scope.isCollapsed;
             if ($scope.isCollapsed) {
-                $scope.splitter.collapse('#ideVarScopePartOfMiddlePart');
+                $scope.innerSplitter.collapse('#ideVarScopePartOfMiddlePart');
+                $scope.ideTabsStyle = { 'margin-left': '47px' };
             } else {
-                $scope.splitter.expand('#ideVarScopePartOfMiddlePart');
+                $scope.innerSplitter.expand('#ideVarScopePartOfMiddlePart');
+                $scope.ideTabsStyle = { 'margin-left': 'calc(10% + 47px)' };
             }
         };
 

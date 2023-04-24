@@ -256,23 +256,9 @@ body {
   background-color: #fff;
 }
 
-/* Make sure the kendo-splitter is not visible in the treeview where it splits the project-name and the LibraryCtrl */
-#ideVarScopePartOfMiddlePart + .k-splitbar .k-icon {
+/* Make sure the kendo-splitter is not visible between variable scope div and the editor */
+#ideVarScopePartOfMiddlePart + .k-splitbar {
   display: none;
-}
-
-#varScopeTabArea {
-  padding: 0px;
-  height: 50px;
-  background-color: #e7e7e7;
-  margin-bottom: 0;
-}
-
-.varScopeTitle {
-  text-align: center;
-  padding-top: 15px;
-  font-size: 0.8em;
-  font-weight: bold;
 }
 
 .varScope {
@@ -297,6 +283,10 @@ body {
   margin-bottom: 0;
   margin-left: 47px;
   padding: 0;
+}
+
+.ideTabs-expanded {
+  margin-left: 10.5%;
 }
 
 .ideTabs li {
@@ -374,8 +364,13 @@ body {
 
 #ideEditorAndConsole {
   height: calc(100% - 50px);
-  overflow: hidden;
 }
+
+/* hide kendo scrollbar between console and ace editor */
+#ideEditorAndConsole .k-scrollable {
+  overflow: visible;
+}
+
 .ideEditor {
   overflow: hidden;
 }
