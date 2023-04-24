@@ -69,9 +69,16 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             }
         };
 
-        // clear the markers array every time the code changes to not get one marker multiple times in the array
-        service.clearMarkers = function () {
-            storedMarkers = [];
+        // add markers dynamically when button is toggled on
+        service.addDynamicMarkers = function (aceEditor) {
+            if (toggled) {
+                storedMarkers.forEach((item) => {
+                    if (item.clazz.includes('marker')) {
+                        aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
+                    }
+                    storedMarkers = [];
+                });
+            }
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

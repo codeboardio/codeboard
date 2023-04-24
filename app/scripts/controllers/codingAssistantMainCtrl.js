@@ -49,7 +49,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                     updateExplanations(db, colors);
                 });
                 // call clearMarker function to clear the markers array every time the code changes
-                codingAssistantCodeMatchSrv.clearMarkers();
+                codingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
             });
         });
 
