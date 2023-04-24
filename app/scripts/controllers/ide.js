@@ -1078,12 +1078,6 @@ app.controller('IdeCtrl', [
          */
         $scope.navBarClick = function (aClickId) {
             $log.debug('NavBarClick with id: ' + aClickId);
-            // disable variable scope and code block visualization buttons
-            if ($scope.pressedButton === aClickId) {
-                $scope.pressedButton = '';
-            } else {
-                $scope.pressedButton = aClickId;
-            }
 
             var req;
 
@@ -1221,9 +1215,6 @@ app.controller('IdeCtrl', [
                 case 'show_var_scope':
                     codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
                     $scope.toggleVarScope();
-                    break;
-                case 'show_code_blocks':
-                    codingAssistantCodeMatchSrv.toggleCodeBlocks($scope.ace.editor);
                     break;
             }
         };

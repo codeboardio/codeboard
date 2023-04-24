@@ -82,32 +82,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Everything related to the code block visualization
-        // Indicates if markers for code-blocks are toggled on or off
-        var toggledBlock = false;
-        // store the markers
-        var storedBlockMarkers = [];
-        service.toggleCodeBlocks = function (aceEditor) {
-            var existBlockMarkers = aceEditor.session.getMarkers();
-            if (toggledBlock === false) {
-                storedBlockMarkers.forEach((item) => {
-                    if (item.clazz.includes('codeBlock')) {
-                        aceEditor.session.addMarker(item.range, item.clazz, item.type);
-                    }
-                });
-                toggledBlock = true;
-            } else {
-                if (existBlockMarkers) {
-                    var prevBlockMarkersArr = Object.keys(existBlockMarkers);
-                    prevBlockMarkersArr.forEach((item) => {
-                        aceEditor.session.removeMarker(existBlockMarkers[item].id);
-                    });
-                }
-                toggledBlock = false;
-            }
-        };
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CODE MATCH AND VARIABLE SCOPE LOGIC
 
         /**
