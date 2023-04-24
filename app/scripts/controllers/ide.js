@@ -853,7 +853,7 @@ app.controller('IdeCtrl', [
             tool: false,
             submit: false,
             beautify: false,
-            varScope: false
+            varScope: false,
         };
 
         // state variables to indicate which actions in the IDE are hidden
@@ -2191,6 +2191,17 @@ app.controller('RightBarCtrl', [
             };
         }
 
+        // tab for code explanation (coding-assistant)
+        if (!$scope.isActionHidden('explanation')) {
+            $scope.rightBarTabs.explanation = {
+                slug: 'explanation',
+                title: 'Erklärungen',
+                disabled: false,
+                icon: 'glyphicon-eye-open',
+                contentURL: 'partials/navBarRight/navBarRightExplanation',
+            };
+        }
+
         // tab for help / chat
         if (!$scope.isActionHidden('help')) {
             $scope.rightBarTabs.help = {
@@ -2201,14 +2212,14 @@ app.controller('RightBarCtrl', [
             };
         }
 
-        // tab for code explanation (coding-assistant)
-        if (!$scope.isActionHidden('explanation')) {
-            $scope.rightBarTabs.explanation = {
-                slug: 'explanation',
-                title: 'Erklärungen',
+        // tab for compiler messages
+        if (!$scope.isActionHidden('compiler')) {
+            $scope.rightBarTabs.compiler = {
+                slug: 'compiler',
+                title: 'Compiler-Meldungen',
                 disabled: false,
-                icon: 'glyphicon-eye-open',
-                contentURL: 'partials/navBarRight/navBarRightExplanation',
+                icon: 'glyphicon-warning-sign',
+                contentURL: 'partials/navBarRight/navBarRightCompiler',
             };
         }
 
@@ -2255,7 +2266,7 @@ app.controller('RightBarCtrl', [
         };
 
         /**
-         * toggle variable scope kPane  
+         * toggle variable scope kPane
          */
         $rootScope.toggleVarScope = function () {
             $scope.isCollapsed = !$scope.isCollapsed;
