@@ -38,6 +38,10 @@
 }
 
 /* - - - Chat - - - */
+.chat-horizontal-line {
+    border-top: 2px solid #ddd;
+}
+
 .chat {
     width: 100%;
     box-sizing: border-box;

@@ -21,6 +21,9 @@ angular.module('codeboardApp')
 
         // scope variables
         $scope.chatLines = [];
+        $scope.filteredCompilerChatLines = [];
+        $scope.filteredTipChatLines = [];
+        $scope.filteredHelpRequestChatLines = [];
         $scope.tips = [];
         $scope.sendRequestFormVisible = false;
         $scope.requestTipDisabled = true;
@@ -44,7 +47,7 @@ angular.module('codeboardApp')
          */
         let getChatLineAvatar = function(chatLine) {
             if(chatLine.author.username === avatarName) {
-                return (chatLine.type === "card") ? 'idea' : 'neutral';
+                return (chatLine.type === "hint") ? 'idea' : 'neutral';
             } else {
                 return (chatLine.author.username === chatLine.user.username) ? 'student' : 'teacher';
             }
@@ -56,7 +59,7 @@ angular.module('codeboardApp')
          */
         let getNumTipsAlreadySent = function () {
             let chatLineTips = $scope.chatLines.filter(function(chatLine) {
-                return (chatLine.type === 'card' && chatLine.message.cardType === "tip");
+                return (chatLine.type === 'hint' && chatLine.message.cardType === "tip");
             });
             return chatLineTips.length;
         };
@@ -73,7 +76,7 @@ angular.module('codeboardApp')
 
             // if chatLine type card, parse the message
             // if current user role is 'user' remove the reference
-            if(chatLine.type === 'card') {
+            if(chatLine.type === 'hint' || chatLine.type === 'helpRequest') {
                 chatLine.message = JSON.parse(chatLine.message);
                 chatLine.message.cardReference = (ProjectFactory.getProject().userRole === 'user') ? null : chatLine.message.cardReference;
             }
@@ -94,6 +97,33 @@ angular.module('codeboardApp')
             $scope.noteTeacher = "";
         };
 
+        // filter chatLines for compiler chatlines
+        function filterCompilerChatLines() {
+            $scope.filteredCompilerChatLines = $scope.chatLines.filter(function(chatLine) {
+                return chatLine.type === 'compiler';
+            });
+        }
+
+        // filter chatLines for tip (hint) chatlines
+        function filterTipChatLines() {
+            $scope.filteredTipChatLines = $scope.chatLines.filter(function(chatLine) {
+                return chatLine.type === 'hint';
+            });
+        }
+
+        // filter chatLines for helpRequest chatlines
+        function filterHelpChatLines() {
+            $scope.filteredHelpRequestChatLines = $scope.chatLines.filter(function(chatLine) {
+                return chatLine.type === 'helpRequest';
+            });
+        }
+
+        // watches for changes in the chatLines array and call filter functions if there are changes
+        $scope.$watch('chatLines', function() {
+            filterCompilerChatLines();
+            filterTipChatLines();
+            filterHelpChatLines();
+        }, true);   
 
         /**
          * init this tab by loading chat history and read tips

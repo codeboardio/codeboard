@@ -425,7 +425,7 @@ app.controller('IdeCtrl', [
                                             cardType: 'compHelp',
                                         };
 
-                                        let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, 'card', 'Roby', 'worried');
+                                        let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, 'compiler', 'Roby', 'worried');
                                         $rootScope.$broadcast(reqAddMsg.msg, reqAddMsg.data);
                                     }
                                 },

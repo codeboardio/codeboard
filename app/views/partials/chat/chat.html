@@ -16,6 +16,30 @@
                     </chat-line>
                 </div>
 
+                <div ng-switch-when="helpRequest">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="compiler">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="hint">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
                 <div ng-switch-when="html">
                     <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="chatLine.avatar">
                         <chat-line-simple>
