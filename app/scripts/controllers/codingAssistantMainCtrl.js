@@ -12,7 +12,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     '$timeout',
     '$document',
     'codingAssistantCodeMatchSrv',
-    function ($scope, $rootScope, $timeout, $document, codingAssistantCodeMatchSrv) {
+    'AceEditorSrv',
+    function ($scope, $rootScope, $timeout, $document, codingAssistantCodeMatchSrv, AceEditorSrv) {
         var aceEditor = $scope.ace.editor;
         var errorLine;
         var currentLine;
@@ -42,8 +43,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                 });
             });
 
-            // Listen to the 'change' event of the Ace Editor / got the Code from the Ace Docs - https://ace.c9.io/#nav=howto
-            aceEditor.on('change', function () {
+            // call change listener in ace service
+            AceEditorSrv.aceChangeListener(aceEditor, function () {
                 // Automatically call $apply if necessarry to prevent '$apply already in progress' error
                 $timeout(function () {
                     updateExplanations(db, colors);
@@ -105,8 +106,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
             $scope.showNoCodeMessage = result.explanations.length === 0;
         }
 
-        // listen to the 'mousedown' event to get line of the click / got code from stackoverflow - https://stackoverflow.com/questions/41647661/how-to-check-if-the-mouse-is-down-in-aceeditor
-        aceEditor.on('mousedown', function (e) {
+        // call mouseclick listener in ace service
+        AceEditorSrv.mouseDownListener(aceEditor, function (e) {
             $rootScope.cursorPosition = e.getDocumentPosition().row + 1;
             $scope.$apply();
 
@@ -120,8 +121,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
             }
         });
 
-        // listen to 'enter-keypress' event to reset cursorPosition / got part of code from stackoverflow - https://stackoverflow.com/questions/7060750/detect-the-enter-key-in-a-text-input-field
-        aceEditor.container.addEventListener('keypress', function (e) {
+        // call enterKey listener in ace service
+        AceEditorSrv.enterKeyListener(aceEditor, function (e) {
             // Check if the key pressed is 'Enter'
             if (e.key === 'Enter' || e.keyCode === 13) {
                 $rootScope.cursorPosition = -1;
