@@ -13,8 +13,8 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
-    function ($scope, $rootScope, $sce, $routeParams, $http, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
+    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv', 'AceEditorSrv',
+    function ($scope, $rootScope, $sce, $routeParams, $http, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv, AceEditorSrv) {
 
         let slug = 'help',
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
@@ -29,6 +29,10 @@ angular.module('codeboardApp')
         $scope.sendRequestFormVisible = false;
         $scope.requestTipDisabled = true;
         $scope.noteStudent = $scope.noteTeacher = "";
+        $scope.showCompilerIntroMessage = true;
+        $scope.showCompilerInfoMessage = false;
+        $scope.showNoCompilationErrorMessage = false;
+        $scope.showCompilationErrorMessage = false;
 
         /**
          * Function to scroll to the bottom of the chat tab
@@ -126,7 +130,17 @@ angular.module('codeboardApp')
             filterHelpChatLines();
         }, true);
 
+        AceEditorSrv.aceChangeListener($scope.ace.editor, function() {
+            $scope.showCompilerInfoMessage = true;
+            $scope.showNoCompilationErrorMessage = false;
+            $scope.showCompilationErrorMessage = false;
+            $scope.showCompilerIntroMessage = false;
+        })
+
         $scope.$on('compilerError', function () {
+            $scope.showCompilerIntroMessage = false;
+            $scope.showCompilerInfoMessage = false;
+            $scope.showCompilationErrorMessage = true;
             $timeout(() => {
                 // remove last compilation error chatbox
                 if (lastCompilerChatboxIndex !== -1) {
@@ -136,6 +150,7 @@ angular.module('codeboardApp')
                 // find the new last compilation error chatbox index
                 $scope.chatLines.forEach((chatLine, index) => {
                     if (chatLine.type === 'compiler') {
+                        $scope.showNoCompilationErrorMessage = false;
                         lastCompilerChatboxIndex = index;
                     }
                 });
@@ -143,6 +158,10 @@ angular.module('codeboardApp')
         });
 
         $scope.$on('noCompilerError', function() {
+            $scope.showCompilerIntroMessage = false;
+            $scope.showCompilerInfoMessage = false;
+            $scope.showNoCompilationErrorMessage = true;
+            $scope.showCompilationErrorMessage = false;
             // remove last compilation error chatbox
             if (lastCompilerChatboxIndex !== -1) {
                 $scope.chatLines.splice(lastCompilerChatboxIndex, 1);
