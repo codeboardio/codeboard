@@ -17,6 +17,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
         var aceEditor = $scope.ace.editor;
         var errorLine;
         var currentLine;
+        $scope.cursorPosition = -1;
 
         // fetch db and colors data from codingAssistantCodeMatchSrv
         function fetchData() {
@@ -108,10 +109,10 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
 
         // call mouseclick listener in ace service
         AceEditorSrv.mouseDownListener(aceEditor, function (e) {
-            $rootScope.cursorPosition = e.getDocumentPosition().row + 1;
+            $scope.cursorPosition = e.getDocumentPosition().row + 1;
             $scope.$apply();
 
-            var chatBoxId = 'chatLine-' + $rootScope.cursorPosition;
+            var chatBoxId = 'chatLine-' + $scope.cursorPosition;
             // get corresponding chatbox
             var chatBox = $document[0].getElementById(chatBoxId);
             // check if the chat line with the corresponding line level exists
@@ -125,7 +126,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
         AceEditorSrv.enterKeyListener(aceEditor, function (e) {
             // Check if the key pressed is 'Enter'
             if (e.key === 'Enter' || e.keyCode === 13) {
-                $rootScope.cursorPosition = -1;
+                $scope.cursorPosition = -1;
                 $scope.$apply();
             }
         });
