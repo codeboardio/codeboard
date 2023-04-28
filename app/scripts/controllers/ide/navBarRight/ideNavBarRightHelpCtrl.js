@@ -18,6 +18,7 @@ angular.module('codeboardApp')
 
         let slug = 'help',
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
+        let lastCompilerChatboxIndex = -1;
 
         // scope variables
         $scope.chatLines = [];
@@ -123,7 +124,34 @@ angular.module('codeboardApp')
             filterCompilerChatLines();
             filterTipChatLines();
             filterHelpChatLines();
-        }, true);   
+        }, true);
+
+        $scope.$on('compilerError', function () {
+            $timeout(() => {
+                // remove last compilation error chatbox
+                if (lastCompilerChatboxIndex !== -1) {
+                    $scope.chatLines.splice(lastCompilerChatboxIndex, 1);
+                }
+        
+                // find the new last compilation error chatbox index
+                $scope.chatLines.forEach((chatLine, index) => {
+                    if (chatLine.type === 'compiler') {
+                        lastCompilerChatboxIndex = index;
+                    }
+                });
+            });
+        });
+
+        $scope.$on('noCompilerError', function() {
+            // remove last compilation error chatbox
+            if (lastCompilerChatboxIndex !== -1) {
+                $scope.chatLines.splice(lastCompilerChatboxIndex, 1);
+                lastCompilerChatboxIndex = -1;
+            } else {
+                console.log("No Compiler message found!");
+            }
+        })
+        
 
         /**
          * init this tab by loading chat history and read tips

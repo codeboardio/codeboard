@@ -427,6 +427,8 @@ app.controller('IdeCtrl', [
 
                                         let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, 'compiler', 'Roby', 'worried');
                                         $rootScope.$broadcast(reqAddMsg.msg, reqAddMsg.data);
+                                        // broadcast event that code gets compiled and has a syntax-error
+                                        $scope.$broadcast('compilerError');
                                     }
                                 },
                                 function (error) {
@@ -434,7 +436,13 @@ app.controller('IdeCtrl', [
                                     $log.debug('An error occurred while trying to create help message for compilation error.');
                                 }
                             );
+                        } else {
+                            // broadcast event that code gets compiled and has no syntax error (make sure with $timeout that the chatbox is available)
+                            $timeout(()=> {
+                                $scope.$broadcast('noCompilerError');
+                            })
                         }
+
                     };
 
                     displayWSOutputStream(data.streamUrl, data.startUrl, onMessageReceived, onConnectionClosed);
