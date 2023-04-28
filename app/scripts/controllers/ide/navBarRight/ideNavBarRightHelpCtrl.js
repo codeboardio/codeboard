@@ -115,7 +115,7 @@ angular.module('codeboardApp')
         // filter chatLines for helpRequest chatlines
         function filterHelpChatLines() {
             $scope.filteredHelpRequestChatLines = $scope.chatLines.filter(function(chatLine) {
-                return chatLine.type === 'helpRequest';
+                return chatLine.type === 'helpRequest' || chatLine.type === 'helpRequestAnswer';
             });
         }
 
@@ -163,7 +163,7 @@ angular.module('codeboardApp')
             // when user role help, make help default tab
             if(ProjectFactory.getProject().userRole === 'help') {
                 $timeout(function () {
-                    let req = IdeMsgService.msgNavBarRightOpenTab('help');
+                    let req = IdeMsgService.msgNavBarRightOpenTab('tips');
                     $rootScope.$broadcast(req.msg, req.data);
                 }, 500);
             }
@@ -288,7 +288,7 @@ angular.module('codeboardApp')
             }, Promise.resolve())
                 .then(function(helpRequest) {
                     let id = (helpRequest !== undefined) ? helpRequest.id : -1;
-                    return ChatSrv.addChatLine(noteTeacher, id, UserSrv.getUsername(), 'html');
+                    return ChatSrv.addChatLine(noteTeacher, id, UserSrv.getUsername(), 'helpRequestAnswer');
                 })
                 .then(function(chatLine) {
                     addChatLine(chatLine, true);
