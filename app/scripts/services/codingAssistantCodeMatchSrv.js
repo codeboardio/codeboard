@@ -151,13 +151,10 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             // variable to check if code is intended
             var level = 0;
             var braceLevel = 0;
-            var ifActive = [];
-            var blockActive = [];
             // variable to check if something a comment
             var isComment = false;
             // variable to check if something a multi-line comment
             var stayComment = false;
-            var blockNotReallyEnded = false;
             // Map to store new declared variables
             var variableMap = new Map();
             // Map for Scanner and Random
@@ -183,7 +180,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 // Check if code-line is a comment
                 if (line.match(/\/\//) || line.match(/\/\*/)) {
                     isComment = true;
-                    ifActive[level] = false;
                     if (line.match(/\/\*/)) {
                         stayComment = true;
                     }
@@ -208,9 +204,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     if (line.match(currentRegex) && matched == false && isComment == false) {
                         // matched == false to not go over it again once it matched
                         matched = true;
-                        if (ifActive[level] == true) {
-                            ifActive[level] = false;
-                        }
                         // loops over all "lines"-objects from the json file
                         data.lines.forEach(function (dbline) {
                             // checks if the regex are the same to make sure its the right object in json => now we can use all the strings from the json file
@@ -340,16 +333,11 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                 // reset the explanationParts array for the next line
                                 explanationParts = [];
 
-                                if (dbline.keepBlock == 'true') {
-                                    // makes sure that the next line gets checked further
-                                    ifActive[level] = true;
-                                }
                                 if (dbline.block == 'true') {
                                     level += 1;
-                                    blockActive[level] = true;
-                                }
-                                if (line.match(/}/) && (dbline.name === 'catchRegex' || dbline.name === 'elseIfRegex' || dbline.name === 'elseRegex')) {
-                                    blockNotReallyEnded = true;
+                                    if (line.match(/}\s*(else\s*if\s*\([^)]*\)|else)\s*{/)) {
+                                        level -= 1;
+                                    }
                                 }
                             }
                         });
@@ -735,64 +723,54 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 });
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //Check how many open {} there are => only close a block when it actually gets closed
-                if (line.match(/{/) && isComment != true) {
-                    var count = line.match(/{/g).length;
-                    braceLevel += count;
-                }
-                if (line.match(/}/) && isComment != true) {
-                    var count = line.match(/}/g).length;
-                    braceLevel -= count;
+                // start or end of the blocks
+
+                // check for closing brace followed by else or else if (code-beautify)
+                var elseIfElseMatch = line.match(/}\s*(else\s*if\s*\([^)]*\)|else)\s*{/);
+
+                if (isComment != true) {
+                    var count = line.match(/{/g);
+                    if (count) {
+                        braceLevel += count.length;
+                    }
                 }
 
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //End of any block
-                if (line.match(/}/) && blockActive[level] == true && level - braceLevel == 1 && blockNotReallyEnded != true) {
-                    if (ifActive[level + 1] == true) {
-                        //stops ifActive on level higher if this block is over
-                        ifActive[level + 1] = false;
+                if (isComment != true) {
+                    var count = line.match(/}/g);
+                    if (count) {
+                        braceLevel -= count.length;
                     }
-                    if (matched == false) {
-                        if (ifActive[level] == true) {
-                            // loops over all variables in map
+                }
+
+                // check if the current line has a closing brace
+                if (count) {
+                    // if the closing brace is followed by else or else if
+                    if (elseIfElseMatch) {
+                        variableMap.forEach(function (value, key) {
+                            if (value.blockLevel === level && value.lineLevelEnd === 0) {
+                                value.lineLevelEnd = linelevel;
+                                var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
+                                height += 'px';
+                                value.height = height;
+                            }
+                        });
+                    } else {
+                        // if the closing brace is not followed by else or else if
+                        if (level - braceLevel === 1) {
                             variableMap.forEach(function (value, key) {
-                                // checks if current variable has the same blocklevel and has no linelevelend
-                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
+                                if (value.blockLevel === level && value.lineLevelEnd === 0) {
                                     value.lineLevelEnd = linelevel;
-                                    // calculate height and convert to string
                                     var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
-                                    // add px (pixel) to height
                                     height += 'px';
-                                    // height is assigned to height of current variable
                                     value.height = height;
                                 }
                             });
-                        } else {
-                            // loops over all variables in map
-                            variableMap.forEach(function (value, key) {
-                                // checks if current variable has the same blocklevel and has no linelevelend
-                                if (value.blockLevel == level && value.lineLevelEnd == 0) {
-                                    value.lineLevelEnd = linelevel;
-                                    // calculate height and convert to string
-                                    var height = '' + (value.lineLevelEnd - value.lineLevelStart) * editorLineHeight;
-                                    // add px (pixel) to height
-                                    height += 'px';
-                                    // height is assigned to height of current variable
-                                    value.height = height;
-                                }
-                            });
+                            level -= 1;
                         }
                     }
-                    blockActive[level] = false;
-                    level -= 1;
-                    matched = true;
                 }
-                if (blockNotReallyEnded == true) {
-                    //if the block didnt really end we stil have to reduce the level by 1 because its gonna add 1 more again
-                    level -= 1;
-                    blockNotReallyEnded = false;
-                }
-                // loops over all variables in map
+
+                // loops over all variables in map to display variable scope blocks for variables which are not in {}
                 variableMap.forEach(function (value, key) {
                     // checks if current variable has the blocklevel = 0
                     if (value.blockLevel == 0) {
@@ -810,7 +788,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
                 // Variables redeclaration
                 data.redeclareVar.forEach(function (dbline) {
-                    if (line.match(dbline.regex) && matched == false && isComment == false) {
+                    if (line.match(dbline.regex) && matched === false && isComment === false) {
                         // check if new Variable & store cg in a new variable
                         var currentMatch = line.match(dbline.regex);
                         // split answer and store in new array

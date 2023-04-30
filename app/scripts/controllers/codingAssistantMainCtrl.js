@@ -46,8 +46,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
 
             // call change listener in ace service
             AceEditorSrv.aceChangeListener(aceEditor, function () {
-                // Automatically call $apply if necessarry to prevent '$apply already in progress' error
-                $timeout(function () {
+                // automatically call $apply if necessarry to prevent '$apply already in progress' error
+                $timeout(() => {
                     updateExplanations(db, colors);
                 });
                 // call clearMarker function to clear the markers array every time the code changes
