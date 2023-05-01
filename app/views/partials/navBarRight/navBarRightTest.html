@@ -24,30 +24,10 @@
 
         <div class="panel panel-default compileTest" ng-show="compilation.compilationError || state === states.inProgress">
             <div class="panel-heading {{compilation.status}}">
-                <a data-target="#compTestSection" data-toggle="collapse" data-parent="#ioTestsAccordion" ng-class="{'collapsed': compilation.status === 'fail'}">
-                    <span class="title" title="Überprüfung Kompilierung">Überprüfung Kompilierung</span>
-                    <span ng-class="{'gly-spin': state === states.inProgress}" class="pull-right flag glyphicon {{compilation.status}}" aria-hidden="true"></span>
+                <a data-parent="#ioTestsAccordion">
+                    <span class="title" ng-show="state === states.inProgress">Überprüfung Kompilierung</span>
+                    <span class="title" ng-show="compilation.status === 'fail'">Deine Aufgabe hat einen Fehler, du findest diesen im 'Compiler-Tab'</span>
                 </a>
-            </div>
-
-            <div id="compTestSection" class="panel-collapse collapse" ng-class="{'in': compilation.status === 'fail'}">
-                <div class="panel-body">
-                    <ul class="list-unstyled d-none">
-                        <li class="clear chat-line my-4" ng-class="{'fadeOut': avatarFade, 'fadeIn': avatarFade}">
-                            <chat-line alignment="left" author="Compile Message Service" avatar="'worried'">
-                                <chat-line-card card-title="Fehler beim Kompilieren" card-type="error" style="font-size: 1.1em">
-                                    {{compilation.compErrorHelpMessage || "Dein Code besitzt leider noch Kompilier-Fehler. Versuche die untenstehende Fehlermeldung zu verstehen. Wenn du nicht mehr weiterkommst, nutze die Chat-Funkion, um Hilfe zu verlangen."}}
-                                    <chat-line-rating message-id="compilation.compilationErrorId" on-rate-message="onMessageRating(messageId, rating)" can-rate="true"/>
-                                </chat-line-card>
-                            </chat-line>
-                        </li>
-                    </ul>
-
-                    <div class="form-group" ng-hide="(compilation.status === 'success')">
-                        <label class="areaLabel">Output:</label>
-                        <textarea class="inputOutputArea teachersInput" disabled>{{compilation.output}}</textarea>
-                    </div>
-                </div>
             </div>
         </div>
 

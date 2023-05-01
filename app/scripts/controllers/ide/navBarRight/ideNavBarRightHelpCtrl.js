@@ -1,6 +1,6 @@
 /**
- * This is the controller for the navBarTab "Help".
- * It makes use of the 'chatSrv' in order to request tips and help, as well as enabling the chat function.
+ * This is the controller for the navBarTab "Tips" and "Compiler".
+ * It makes use of the 'chatSrv' in order to request tips as well as enabling the chat function in the "Tips" tab and provide the compiler-messages to the "Compiler" tab.
  *
  * @author Janick Michot
  * @date 19.12.2019
@@ -105,7 +105,7 @@ angular.module('codeboardApp')
         // filter chatLines for compiler chatlines
         function filterCompilerChatLines() {
             $scope.filteredCompilerChatLines = $scope.chatLines.filter(function(chatLine) {
-                return chatLine.type === 'compiler';
+                return chatLine.type === 'compiler' || chatLine.type === 'compilerTest';
             });
         }
 
@@ -130,6 +130,7 @@ angular.module('codeboardApp')
             filterHelpChatLines();
         }, true);
 
+        // function gets called when there is a change in the aceEditor
         AceEditorSrv.aceChangeListener($scope.ace.editor, function() {
             $scope.showCompilerInfoMessage = true;
             $scope.showNoCompilationErrorMessage = false;
@@ -137,6 +138,7 @@ angular.module('codeboardApp')
             $scope.showCompilerIntroMessage = false;
         })
 
+        // gets called when there is an error after the code gets compiled
         $scope.$on('compilerError', function () {
             $scope.showCompilerIntroMessage = false;
             $scope.showCompilerInfoMessage = false;
@@ -149,7 +151,7 @@ angular.module('codeboardApp')
         
                 // find the new last compilation error chatbox index
                 $scope.chatLines.forEach((chatLine, index) => {
-                    if (chatLine.type === 'compiler') {
+                    if (chatLine.type === 'compiler' || chatLine.type === 'compilerTest') {
                         $scope.showNoCompilationErrorMessage = false;
                         lastCompilerChatboxIndex = index;
                     }
@@ -157,6 +159,7 @@ angular.module('codeboardApp')
             });
         });
 
+        // gets called when there is no error after the code gets compiled
         $scope.$on('noCompilerError', function() {
             $scope.showCompilerIntroMessage = false;
             $scope.showCompilerInfoMessage = false;
@@ -322,5 +325,19 @@ angular.module('codeboardApp')
          */
         $scope.showSendRequestForm = function() {
             $scope.sendRequestFormVisible = true;
+        };
+
+        /**
+         * This method is bound to the chatLine rating directive.
+         * When the message is rated this method calls the chatService to
+         * send the rating to the api.
+         * @param messageId
+         * @param rating
+         */
+        $scope.onMessageRating = function (messageId, rating) {
+            ChatSrv.rateCompilationErrorMessage(messageId, rating)
+                .then(function() {
+                    console.log("Message rated");
+                });
         };
     }]);

@@ -20,7 +20,8 @@ angular.module('codeboardApp').directive('chat', function () {
         scope: {
             chatLines: '=',
             showCompilerInfoMessage: '=?',
-            cursorPosition: '=?'
+            cursorPosition: '=?',
+            onMessageRating: '&'
         },
         templateUrl: 'partials/chat/chat',
     };
