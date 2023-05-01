@@ -70,7 +70,7 @@ angular.module('codeboardApp').service('ChatSrv', [
                 // add chatline for tips
                 return addChatLine(JSON.stringify(card), helpRequestId, user, 'hint');
             } else if (aType === 'help') {
-                console.log(card);
+                // console.log(card);
                 // add chatline for helprequests
                 return addChatLine(JSON.stringify(card), helpRequestId, user, 'helpRequest');
             }
@@ -97,7 +97,7 @@ angular.module('codeboardApp').service('ChatSrv', [
                     deferred.resolve(data);
                 },
                 function error(response) {
-                    console.log(response);
+                    // console.log(response);
                     deferred.reject(response);
                 }
             );

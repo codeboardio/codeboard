@@ -13,8 +13,8 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv', 'AceEditorSrv',
-    function ($scope, $rootScope, $sce, $routeParams, $http, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv, AceEditorSrv) {
+    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$log', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv', 'AceEditorSrv',
+    function ($scope, $rootScope, $sce, $routeParams, $http, $log, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv, AceEditorSrv) {
 
         let slug = 'help',
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
@@ -170,7 +170,7 @@ angular.module('codeboardApp')
                 $scope.chatLines.splice(lastCompilerChatboxIndex, 1);
                 lastCompilerChatboxIndex = -1;
             } else {
-                console.log("No Compiler message found!");
+                $log.debug('No Compiler message found!');
             }
         })
         
@@ -337,7 +337,7 @@ angular.module('codeboardApp')
         $scope.onMessageRating = function (messageId, rating) {
             ChatSrv.rateCompilationErrorMessage(messageId, rating)
                 .then(function() {
-                    console.log("Message rated");
+                    // console.log("Message rated");
                 });
         };
     }]);
