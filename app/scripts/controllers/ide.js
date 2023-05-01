@@ -1207,7 +1207,7 @@ app.controller('IdeCtrl', [
                     // options for the beautifer
                     var jsbOpts = {
                         indent_size: 4,
-                        brace_style: "collapse,preserve-inline",
+                        brace_style: 'collapse, preserve-inline',
                     };
                     function syncEditor() {
                         $scope.ace.editor.getSession().setValue(code);
