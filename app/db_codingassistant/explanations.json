@@ -652,7 +652,7 @@
         },
         {
             "name": "newVariableSubstringMethodRegex",
-            "regex": "^\\s*(String)\\s(\\w+)\\s?=?\\s?([A-Za-z0-9]+)\\.substring\\(([0-9]+),([0-9]+)\\)\\s*;\\s*$",
+            "regex": "^\\s*(String)\\s(\\w+)\\s?=?\\s?([A-Za-z0-9]+)\\.substring\\s*\\(\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*\\)\\s*;\\s*$",
             "answer": "1' \"'2'\" wird mit dem Teil von \"'3'\" deklariert welcher zwischen dem Index '4' und '5' liegt (\"'3'\" muss vom Datentyp String sein)",
             "link": "https://www.geeksforgeeks.org/substring-in-java/",
             "keepLevel": "false",
@@ -852,7 +852,7 @@
         },
         {
             "name": "newStartValueTwoDimensoinalArrayRegex",
-            "regex": "^\\s*(int|String|boolean|long|double|char)\\[\\]\\[\\]\\s*(\\w+)\\s*=?\\s*\\{(\\{.*\\})\\}\\s*;\\s*$",
+            "regex": "^\\s*(int|String|boolean|long|double|char)\\[\\]\\[\\]\\s*(\\w+)\\s*=?\\s*\\{\\s*(\\{.*\\})\\s*\\}\\s*;\\s*$",
             "answer": "Zweidimensionaler Array vom Typ '1' mit dem Namen \"'2'\" wird erstellt und mit folgenden '1'-Werten (Startwerte) definiert: '3",
             "link": "https://www.w3schools.com/java/java_arrays_multi.asp",
             "keepLevel": "false",
@@ -1064,7 +1064,7 @@
         },
         {
             "name": "redeclareArrayRegex",
-            "regex": "^\\s*(\\w+)\\s*\\[([\\d+\\-+*/%]+)\\]\\s*=\\s*(.+)\\s*;\\s*$",
+            "regex": "^\\s*(\\w+)\\s*\\[([\\d+\\-+*/%\\s]+)\\]\\s*=\\s*(.+)\\s*;\\s*$",
             "answer": "3' wird der Stelle '2' im Array \"'1'\" zugewiesen",
             "link": "https://www.w3schools.com/java/java_arrays.asp",
             "keepLevel": "false",

@@ -438,11 +438,10 @@ app.controller('IdeCtrl', [
                             );
                         } else {
                             // broadcast event that code gets compiled and has no syntax error (make sure with $timeout that the chatbox is available)
-                            $timeout(()=> {
+                            $timeout(() => {
                                 $scope.$broadcast('noCompilerError');
-                            })
+                            });
                         }
-
                     };
 
                     displayWSOutputStream(data.streamUrl, data.startUrl, onMessageReceived, onConnectionClosed);
@@ -1205,8 +1204,10 @@ app.controller('IdeCtrl', [
                 case 'beautify_code':
                     // part of code from https://stackoverflow.com/questions/45458330/how-to-format-java-code-in-ace-editor
                     var code = $scope.ace.editor.getSession().getValue();
+                    // options for the beautifer
                     var jsbOpts = {
                         indent_size: 4,
+                        brace_style: "collapse,preserve-inline",
                     };
                     function syncEditor() {
                         $scope.ace.editor.getSession().setValue(code);
