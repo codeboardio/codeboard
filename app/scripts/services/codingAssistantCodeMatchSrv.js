@@ -726,7 +726,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 // start or end of the blocks
 
                 // check for closing brace followed by else or else if (code-beautify)
-                var elseIfElseMatch = line.match(/}\s*(else\s*if\s*\([^)]*\)|else)\s*{/);
+                var elseIfOrElseRegex = line.match(/}\s*(else\s*if\s*\([^)]*\)|else)\s*{/);
 
                 if (isComment != true) {
                     var count = line.match(/{/g);
@@ -745,7 +745,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 // check if the current line has a closing brace
                 if (count) {
                     // if the closing brace is followed by else or else if
-                    if (elseIfElseMatch) {
+                    if (elseIfOrElseRegex) {
                         variableMap.forEach(function (value, key) {
                             if (value.blockLevel === level && value.lineLevelEnd === 0) {
                                 value.lineLevelEnd = linelevel;
@@ -949,7 +949,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     matched = true;
                 }
                 if (matched == false) {
-                    if (line.match(/^\s*[a-zA-Z0-9]+/)) {
+                    if (line.match(/^(?!^\s*}\s*$)(?!^\s*\t\s*$)(?!^\s*$).+$/gm)) {
                         if (redeclareVarErr) {
                             explanations.push({
                                 answer: 'Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!',
