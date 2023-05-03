@@ -45,27 +45,40 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         var toggled = false;
         // store the markers
         var storedMarkers = [];
+        // does line match
+        var markerMatch;
+        var dataType;
+        var numWhitespaces;
+        var variableName;
+        var startIndex;
+        var variableLength;
+        var wholeLineTxt;
+        // regex to calculate marker position
+        const markerDeclarationRegex = /(?<=\s|^)((?:\w+)(?:\[\])+|\w+)(\s+)(\w+)/;
+        const markerRedeclarationRegex = /(?<=\s|^)(\w+)(?=\s*[+\-*\/]?=)/;
+        const markerLoopRegex = /(?:for|while)\s*\(([^()]*?)(\w+)\s+([^()]*?)(\w+)/;
 
-        // Toggles the markers on and off in the Code-Editor
+        // toggles the markers on and off in the code-editor
         service.toggleMarkers = function (aceEditor) {
-            if (!toggled) {
-                // Show the stored markers in the Code-Editor
+            toggled = !toggled;
+            if (toggled) {
+                // show the stored markers in the code-editor
                 storedMarkers.forEach((item) => {
                     if (item.clazz.includes('marker')) {
-                        aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
+                        // store marker id for later removal
+                        item.markerId = aceEditor.session.addMarker(item.range, item.clazz, item.type);
                     }
                 });
-                toggled = true;
             } else {
-                // remove exisiting markers in the ace Editor
-                var existMarkers = aceEditor.session.getMarkers();
-                if (existMarkers) {
-                    var prevMarkersArr = Object.keys(existMarkers);
-                    prevMarkersArr.forEach((item) => {
-                        aceEditor.session.removeMarker(existMarkers[item].id);
-                    });
-                }
-                toggled = false;
+                // remove existing markers in the ace Editor
+                storedMarkers.forEach((item) => {
+                    if (item.clazz.includes('marker') && item.markerId !== undefined) {
+                        console.log("Removed markers");
+                        aceEditor.session.removeMarker(item.markerId);
+                        // clear the marker ID after removal
+                        item.markerId = undefined;
+                    }
+                });
             }
         };
 
@@ -74,7 +87,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             if (toggled) {
                 storedMarkers.forEach((item) => {
                     if (item.clazz.includes('marker')) {
-                        aceEditor.session.addMarker(item.range, item.clazz, item.type, false);
+                        aceEditor.session.addMarker(item.range, item.clazz, item.type);
                     }
                     storedMarkers = [];
                 });
@@ -96,11 +109,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             const beforeRegex = /^(public|private|protected)/;
             const staticRegex = /.* static/;
             const paraRegex = /(int|String|boolean|long|double|char)\s(\w+)+/;
-            const newArrayDeclarationRegex = /(int|String|boolean|long|double|char)\[\]\s*(\w+);\s*$/;
-            const newArrayRegex = /(int|String|boolean|long|double|char)\s*\[\]\s*(\w+)\s*=?\s*\{(.*)\};\s*$/;
-            const newArrayDeclarationAndInitializationRegex = /(int|String|boolean|long|double|char)\[\]\s*(\w+)\s?=?\s*new\s*(int|String|boolean|long|double|char)\[([0-9])\]\s*;\s*$/;
-            const newTwoDimensoinalArrayRegex = /(\w+)\[\]\[\]\s*(\w+)\s?=?\s*new\s*(\w+)\s*\[([0-9]+)\]\s*\[([0-9]+)\];\s*$/;
-            const newStartValueTwoDimensoinalArrayRegex = /(\w+)\[\]\[\]\s*(\w+)\s*=?\s*\{(\{.*\})\};\s*$/;
             const newVarComparisationRegex = /^\s*((?:boolean))\s*(\w+)\s*\=\s*([A-z0-9$_()+\-*\/%\s]+)\s+([<=!>]+)\s+([A-z0-9$_()\-+*\/%\s]+);\s*$/;
             const redeclareVarComparisationRegex = /^\s*(\w+)\s+\=\s+([A-z0-9$_.()*\-+/%\s*]+)\s+([<=!>]+)\s+([A-z0-9$_.()*\-+/%\s*]+);\s*$/;
 
@@ -138,15 +146,6 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             var lastLineIndex = -1;
             // array to store explanations, row-numbers, links and explanation type
             var explanations = [];
-
-            // Variables to highlight the code in the Code-Editor
-            var currLine;
-            var wholeLineTxt;
-            var countWhiteSpacesLine;
-            var countWhiteSpaces1;
-            var countWhiteSpaces2;
-            var countWhiteSpaceArray;
-            var countWhiteSpace2DArray;
 
             // variable to check if code is intended
             var level = 0;
@@ -367,20 +366,23 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                     var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount].hexacode };
                                     var startwertMatch = newCondition[0].match(/(int|double)\s(\w+)\s?\=\s?[0-9]+/);
                                     variableMap.set(startwertMatch[2], variableObject);
-                                    // create variable scope div with variable name as id
 
-                                    // Ace Marker
-                                    currLine = linelevel; // codeEditor.getSelectionRange().start.row;
-                                    wholeLineTxt = aceEditor.session.getLine(currLine - 1);
-                                    countWhiteSpacesLine = wholeLineTxt.search(/\S/);
-                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(?<=\w)\s+(?=\w)/gm, '').length;
-                                    countWhiteSpaces2 = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\w+)\s+(\()\s*/gm, '').length;
-                                    storedMarkers.push({
-                                        range: new Range(linelevel - 1, startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2, linelevel - 1, startwertMatch[2].length + startwertMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1 + countWhiteSpaces2),
-                                        clazz: 'marker' + startwertMatch[2],
-                                        type: 'text',
-                                    });
+                                    /////////////////// Ace Marker ///////////////////
+                                    // get the code from the current line
+                                    wholeLineTxt = aceEditor.session.getLine(linelevel - 1);
+                                    markerMatch = wholeLineTxt.match(markerLoopRegex);
+                                    if (markerMatch) {
+                                        dataType = markerMatch[3];
+                                        variableName = markerMatch[4];
+                                        startIndex = markerMatch.index + markerMatch[0].length - dataType.length - variableName.length;
+                                        variableLength = variableName.length;
 
+                                        storedMarkers.push({
+                                            range: new Range(linelevel - 1, startIndex, linelevel - 1, startIndex + variableLength),
+                                            clazz: 'marker' + variableName,
+                                            type: 'text',
+                                        });
+                                    }
                                     variableCount++;
 
                                     explanationParts.push(' mit Startwert ' + newCondition[0] + '; ');
@@ -583,39 +585,20 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                                 // add object to variable map with variable name as key
                                 variableMap.set(currentMatch[2], variableObject);
 
-                                // Ace Marker
-                                currLine = linelevel; //codeEditor.getSelectionRange().start.row;
+                                /////////////////// Ace Marker ///////////////////
                                 // get the code from the current line
-                                wholeLineTxt = aceEditor.session.getLine(currLine - 1);
-                                // count whitespaces before beginning of the code
-                                countWhiteSpacesLine = wholeLineTxt.search(/\S/);
-                                // count whitespaces between first and second word
-                                countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/\b\s+\b/, '').length;
-                                //(?<=\w)\s+(?=\w)
-                                //(?<=[\w\[\]])\s+(?=\w[^int\[\]]
-                                if (wholeLineTxt.match(newArrayDeclarationRegex) || wholeLineTxt.match(newArrayRegex) || wholeLineTxt.match(newArrayDeclarationAndInitializationRegex)) {
-                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/(?<=\w\[\])\s+(?=\w)/, '').length;
-                                    countWhiteSpaceArray = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\[)\s*(\])/gm, '').length;
-                                    // add marker to the variable name
+                                wholeLineTxt = aceEditor.session.getLine(linelevel - 1);
+                                markerMatch = wholeLineTxt.match(markerDeclarationRegex);
+                                if (markerMatch) {
+                                    dataType = markerMatch[1];
+                                    numWhitespaces = markerMatch[2].length;
+                                    variableName = markerMatch[3];
+                                    startIndex = markerMatch.index + dataType.length + numWhitespaces;
+                                    variableLength = variableName.length;
+
                                     storedMarkers.push({
-                                        range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpaceArray + countWhiteSpaces1),
-                                        clazz: 'marker' + currentMatch[2],
-                                        type: 'text',
-                                    });
-                                } else if (wholeLineTxt.match(newTwoDimensoinalArrayRegex) || wholeLineTxt.match(newStartValueTwoDimensoinalArrayRegex)) {
-                                    countWhiteSpaces1 = wholeLineTxt.length - wholeLineTxt.replace(/(?<=\w\[\]\[\])\s+(?=\w)/, '').length;
-                                    countWhiteSpace2DArray = wholeLineTxt.length - wholeLineTxt.replaceAll(/(\[)\s*(\])/gm, '').length;
-                                    // add marker to the variable name
-                                    storedMarkers.push({
-                                        range: new Range(linelevel - 1, countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + countWhiteSpacesLine + currentMatch[1].length + countWhiteSpace2DArray + countWhiteSpaces1),
-                                        clazz: 'marker' + currentMatch[2],
-                                        type: 'text',
-                                    });
-                                } else {
-                                    // add marker to the variable name
-                                    storedMarkers.push({
-                                        range: new Range(linelevel - 1, currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1, linelevel - 1, currentMatch[2].length + currentMatch[1].length + countWhiteSpacesLine + countWhiteSpaces1),
-                                        clazz: 'marker' + currentMatch[2],
+                                        range: new Range(linelevel - 1, startIndex, linelevel - 1, startIndex + variableLength),
+                                        clazz: 'marker' + variableName,
                                         type: 'text',
                                     });
                                 }
@@ -842,17 +825,22 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                         }
 
                         if (matched == true) {
-                            // Ace Marker
-                            currLine = linelevel; //codeEditor.getSelectionRange().start.row;
-                            wholeLineTxt = aceEditor.session.getLine(currLine - 1);
-                            // count whitespaces before first character of code
-                            countWhiteSpacesLine = wholeLineTxt.search(/\S/);
-                            // add marker
-                            storedMarkers.push({
-                                range: new Range(linelevel - 1, countWhiteSpacesLine, linelevel - 1, currentMatch[1].length + countWhiteSpacesLine),
-                                clazz: 'marker' + currentMatch[1],
-                                type: 'text',
-                            });
+                            /////////////////// Ace Marker ///////////////////
+                            // get the code from the current line
+                            wholeLineTxt = aceEditor.session.getLine(linelevel - 1);
+                            markerMatch = wholeLineTxt.match(markerRedeclarationRegex);
+                            if (markerMatch) {
+                                variableName = markerMatch[1];
+                                startIndex = markerMatch.index;
+                                variableLength = variableName.length;
+
+                                storedMarkers.push({
+                                    range: new Range(linelevel - 1, startIndex, linelevel - 1, startIndex + variableLength),
+                                    clazz: 'marker' + variableName,
+                                    type: 'text',
+                                });
+                            }
+
                             if (dbline.name === 'redeclareVariableCallMethodRegex') {
                                 if (currentMatch[3] !== '') {
                                     let inputPara = currentMatch[3].split(',');
