@@ -1,5 +1,5 @@
 /**
- * This is the controller for the navBarTab "Tips" and "Compiler".
+ * This is the controller for the navBarTab "Tipps", "Fragen" and "Compiler".
  * It makes use of the 'chatSrv' in order to request tips as well as enabling the chat function in the "Tips" tab and provide the compiler-messages to the "Compiler" tab.
  *
  * @author Janick Michot
@@ -186,7 +186,7 @@ angular.module('codeboardApp')
             // when user role help, make help default tab
             if(ProjectFactory.getProject().userRole === 'help') {
                 $timeout(function () {
-                    let req = IdeMsgService.msgNavBarRightOpenTab('tips');
+                    let req = IdeMsgService.msgNavBarRightOpenTab('questions');
                     $rootScope.$broadcast(req.msg, req.data);
                 }, 500);
             }
@@ -277,7 +277,7 @@ angular.module('codeboardApp')
             if (relevantTip) {
                 // get index of the tip to store it in db
                 let tipIndex = $scope.tips.indexOf(relevantTip);
-                ChatSrv.addChatLineCard(relevantTip.note, relevantTip.name, 'tip', true, tipIndex, null, null, avatarName)
+                ChatSrv.addChatLineCard(relevantTip.note, relevantTip.name, 'tip', null, null, avatarName, true, tipIndex)
                     .then(function(aChatLine) {
                         addChatLine(aChatLine, true);
                         relevantTip.sent = true;

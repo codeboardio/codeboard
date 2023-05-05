@@ -2211,6 +2211,17 @@ app.controller('RightBarCtrl', [
             };
         }
 
+        // tab for compiler messages
+        if (!$scope.isActionHidden('compiler')) {
+            $scope.rightBarTabs.compiler = {
+                slug: 'compiler',
+                title: 'Compiler',
+                disabled: false,
+                icon: 'glyphicon-warning-sign',
+                contentURL: 'partials/navBarRight/navBarRightCompiler',
+            };
+        }
+        
         // tab for tips
         if (!$scope.isActionHidden('tips')) {
             $scope.rightBarTabs.tips = {
@@ -2222,14 +2233,14 @@ app.controller('RightBarCtrl', [
             };
         }
 
-        // tab for compiler messages
-        if (!$scope.isActionHidden('compiler')) {
-            $scope.rightBarTabs.compiler = {
-                slug: 'compiler',
-                title: 'Compiler',
+        // tab for questions and answers
+        if (!$scope.isActionHidden('questions')) {
+            $scope.rightBarTabs.questions = {
+                slug: 'questions',
+                title: 'Fragen',
                 disabled: false,
-                icon: 'glyphicon-warning-sign',
-                contentURL: 'partials/navBarRight/navBarRightCompiler',
+                icon: 'glyphicon-pencil',
+                contentURL: 'partials/navBarRight/navBarRightQuestions',
             };
         }
 
