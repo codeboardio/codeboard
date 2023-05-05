@@ -21,7 +21,7 @@ angular.module('codeboardApp').directive('chat', function () {
             chatLines: '=',
             showCompilerInfoMessage: '=?',
             cursorPosition: '=?',
-            onMessageRating: '&'
+            onMessageRating: '&',
         },
         templateUrl: 'partials/chat/chat',
     };
@@ -97,10 +97,14 @@ angular.module('codeboardApp').directive('chatLine', function () {
 
                 $scope.openHelpTab = function (type) {
                     switch (type) {
+                        case 'test':
+                            // open test tab
+                            req = IdeMsgService.msgNavBarRightOpenTab('test');
+                            $rootScope.$broadcast(req.msg, req.data);
+                            break;
                         case 'explanation':
                             // open explanation tab
                             req = IdeMsgService.msgNavBarRightOpenTab('explanation');
-                            console.log(req);
                             $rootScope.$broadcast(req.msg, req.data);
                             break;
                         case 'tips':
@@ -111,6 +115,11 @@ angular.module('codeboardApp').directive('chatLine', function () {
                         case 'compiler':
                             // open compiler tab
                             req = IdeMsgService.msgNavBarRightOpenTab('compiler');
+                            $rootScope.$broadcast(req.msg, req.data);
+                            break;
+                        case 'question':
+                            // open questions tab
+                            req = IdeMsgService.msgNavBarRightOpenTab('questions');
                             $rootScope.$broadcast(req.msg, req.data);
                             break;
                     }

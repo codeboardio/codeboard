@@ -2217,7 +2217,7 @@ app.controller('RightBarCtrl', [
                 slug: 'compiler',
                 title: 'Compiler',
                 disabled: false,
-                icon: 'glyphicon-warning-sign',
+                icon: 'glyphicon-exclamation-sign',
                 contentURL: 'partials/navBarRight/navBarRightCompiler',
             };
         }
