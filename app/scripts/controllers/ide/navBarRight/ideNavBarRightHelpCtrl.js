@@ -19,6 +19,7 @@ angular.module('codeboardApp')
         let slug = 'help',
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
         let lastCompilerChatboxIndex = -1;
+        var aceEditor = $scope.ace.editor;
 
         // scope variables
         $scope.chatLines = [];
@@ -179,7 +180,7 @@ angular.module('codeboardApp')
          * init this tab by loading chat history and read tips
          */
         $scope.init = function() {
-
+            // $scope.currentRoleIsUser()
             $scope.sendRequestFormVisible = !$scope.currentRoleIsUser();
 
             // when user role help, make help default tab
@@ -201,10 +202,23 @@ angular.module('codeboardApp')
                 .then(function() {
                     // read all tips from codeboard.json
                     let config = ProjectFactory.getConfig();
-                    if(config && "Help" in config && "tips" in config.Help) {
-                        $scope.tips = config.Help.tips;
+                    if (config && "Help" in config && "tips" in config.Help) {
+                        // add property to tips that they do not get sent multiple times in runtime
+                        $scope.tips = config.Help.tips.map(tip => ({...tip, sent: false}));
                         $scope.helpIntro = config.Help.helpIntro;
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
+
+                        // update tips sent property based on chat history
+                        $scope.chatLines.forEach(function (chatLine) {
+                            if (chatLine.type === 'hint' && chatLine.message.cardType === 'tip' && chatLine.message.tipSent) {
+                                // get index of already sent tip
+                                let tipIndex = chatLine.message.tipIndex;
+                                // if the tip was already sent mark it as true
+                                if (tipIndex !== -1) {
+                                    $scope.tips[tipIndex].sent = true;
+                                }
+                            }
+                        });
                     }
                 })
                 .catch(function() {
@@ -240,14 +254,33 @@ angular.module('codeboardApp')
         });
 
         /**
-         * This functions adds a chatline with a tip.
+         * This functions adds a chatline with a relevant tip.
          */
         $scope.askForTip = function() {
-            let tip = $scope.tips[getNumTipsAlreadySent()];
-            if(typeof tip !== "undefined") {
-                ChatSrv.addChatLineCard(tip.note, tip.name, 'tip', null, null, avatarName)
+            let relevantTip;
+            // loop trough each tip in $scope.tips
+            for (let i = 0; i < $scope.tips.length; i++) {
+                // assign current tip to tip variable
+                let tip = $scope.tips[i];
+                // check if student code matches the "matching" regex pattern from current tip
+                let codeMatched = aceEditor.getSession().getValue().match(tip.matching) !== null;
+                
+                // if student code matches "matching" regex and tip is not already sent assign current tip to relevant tip variable
+                if (!tip.sent && ((tip.mustMatch && codeMatched) || (!tip.mustMatch && !codeMatched))) {
+                    relevantTip = tip;
+                    console.log(relevantTip);
+                    break;
+                }
+            }
+                       
+            // if there is a relevant tip add it to chatLines array
+            if (relevantTip) {
+                // get index of the tip to store it in db
+                let tipIndex = $scope.tips.indexOf(relevantTip);
+                ChatSrv.addChatLineCard(relevantTip.note, relevantTip.name, 'tip', true, tipIndex, null, null, avatarName)
                     .then(function(aChatLine) {
                         addChatLine(aChatLine, true);
+                        relevantTip.sent = true;
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
                     });
             }

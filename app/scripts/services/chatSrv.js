@@ -53,12 +53,14 @@ angular.module('codeboardApp').service('ChatSrv', [
          * @param aMessage
          * @param aHeader
          * @param aType
+         * @param aStatus
+         * @param aTipIndex
          * @param aReference
          * @param helpRequestId
          * @param user
          * @returns {*}
          */
-        let addChatLineCard = function (aMessage, aHeader, aType = 'help', aReference = null, helpRequestId = null, user = null) {
+        let addChatLineCard = function (aMessage, aHeader, aType = 'help', aStatus = null, aTipIndex = null, aReference = null, helpRequestId = null, user = null) {
             // prepare card
             let card = {
                 cardHeader: aHeader,
@@ -67,6 +69,8 @@ angular.module('codeboardApp').service('ChatSrv', [
                 cardReference: aReference,
             };
             if (aType === 'tip') {
+                card.tipSent = aStatus;
+                card.tipIndex = aTipIndex;
                 // add chatline for tips
                 return addChatLine(JSON.stringify(card), helpRequestId, user, 'hint');
             } else if (aType === 'help') {
