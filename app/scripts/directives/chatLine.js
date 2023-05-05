@@ -43,6 +43,9 @@ angular.module('codeboardApp').directive('chatLine', function () {
             author: '@?',
             createdAt: '@?',
             link: '@?',
+            cardType: '@?',
+            cardReference: '@?',
+            cardTitle: '@?',
         },
         controller: [
             '$scope',
@@ -125,6 +128,7 @@ angular.module('codeboardApp').directive('chatLineCard', function () {
     return {
         restrict: 'E',
         transclude: true,
+        // todo: remove and add all to parent chatLine (also in chat.html)
         scope: {
             cardType: '@?',
             cardReference: '@?',

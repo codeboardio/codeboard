@@ -12,6 +12,7 @@
                 <span>{{author}}</span>
                 <a href="{{link}}" target="_blank" ng-if="type === 'explanation'"> | Docs</a>
                 <span ng-if="type === 'error'"> | Achtung Fehler</span>
+                <span ng-if="cardType === 'tip'"> | {{cardTitle}}</span>
                 <button ng-if="type === 'info'" ng-click="openHelpTab(tab)" class="btn btn-primary btn-xs"></button>
             </span>
         </div>
