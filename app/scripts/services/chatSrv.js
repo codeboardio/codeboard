@@ -53,14 +53,14 @@ angular.module('codeboardApp').service('ChatSrv', [
          * @param aMessage
          * @param aHeader
          * @param aType
-         * @param aStatus
-         * @param aTipIndex
          * @param aReference
          * @param helpRequestId
          * @param user
+         * @param aStatus
+         * @param aTipIndex
          * @returns {*}
          */
-        let addChatLineCard = function (aMessage, aHeader, aType = 'help', aStatus = null, aTipIndex = null, aReference = null, helpRequestId = null, user = null) {
+        let addChatLineCard = function (aMessage, aHeader, aType = 'help', aReference = null, helpRequestId = null, user = null, aStatus = null, aTipIndex = null) {
             // prepare card
             let card = {
                 cardHeader: aHeader,
