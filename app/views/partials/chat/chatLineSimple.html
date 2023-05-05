@@ -1,3 +1,3 @@
-<div class="chat-line-item w-100">
+<div class="chat-line-item w-100" ng-class="{'highlight': (messageType === 'compilerMessage' && $parent.showNoCompilationErrorMessage), 'highlight-error' : (messageType === 'compilerMessage' && $parent.showCompilationErrorMessage)}">
     <div class="message pb-1 mb-0 text-gray-700" ng-transclude></div>
 </div>

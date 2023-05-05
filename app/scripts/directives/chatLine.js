@@ -161,6 +161,9 @@ angular.module('codeboardApp').directive('chatLineSimple', function () {
     return {
         restrict: 'E',
         transclude: true,
+        scope: {
+            messageType: '@?'
+        },
         templateUrl: 'partials/chat/chatLineSimple',
     };
 });

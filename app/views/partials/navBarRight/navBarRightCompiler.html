@@ -4,8 +4,8 @@
         <chat chat-lines="filteredCompilerChatLines" class="px-4" show-compiler-info-message="showCompilerInfoMessage" on-message-rating="onMessageRating(messageId, rating)">
             <before-chat>
                 <li class="clear chat-line my-4 clearfix text">
-                    <chat-line author="Roby" avatar-size="" alignment="left">
-                        <chat-line-simple>
+                    <chat-line author="Roby" avatar-size="" alignment="left" >
+                        <chat-line-simple message-type="compilerMessage">
                             <p class="mb-0" ng-show="showCompilerIntroMessage">Nutze diesen Tab, um dir Exceptions erklären zu lassen. Wenn du das Programm ausführst und dieses Fehler beinhaltet, wird automatisch in diesen Tab gewechselt.</p>
                             <p class="mb-0" ng-show="showCompilerInfoMessage">Wie es scheint hast du Änderungen im Code vorgenommen. Bitte führe den Code erneut aus, oder teste das Programm, um diese zu überprüfen.</p>
                             <p class="mb-0" ng-show="showCompilationErrorMessage">Pass auf! Dein Code weist einen Fehler auf.</p>
