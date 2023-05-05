@@ -2226,7 +2226,7 @@ app.controller('RightBarCtrl', [
         if (!$scope.isActionHidden('compiler')) {
             $scope.rightBarTabs.compiler = {
                 slug: 'compiler',
-                title: 'Compiler-Meldungen',
+                title: 'Compiler',
                 disabled: false,
                 icon: 'glyphicon-warning-sign',
                 contentURL: 'partials/navBarRight/navBarRightCompiler',
@@ -2237,7 +2237,7 @@ app.controller('RightBarCtrl', [
         if (ProjectFactory.hasSampleSolution()) {
             $scope.rightBarTabs.sampleSolution = {
                 slug: 'sampleSolution',
-                title: 'Musterlösung',
+                title: 'Lösung',
                 icon: 'glyphicon-screenshot',
                 contentURL: 'partials/navBarRight/navBarRightSampleSolution',
             };
