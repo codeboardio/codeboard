@@ -13,8 +13,8 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$log', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv', 'AceEditorSrv',
-    function ($scope, $rootScope, $sce, $routeParams, $http, $log, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv, AceEditorSrv) {
+    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$log', '$timeout', '$uibModal', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv', 'AceEditorSrv',
+    function ($scope, $rootScope, $sce, $routeParams, $http, $log, $timeout, $uibModal, IdeMsgService, ProjectFactory, ChatSrv, UserSrv, AceEditorSrv) {
 
         let slug = 'help',
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
@@ -283,6 +283,22 @@ angular.module('codeboardApp')
                         relevantTip.sent = true;
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
                     });
+            } else {
+                /** The controller for the modal */
+                var noRelevantTipModalInstanceCtrl = [
+                    '$scope',
+                    '$uibModalInstance',
+                    function ($scope, $uibModalInstance) {
+                        $scope.cancel = function () {
+                            $uibModalInstance.close();
+                        };
+                    },
+                ];
+
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'noRelevantTipModalContent.html',
+                    controller: noRelevantTipModalInstanceCtrl
+                });
             }
         };
 

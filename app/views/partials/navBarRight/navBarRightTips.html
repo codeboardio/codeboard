@@ -21,3 +21,16 @@
     <button ng-show="!currentRoleIsUser()" ng-hide="requestTipDisabled" class="btn btn-success btn-100" ng-click="askForTip()"><span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern</button>
     <div id="targetinto" style="height: 1px; width: 100%"></div>
 </div>
+
+<!-- THe Modal Window, when there is no relevant tip -->
+<script type="text/ng-template" id="noRelevantTipModalContent.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Helpersystem - Tipps</h3>
+    </div>
+    <div class="modal-body">
+      <p class="">Es wurde kein relevanter Tipp für deine aktuelle Lösung gefunden!</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-info" ng-click="cancel()">Schliessen</button>
+    </div>
+</script>
