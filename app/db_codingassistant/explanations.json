@@ -58,7 +58,7 @@
         },
         {
             "name": "mainMethodRegex",
-            "regex": "public\\sstatic\\svoid\\smain\\s*\\(.*\\)\\s?{\\s*$",
+            "regex": "public\\sstatic\\svoid\\smain\\s*\\(String\\s*\\[\\s*\\]\\s*args\\s*\\)\\s?{\\s*$",
             "answer": "Die \"main-method\" wird erstellt (Ausführung des Programms beginnt hier)",
             "link": "https://www.geeksforgeeks.org/java-main-method-public-static-void-main-string-args/",
             "block": "true",
@@ -66,7 +66,7 @@
         },
         {
             "name": "methodRegex",
-            "regex": "(int|String|boolean|long|double|char)\\s(\\w+)\\s?\\(([\\w\\s,.\"]*)\\)\\s?{\\s*$",
+            "regex": "(int|String|boolean|long|double|char)\\s(\\w+)\\s?\\(([\\w\\s,.\"[\\]]*)\\)\\s?{\\s*$",
             "answer": "Methode \"'2'\" mit einem Rückgabewert vom Typ \"'1'\" wird erstellt",
             "link": "https://studyflix.de/informatik/java-methoden-1901",
             "block": "true",
@@ -74,7 +74,7 @@
         },
         {
             "name": "methodVoidRegex",
-            "regex": "(void)\\s(\\w+)\\s?\\(([\\w\\s,.\"]*\\))\\s?{\\s*$",
+            "regex": "(void)\\s(?!main)(\\w+)\\s?\\(([\\w\\s,.\"[\\]]*]*\\))\\s?{\\s*$",
             "answer": "Methode \"'2'\" ohne Rückgabewert wird erstellt",
             "link": "https://studyflix.de/informatik/java-methoden-1901",
             "block": "true",
@@ -445,31 +445,31 @@
         },
         {
             "name": "additionAllocationPrint",
-            "regex": "(([a-zA-Z0-9_]+)\\s*\\+\\=\\s*([a-zA-Z0-9_]+))",
+            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\+\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
             "answer": "Das Ergebnis von '1' (entspricht '2' = '2' + '3') wird ",
             "type": "operator"
         },
         {
             "name": "multiplicationAllocationPrint",
-            "regex": "(([a-zA-Z0-9_]+)\\s*\\*\\=\\s*([a-zA-Z0-9_]+))",
+            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\*\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
             "answer": "Das Ergebnis von '1' (entspricht '2' = '2' * '3') wird ",
             "type": "operator"
         },
         {
             "name": "divisionAllocationPrint",
-            "regex": "(([a-zA-Z0-9_]+)\\s+\\/\\=\\s+([a-zA-Z0-9_]+))",
+            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s+\\/\\=\\s+([a-zA-Z0-9_\\[\\]]+))",
             "answer": "Das Ergebnis von '1' (entspricht '2' = '2' / '3') wird ",
             "type": "operator"
         },
         {
             "name": "subtractionAllocationPrint",
-            "regex": "(([a-zA-Z0-9_]+)\\s*\\-\\=\\s*([a-zA-Z0-9_]+))",
+            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\-\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
             "answer": "Das Ergebnis von '1' (entspricht '2' = '2' - '3') wird ",
             "type": "operator"
         },
         {
             "name": "moduloAllocationPrint",
-            "regex": "(([a-zA-Z0-9_]+)\\s*\\%\\=\\s*([a-zA-Z0-9_]+))",
+            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\%\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
             "answer": "Das Ergebnis von '1' (entspricht '2' = '2' % '3') wird ",
             "type": "operator"
         },
@@ -999,7 +999,7 @@
         },
         {
             "name": "additionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_]*)\\s*\\+\\=\\s*([a-zA-Z0-9_]*)\\s*\\;\\s*$",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\+\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
             "answer": "Das Ergebnis von '1' + '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' + '2')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",
@@ -1007,7 +1007,7 @@
         },
         {
             "name": "divisionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_]*)\\s*\\/\\=\\s*([a-zA-Z0-9_]*)\\s*\\;\\s*$",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\/\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
             "answer": "Das Ergebnis von '1' / '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' / '2')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",
@@ -1015,7 +1015,7 @@
         },
         {
             "name": "subtractionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_]*)\\s*\\-\\=\\s*([a-zA-Z0-9_]*)\\s*\\;\\s*$",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\-\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
             "answer": "Das Ergebnis von '1' - '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' - '2')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",
@@ -1023,7 +1023,7 @@
         },
         {
             "name": "multiplicationAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_]*)\\s*\\*\\=\\s*([a-zA-Z0-9_]*)\\s*\\;\\s*$",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\*\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
             "answer": "Das Ergebnis von '1' * '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' * '2')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",
@@ -1031,7 +1031,7 @@
         },
         {
             "name": "moduloAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_]*)\\s*\\%\\=\\s*([a-zA-Z0-9_]*)\\s*\\;\\s*$",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\%\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
             "answer": "Das Ergebnis von '1' % '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' % '2')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",
@@ -1047,7 +1047,7 @@
         },
         {
             "name": "redeclareVariableRegex",
-            "regex": "^\\s*(\\w+)\\s*=\\s*((\\(*[\\w\\s\"+\\-\\/%]+\\)*)\\s*[^\\[\\]()<>=!/%]*\\s*(\\(*[\\w\\s\"+\\-/]*\\)*))\\s*;\\s*$",
+            "regex": "^\\s*(\\w+)\\s*=\\s*((\\(*[\\w\\s\"+\\-\/%\\[\\]]+\\)*)\\s*[^\\[\\]()<>=!\/%]*\\s*(\\(*[\\w\\s\"+\\-\/\\[\\]]*\\)*))\\s*;\\s*$",
             "answer": "2' wird der Variable '1' zugewiesen",
             "link": "https://www.w3schools.com/java/java_variables.asp",
             "block": "false",

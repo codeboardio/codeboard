@@ -71,14 +71,13 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                 });
             } else {
                 // remove existing markers in the ace Editor
-                storedMarkers.forEach((item) => {
-                    if (item.clazz.includes('marker') && item.markerId !== undefined) {
-                        console.log("Removed markers");
-                        aceEditor.session.removeMarker(item.markerId);
-                        // clear the marker ID after removal
-                        item.markerId = undefined;
-                    }
-                });
+                var existMarkers = aceEditor.session.getMarkers();
+                if (existMarkers) {
+                    var prevMarkersArr = Object.keys(existMarkers);
+                    prevMarkersArr.forEach((item) => {
+                        aceEditor.session.removeMarker(existMarkers[item].id);
+                    });
+                }
             }
         };
 
@@ -108,7 +107,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
             // Regexes needed for further check
             const beforeRegex = /^(public|private|protected)/;
             const staticRegex = /.* static/;
-            const paraRegex = /(int|String|boolean|long|double|char)\s(\w+)+/;
+            const paraRegex = /(int|String|boolean|long|double|char)[\[\]]*\s*(\w+[\[\]]*)+/;
             const newVarComparisationRegex = /^\s*((?:boolean))\s*(\w+)\s*\=\s*([A-z0-9$_()+\-*\/%\s]+)\s+([<=!>]+)\s+([A-z0-9$_()\-+*\/%\s]+);\s*$/;
             const redeclareVarComparisationRegex = /^\s*(\w+)\s+\=\s+([A-z0-9$_.()*\-+/%\s*]+)\s+([<=!>]+)\s+([A-z0-9$_.()*\-+/%\s*]+);\s*$/;
 
