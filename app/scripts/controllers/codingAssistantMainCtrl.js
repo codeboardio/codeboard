@@ -50,7 +50,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                 $timeout(() => {
                     updateExplanations(db, colors);
                 });
-                // call clearMarker function to clear the markers array every time the code changes
+                // add markers dynamically
                 codingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
             });
         });
