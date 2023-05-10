@@ -57,6 +57,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
 
         // Automatic function executed one time at the beginning / when a file is openend and then every time the code in the editor changes
         function updateExplanations(db, colors) {
+            var annotations = [];
             $scope.chatLines = [];
 
             // get current code from aceEditor
@@ -88,6 +89,13 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                     };
                     // show checkbox when line changed
                     if (currentLine !== errorLine) {
+                        // store a new annotation with the error lineLevel in the annotations array
+                        annotations.push({
+                            row: chatline.lineLevel - 1,
+                            column: 0,
+                            text: chatline.message,
+                            type: "error"
+                        });
                         $scope.chatLines.push(chatline);
                     }
                 } else {
@@ -101,6 +109,8 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                     };
                     $scope.chatLines.push(chatline);
                 }
+                // display all the annotations in the aceEditor
+                aceEditor.getSession().setAnnotations(annotations);
             });
 
             // Update showNoCodeMessage element based on combinedExplanations array length
