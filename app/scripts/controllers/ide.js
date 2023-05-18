@@ -544,7 +544,7 @@ app.controller('IdeCtrl', [
 
                     // default texts
                     $scope.title = 'Deine Lösung wird überprüft';
-                    $scope.textAfterResult = 'Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze den Hilfe-Tab auf der rechten Seite. Weiterhin viel Erfolg!';
+                    $scope.textAfterResult = 'Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze die einzelnen Hilfestellungen, welche über die rechte Navigationsleiste aufgerufen werden können. Weiterhin viel Erfolg!';
                     $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg';
 
                     /**
