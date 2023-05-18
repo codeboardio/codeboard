@@ -262,14 +262,22 @@ angular.module('codeboardApp')
             for (let i = 0; i < $scope.tips.length; i++) {
                 // assign current tip to tip variable
                 let tip = $scope.tips[i];
-                // check if student code matches the "matching" regex pattern from current tip
-                let codeMatched = aceEditor.getSession().getValue().match(tip.matching) !== null;
-                
-                // if student code matches "matching" regex and tip is not already sent assign current tip to relevant tip variable
-                if (!tip.sent && ((tip.mustMatch && codeMatched) || (!tip.mustMatch && !codeMatched))) {
-                    relevantTip = tip;
-                    console.log(relevantTip);
-                    break;
+
+                if (tip.hasOwnProperty("mustMatch") && tip.hasOwnProperty("matching")) {
+                    // check if student code matches the "matching" regex pattern from current tip
+                    let codeMatched = aceEditor.getSession().getValue().match(tip.matching) !== null;
+                    
+                    // if student code matches "matching" regex and tip is not already sent assign current tip to relevant tip variable
+                    if (!tip.sent && ((tip.mustMatch && codeMatched) || (!tip.mustMatch && !codeMatched))) {
+                        relevantTip = tip;
+                        break;
+                    } 
+                } else {
+                    // tips which do not have "mustMatch" & "matching" property
+                    if (!tip.sent) {
+                        relevantTip = tip;
+                        break;
+                    } 
                 }
             }
                        
