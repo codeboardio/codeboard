@@ -7,7 +7,7 @@
 
 'use strict';
 
-angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
+angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
     '$http',
     function ($http) {
         var service = this;
@@ -45,6 +45,7 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         var toggled = false;
         // store the markers
         var storedMarkers = [];
+        var storedMarkersBackup = [];
         // does line match
         var markerMatch;
         var dataType;
@@ -59,17 +60,28 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
         const markerLoopRegex = /(?:for|while)\s*\(([^()]*?)(\w+)\s+([^()]*?)(\w+)/;
 
         // toggles the markers on and off in the code-editor
-        service.toggleMarkers = function (aceEditor) {
+        service.toggleMarkers = function (aceEditor, changed) {
             toggled = !toggled;
-            if (toggled) {
-                // show the stored markers in the code-editor
-                storedMarkers.forEach((item) => {
-                    if (item.clazz.includes('marker')) {
-                        // store marker id for later removal
-                        item.markerId = aceEditor.session.addMarker(item.range, item.clazz, item.type);
-                    }
-                });
-            } else {
+            if (toggled && !changed) {
+                // if storedMarkers is empty, try adding from storedMarkersBackup (this case gets executed when the code in the editor does not change and the variable scope window gets toggled on/off)
+                if (storedMarkers.length === 0 && storedMarkersBackup) {
+                    storedMarkersBackup.forEach((item) => {
+                        if (item.clazz.includes('marker')) {
+                            aceEditor.session.addMarker(item.range, item.clazz, item.type);
+                        }
+                    });
+                } else {
+                    // show the stored markers in the code-editor
+                    storedMarkers.forEach((item) => {
+                        if (item.clazz.includes('marker')) {
+                            // store marker id for later removal
+                            item.markerId = aceEditor.session.addMarker(item.range, item.clazz, item.type);
+                        }
+                    });
+                    // update storedMarkersBackup when storedMarkers are shown
+                    storedMarkersBackup = [...storedMarkers];
+                }
+            } else if (!toggled && !changed || changed) {
                 // remove existing markers in the ace Editor
                 var existMarkers = aceEditor.session.getMarkers();
                 if (existMarkers) {
@@ -77,21 +89,22 @@ angular.module('codeboardApp').service('codingAssistantCodeMatchSrv', [
                     prevMarkersArr.forEach((item) => {
                         aceEditor.session.removeMarker(existMarkers[item].id);
                     });
+                    storedMarkers = [];
                 }
             }
         };
 
         // add markers dynamically when button is toggled on
-        service.addDynamicMarkers = function (aceEditor) {
-            if (toggled) {
-                storedMarkers.forEach((item) => {
-                    if (item.clazz.includes('marker')) {
-                        aceEditor.session.addMarker(item.range, item.clazz, item.type);
-                    }
-                    storedMarkers = [];
-                });
-            }
-        };
+        // service.addDynamicMarkers = function (aceEditor) {
+        //     if (toggled) {
+        //         storedMarkers.forEach((item) => {
+        //             if (item.clazz.includes('marker')) {
+        //                 aceEditor.session.addMarker(item.range, item.clazz, item.type);
+        //             }
+        //             storedMarkers = [];
+        //         });
+        //     }
+        // };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // CODE MATCH AND VARIABLE SCOPE LOGIC

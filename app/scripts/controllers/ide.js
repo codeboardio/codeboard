@@ -20,8 +20,8 @@ app.controller('IdeCtrl', [
     'UserSrv',
     'WebsocketSrv',
     'ChatSrv',
-    'codingAssistantCodeMatchSrv',
-    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, codingAssistantCodeMatchSrv) {
+    'CodingAssistantCodeMatchSrv',
+    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, CodingAssistantCodeMatchSrv) {
         // First we handle all data that was injected as part of the app.js resolve.
         // set the ProjectFactory to contain the project loaded from the server
         ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
@@ -1222,7 +1222,7 @@ app.controller('IdeCtrl', [
                     });
                     break;
                 case 'show_var_scope':
-                    codingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor);
+                    CodingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor, false);
                     $scope.toggleVarScope();
                     break;
             }
@@ -2156,7 +2156,8 @@ app.controller('RightBarCtrl', [
     '$uibModal',
     'ProjectFactory',
     'IdeMsgService',
-    function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService) {
+    'CodingAssistantCodeMatchSrv',
+    function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService, CodingAssistantCodeMatchSrv) {
         $scope.navBarRightContent = '';
         $scope.activeTab = '';
         $scope.rightBarTabs = {};
@@ -2298,7 +2299,19 @@ app.controller('RightBarCtrl', [
                 $scope.innerSplitter.expand('#ideVarScopePartOfMiddlePart');
                 $scope.ideTabsStyle = { 'margin-left': 'calc(10% + 47px)' };
             }
-        };
+        };    
+
+        /**
+         * function which gets called when code in ace editor changed to close the variable scope div
+         */
+        $scope.$on("codeChanged", function() {
+            if (!$scope.isCollapsed) {
+                $scope.innerSplitter.collapse('#ideVarScopePartOfMiddlePart');
+                $scope.ideTabsStyle = { 'margin-left': '47px' };
+                $scope.isCollapsed = true;
+                CodingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor, true);
+            }
+        });
 
         /**
          * This broadcast can be used to disable tabs from within a tab specific controller

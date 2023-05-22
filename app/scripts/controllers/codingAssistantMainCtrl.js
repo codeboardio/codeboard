@@ -11,20 +11,20 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     '$rootScope',
     '$timeout',
     '$document',
-    'codingAssistantCodeMatchSrv',
+    'CodingAssistantCodeMatchSrv',
     'AceEditorSrv',
-    function ($scope, $rootScope, $timeout, $document, codingAssistantCodeMatchSrv, AceEditorSrv) {
+    function ($scope, $rootScope, $timeout, $document, CodingAssistantCodeMatchSrv, AceEditorSrv) {
         var aceEditor = $scope.ace.editor;
         var errorLine;
         var currentLine;
         $scope.cursorPosition = -1;
 
-        // fetch db and colors data from codingAssistantCodeMatchSrv
+        // fetch db and colors data from CodingAssistantCodeMatchSrv
         function fetchData() {
-            return codingAssistantCodeMatchSrv
+            return CodingAssistantCodeMatchSrv
                 .getJsonData()
                 .then((db) => {
-                    return codingAssistantCodeMatchSrv.getJsonColors().then((colors) => {
+                    return CodingAssistantCodeMatchSrv.getJsonColors().then((colors) => {
                         return { db, colors };
                     });
                 })
@@ -51,7 +51,9 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                     updateExplanations(db, colors);
                 });
                 // add markers dynamically
-                codingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
+                // CodingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
+
+                $rootScope.$broadcast("codeChanged");
             });
         });
 
@@ -67,7 +69,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
                 .replace(/ +/g, ' ')
                 .replace(/\s*\;\s*$/g, ';');
             var inputCodeArray = inputCode.split('\n');
-            var result = codingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, aceEditor, colors);
+            var result = CodingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCodeArray, aceEditor, colors);
 
             // convert variableMap into an object
             $rootScope.variableMap = Object.fromEntries(result.variableMap);
