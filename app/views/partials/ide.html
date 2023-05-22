@@ -33,6 +33,11 @@
                       <span class="glyphicon glyphicon-home"></span>
                     </a>
 
+                    <button class="btn btn-default btn-sm" ng-if="!isActionHidden('full-screen')" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
+                      <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
+                      <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
+                    </button>
+
                     <div class="dropdown" ng-show="currentRoleIsOwner()" style="display: inline-block">
 
                       <a id="projectButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
@@ -57,7 +62,21 @@
                         <li ng-show="currentRoleIsOwner()" class="divider"></li>
                         <li><a ng-show="currentRoleIsOwner()" ng-click="navBarClick('show_share_project')">Share project</a></li>
                       </ul>
+                    </div> 
+                    
+                    <div class="dropdown" ng-if="!isActionHidden('editor-settings')" style="display: inline-block">
+                      <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
+                        <span class="glyphicon glyphicon-cog"></span>
+                      </a>
+
+                      <ul class="dropdown-menu">
+                        <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
+                      </ul>
                     </div>
+
+                    <button ng-hide="!currentRoleIsOwner()" ng-if="!isActionHidden('reset')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
+                      <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
+                    </button>
 
                     <a class="btn btn-default btn-sm" ng-if="userAllowedToSave() && !isActionHidden('save')" ng-click="navBarClick('save_project')" ng-class="{'unsavedChanges': isProjectModified}" title="Save Project">
                       <span class="glyphicon glyphicon-floppy-disk"></span>
@@ -97,8 +116,6 @@
                     <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" ng-click="navBarClick('submit')" title="Submit this project">
                       <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe gelöst</span>
                     </button>
-                    <button id="codeBeautifyButton" class="btn btn-info btn-sm ml-2" ng-if="!isActionHidden('beautify')" ng-disabled="disabledActions.beautify" ng-click="navBarClick('beautify_code')" title="Beautify code"><span class="glyphicon glyphicon-flash"></span><span class="hidden-xs">Beautify</span></button>
-                    <button id="varScopeButton" class="btn btn-info btn-sm" ng-if="!isActionHidden('varScope')" ng-disabled="disabledActions.varScope" ng-click="navBarClick('show_var_scope')" title="Show variable scope"><span class="glyphicon glyphicon-resize-vertical"></span></button>
                   </form>
 
                 </div>
@@ -115,28 +132,11 @@
                       </li>
 
                       <li class="nav-item pull-right">
-                        <button class="btn btn-default btn-sm nav-link" ng-if="!isActionHidden('full-screen')" ng-click="fullscreenCtrl.toggleFullscreen()" show-if-fullscreen-enabled>
-                          <span class="glyphicon glyphicon-resize-full" show-if-fullscreen=false></span>
-                          <span class="glyphicon glyphicon-resize-small" show-if-fullscreen=true></span>
-                        </button>
+                        <button id="codeBeautifyButton" class="btn btn-info btn-sm" ng-if="!isActionHidden('beautify')" ng-disabled="disabledActions.beautify" ng-click="navBarClick('beautify_code')" title="Beautify code"><span class="glyphicon glyphicon-flash"></span><span class="hidden-xs">Beautify</span></button>
                       </li>
-
+                      
                       <li class="nav-item pull-right">
-                        <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('reset')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
-                          <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
-                        </button>
-                      </li>
-
-                      <li class="nav-item pull-right">
-                        <div class="dropdown" ng-if="!isActionHidden('editor-settings')">
-                          <a id="settingsButton" class="btn btn-default btn-sm dropdown" data-toggle="dropdown" role="button">
-                            <span class="glyphicon glyphicon-cog"></span>
-                          </a>
-
-                          <ul class="dropdown-menu">
-                            <li><a ng-click="navBarClick('show_editor_settings')">Change editor settings</a></li>
-                          </ul>
-                        </div>
+                        <button id="varScopeButton" class="btn btn-info btn-sm" ng-if="!isActionHidden('varScope')" ng-disabled="disabledActions.varScope" ng-click="navBarClick('show_var_scope')" title="Show variable scope"><span class="glyphicon glyphicon-resize-vertical"></span></button>
                       </li>
                     </ul>
                   </div>
