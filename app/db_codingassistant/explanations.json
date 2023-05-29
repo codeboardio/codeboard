@@ -685,7 +685,7 @@
         },
         {
             "name": "newVariableStringRegex",
-            "regex": "^\\s*(String)\\s(\\w+)\\s*\\=\\s*(\"[\\w\\W]+\")\\s*;\\s*$",
+            "regex": "^\\s*(String)\\s(\\w+)\\s*\\=\\s*(\"[\\w\\W]*\")\\s*;\\s*$",
             "answer": "1' \"'2'\" wird als '3' deklariert",
             "link": "https://www.w3schools.com/java/java_variables.asp",
             "block": "false",

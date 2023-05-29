@@ -56,7 +56,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
         var wholeLineTxt;
         // regex to calculate marker position
         const markerDeclarationRegex = /(?<=\s|^)((?:\w+)(?:\[\])+|\w+)(\s+)(\w+)/;
-        const markerRedeclarationRegex = /(?<=\s|^)(\w+)(?=\s*[+\-*\/]?=)/;
+        const markerRedeclarationRegex = /(?<=\s|^)(\w+)(?=\s*[+\-*\/]?=|\+\+;|--;|\[\d+\])/;
         const markerLoopRegex = /(?:for|while)\s*\(([^()]*?)(\w+)\s+([^()]*?)(\w+)/;
 
         // toggles the markers on and off in the code-editor
