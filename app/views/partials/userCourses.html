@@ -46,13 +46,13 @@
 
   <hr>
 
-    <div class="row" ng-show="currentUserIsSelf">
-      <div class="col-md-12">
-        <a class="btn btn-success" id="userProjects_createProject" href="/projects/new">Create new project</a>
-        <a class="btn btn-info" id="userProjects_createCourse" href="/courses/new">Create new course</a>
-        <a class="btn btn-default" ng-href="/users/{{user.username}}/settings">Edit user settings</a>
-      </div>
+  <div class="row" ng-show="currentUserIsSelf">
+    <div class="col-md-12">
+      <a class="btn btn-success" id="userProjects_createProject" href="/projects/new">Create new project</a>
+      <a class="btn btn-info" id="userProjects_createCourse" href="/courses/new">Create new course</a>
+      <a class="btn btn-default" ng-href="/users/{{user.username}}/settings">Edit user settings</a>
     </div>
+  </div>
 
   <div class="row" ng-show="courseOwnerSet.length > 0">
     <div class="col-md-12">
@@ -60,14 +60,13 @@
         <h1>Owns courses</h1>
       </div>
 
-
       <div class="panel panel-default" ng-repeat="course in courseOwnerSet">
         <div class="panel-heading" style="background-color: #fdd835">
-          <h3 class="panel-title">Course: <b>{{course.coursename}}</b></h3>
+          <h3 class="panel-title"><b>{{course.coursename}}</b></h3>
         </div>
         <div class="panel-body">
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label>Description</label>
               <p style="white-space: pre-line;">{{course.description}}</p>
             </div>
@@ -79,10 +78,13 @@
               <label>Context ID (Moodle ID)</label>
               <p style="white-space: pre-line;">{{course.contextId}}</p>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <div class="btn-group pull-right" role="group">
                 <a ng-show="currentUserIsSelf" href="/courses/{{course.id}}/settings" role="button" class="btn btn-default" title="Edit project settings"><span class="glyphicon glyphicon-wrench"></span></a>
                 <a ng-show="currentUserIsSelf" href="/users/{{user.username}}?courseId={{course.id}}" role="button" class="btn btn-default" title="View Projects assigned to this course"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a ng-show="currentUserIsSelf" href="/courses/{{course.id}}/userprojects" role="button" class="btn btn-default" title="Show course user projects"><span class="glyphicon glyphicon-user"></span></a>
+                <a ng-show="currentUserIsSelf" href="/courses/{{course.id}}/helprequests" role="button" class="btn btn-default" title="Show course help requests"><span class="glyphicon glyphicon-education"></span></a>
+                <a ng-show="currentUserIsSelf" href="/courses/{{course.id}}/submissions" role="button" class="btn btn-default" title="Show course submissions"><span class="glyphicon glyphicon-bell"></span></a>
               </div>
             </div>
           </div>

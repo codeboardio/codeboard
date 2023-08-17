@@ -1210,20 +1210,22 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @returns a promise that resolves when a the request was completed
      * @author Janick Michot
      */
-    let updateHelpRequest = function (helpRequestId, status = "answered") {
+    let updateHelpRequest = function (helpRequestId, status = "answered", projectId = null, courseId = null) {
 
       // create payload
       let payload = {
         status: status,
         helpRequestId: helpRequestId,
-        courseId:  getCourseId()
+        courseId:  courseId ?? getCourseId()
       };
+
+      projectId = projectId ?? $routeParams.projectId;
 
       // create the promise that is returned
       let deferred = $q.defer();
 
       // make call to the server
-      ProjectRequestHelpRes.update( { projectId: $routeParams.projectId }, payload,
+      ProjectRequestHelpRes.update( { projectId: projectId }, payload,
           function success(data, status, header, config) {
             deferred.resolve(data); // resolve the promise
           },

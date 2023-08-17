@@ -55,8 +55,6 @@ app.controller('IdeCtrl',
               event.preventDefault();
             } else {
 
-              console.log("leave page");
-
               $scope.ace.editor.destroy();
 
               // clear interval used to auto save project when leaving the ide
@@ -1075,10 +1073,12 @@ app.controller('IdeCtrl',
         return ProjectFactory.hasSampleSolution();
       };
 
+
       /**
        * prepare panes depending on hidden actions (Janick Michot)
        */
-      $scope.kPanes = ($scope.isActionHidden("tree-view")) ? "[" : "[{ collapsible: true, collapsed: true, size: '220px' } ,";
+      var treeViewOpen = $scope.currentRoleIsOwner() || $scope.currentRoleIsHelp() || $scope.currentRoleIsSubmission();
+      $scope.kPanes = ($scope.isActionHidden("tree-view")) ? "[" : "[{ collapsible: true, collapsed: "+!treeViewOpen+", size: '220px' } ,";
       $scope.kPanes += " {collapsible: false} ";
       $scope.kPanes += (!angular.equals({}, $scope.rightBarTabs)) ? ", { collapsible: true, resizable: true, collapsed: true, size: '35%' }" : "";
       $scope.kPanes += (!angular.equals({}, $scope.rightBarTabs)) ? ", { collapsible: false, resizable: false, collapsed: false, size: '26px' } ]" : "]";

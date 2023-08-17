@@ -8,6 +8,15 @@ angular.module('codeboardApp')
 
     $scope.isAuth = UserSrv.isAuthenticated();
 
+    /* Determines whether we are on the course page or not */
+    $scope.isCoursePage = false;
+
+
+    $scope.init = function () {
+        $scope.isCoursePage = $location.path().includes('courses');
+    };
+    $scope.init();
+
 
     $scope.$on('userLoggedIn', function(event, args) {
       $scope.username = UserSrv.getUsername();

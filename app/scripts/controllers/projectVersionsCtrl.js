@@ -59,7 +59,7 @@ angular.module('codeboardApp')
          * @returns {a}
          */
         $scope.updateHelpRequestStatus = function(helpRequest) {
-            return ProjectFactory.updateHelpRequest(helpRequest.id).then(() => helpRequest.status = "answered");
+            return ProjectFactory.updateHelpRequest(helpRequest.id, 'answered', helpRequest.projectId, helpRequest.courseId).then(() => helpRequest.status = "answered");
         };
     }]);
 
@@ -117,7 +117,7 @@ angular.module('codeboardApp')
          * @returns {a}
          */
         $scope.updateHelpRequestStatus = function(helpRequest) {
-            return ProjectFactory.updateHelpRequest(helpRequest.id).then(() => helpRequest.status = "answered");
+            return ProjectFactory.updateHelpRequest(helpRequest.id, 'answered', helpRequest.projectId, helpRequest.courseId).then(() => helpRequest.status = "answered");
         };
     }]);
 
@@ -129,6 +129,8 @@ angular.module('codeboardApp')
         $scope.userVersionSet = initialData.userVersionSet;
         $scope.userVersionType = $route.current.params.versionType.toLowerCase();
         $scope.usernameFilter = "";
+
+        console.log($scope.projectData)
 
         // define title depending userVersionType
         switch($scope.userVersionType) {
@@ -175,7 +177,7 @@ angular.module('codeboardApp')
          * @returns {a}
          */
         $scope.updateHelpRequestStatus = function(helpRequest) {
-            return ProjectFactory.updateHelpRequest(helpRequest.id).then(() => helpRequest.status = "answered");
+            return ProjectFactory.updateHelpRequest(helpRequest.id, 'answered', helpRequest.projectId, helpRequest.courseId).then(() => helpRequest.status = "answered");
         };
     }]);
 

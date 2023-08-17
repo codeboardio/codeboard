@@ -19,9 +19,6 @@ angular.module('codeboardApp')
             /* Parameter that is true if the user is watching her own page, otherwise false; use to display buttons */
             $scope.currentUserIsSelf = false;
 
-            /* Determines whether we are on the course page or not */
-            $scope.isCoursePage = false;
-
             $scope.courseId = null;
 
             /**

@@ -8,8 +8,8 @@
         <li ng-show="username" ng-style="!isCoursePage ? {'text-decoration': 'underline'} : {}">
           <a ng-href="/users/{{username}}">Projects</a>
         </li>
-        <li ng-style="isCoursePage ? {'text-decoration': 'underline'} : {}">
-          <a ng-href="/users/{{username}}/courses">Courses</a>
+        <li ng-show="username" ng-style="isCoursePage ? {'text-decoration': 'underline'} : {}">
+          <a ng-href="/users/{{username}}/courses">Courses{{location.path()}}</a>
         </li>
         <li><a ng-show="isAuth" href="" ng-click="signOut()">Sign out</a></li>
       </ul>
