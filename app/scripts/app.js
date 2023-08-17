@@ -69,6 +69,11 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
         templateUrl: 'partials/userProjects',
         controller: 'UserProjectsCtrl'
       })
+      .when('/users/:username/courses', {
+        // shows the :userId page (non-public projects are included when user is authorized)
+        templateUrl: 'partials/userCourses',
+        controller: 'UserProjectsCtrl'
+      })
       .when('/courses/new', {
         // user creates a new project
         templateUrl: 'partials/courses/courseNew',
@@ -92,6 +97,15 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
                 .then(function(result) {
                   return result.data.courseOwnerSet;
                 });
+          }]
+        }
+      })
+      .when('/courses/:courseId/settings', {
+        templateUrl: 'partials/courses/courseSettings',
+        controller: 'CourseSettingsCtrl',
+        resolve: {
+          courseData: ['$route', 'CourseSettingsRes', function($route, CourseSettingsRes) {
+            return CourseSettingsRes.get({ courseId: $route.current.params.courseId }).$promise;
           }]
         }
       })

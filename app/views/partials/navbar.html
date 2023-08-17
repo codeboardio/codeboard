@@ -5,8 +5,11 @@
       <a href="/" style="text-decoration: none;" class="pull-left"><h3 class="dark-font-color" style="margin: 0">Codeboard</h3></a></div>
     <div class="col-md-9">
       <ul class="nav nav-pills pull-right">
-        <li ng-show="username">
-          <a ng-href="/users/{{username}}">{{username}}</a>
+        <li ng-show="username" ng-style="!isCoursePage ? {'text-decoration': 'underline'} : {}">
+          <a ng-href="/users/{{username}}">Projects</a>
+        </li>
+        <li ng-style="isCoursePage ? {'text-decoration': 'underline'} : {}">
+          <a ng-href="/users/{{username}}/courses">Courses</a>
         </li>
         <li><a ng-show="isAuth" href="" ng-click="signOut()">Sign out</a></li>
       </ul>

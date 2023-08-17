@@ -9,6 +9,13 @@
 
 angular.module('codeboardApp')
 
+    .factory('CourseSettingsRes', ['$resource', function($resource) {
+        return $resource(
+            '/api/courses/:courseId/settings',
+            { projectId: '@id' }
+        );
+    }])
+
     .factory('CourseRes', ['$resource', function($resource) {
         return $resource(
             '/api/courses/:courseId/',

@@ -1,0 +1,94 @@
+<div ng-include="'partials/navbar.html'"></div>
+
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-8 col-md-offset-3">
+      <h2>{{user.username}}</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-2 col-md-offset-1">
+      <img src="{{user.imageUrl}}" alt="" style="width: 150px"/>
+    </div>
+    <div class="col-md-4">
+      <p ng-show="user.name">
+        <label>Name</label>
+        <br>
+        {{user.name}}
+      </p>
+      <p ng-show="user.email">
+        <label>Email</label>
+        <br>
+        <a href="mailto:{{user.email}}">{{user.email}}</a>
+      </p>
+      <p ng-show="user.url">
+        <label>Web</label>
+        <br>
+        <a href="{{user.url}}">{{user.url}}</a>
+      </p>
+    </div>
+    <div class="col-md-3">
+      <p ng-show="user.location">
+        <label>Located in</label>
+        <br>
+        {{user.location}}
+      </p>
+      <p ng-show="user.institution">
+        <label>Institution</label>
+        <br>
+        {{user.institution}}
+      </p>
+    </div>
+  </div>
+
+  <hr>
+
+    <div class="row" ng-show="currentUserIsSelf">
+      <div class="col-md-12">
+        <a class="btn btn-success" id="userProjects_createProject" href="/projects/new">Create new project</a>
+        <a class="btn btn-info" id="userProjects_createCourse" href="/courses/new">Create new course</a>
+        <a class="btn btn-default" ng-href="/users/{{user.username}}/settings">Edit user settings</a>
+      </div>
+    </div>
+
+  <div class="row" ng-show="courseOwnerSet.length > 0">
+    <div class="col-md-12">
+      <div class="page-header">
+        <h1>Owns courses</h1>
+      </div>
+
+
+      <div class="panel panel-default" ng-repeat="course in courseOwnerSet">
+        <div class="panel-heading" style="background-color: #fdd835">
+          <h3 class="panel-title">Course: <b>{{course.coursename}}</b></h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label>Description</label>
+              <p style="white-space: pre-line;">{{course.description}}</p>
+            </div>
+            <div class="col-md-3">
+              <label>Created</label>
+              <p>{{course.createdAt | date}}</p>
+            </div>
+            <div class="col-md-3">
+              <label>Context ID (Moodle ID)</label>
+              <p style="white-space: pre-line;">{{course.contextId}}</p>
+            </div>
+            <div class="col-md-2">
+              <div class="btn-group pull-right" role="group">
+                <a ng-show="currentUserIsSelf" href="/courses/{{course.id}}/settings" role="button" class="btn btn-default" title="Edit project settings"><span class="glyphicon glyphicon-wrench"></span></a>
+                <a ng-show="currentUserIsSelf" href="/users/{{user.username}}?courseId={{course.id}}" role="button" class="btn btn-default" title="View Projects assigned to this course"><span class="glyphicon glyphicon-eye-open"></span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div> <!-- end of container -->

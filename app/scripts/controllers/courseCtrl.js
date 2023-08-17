@@ -23,18 +23,23 @@ angular.module('codeboardApp')
         // Object's values are used to show success or failure message after saving data to server
         $scope.server = {
             saveSuccess: false,
-            saveFailure: false
+            saveFailure: false,
+            error: ''
         };
 
-        $scope.save = function(form) {
+        $scope.actionsSelected = [];
 
-            var courseId = $routeParams.courseId;
+        $scope.save = function(form) {
 
             if(form.$valid) {
 
                 var payload = {
                     coursename: $scope.data.coursename,
-                    description: $scope.data.description
+                    description: $scope.data.description,
+                    contextId: $scope.data.contextId,
+                    courseOptions: {
+                        userDisabledActions: $scope.actionsSelected.join('|')
+                    }
                 };
 
                 // hide user messages (in case they are displayed from a previous saving attempt)
@@ -43,20 +48,28 @@ angular.module('codeboardApp')
 
                 $http.post('/api/courses/', payload)
                     .then(function(result) {
-
-                        let data = result.data;
-
-                        // show the success message
                         $scope.server.saveSuccess = true;
-
-                        // redirect to main page
-                        $location.path("/");
+                        $location.path(`/`);
 
                     }, function(error) {
                         // show the error message and remove it after 4 seconds
                         $scope.server.saveFailure = true;
+                        $scope.server.error = error.data.message;
                     });
             }
         };
 
+        /**
+         * Toggle selection for courses
+         * @param action
+         */
+        $scope.toggleSelection = function toggleSelection(action) {
+            let idx = $scope.actionsSelected.indexOf(action);
+            if (idx > -1) {
+                $scope.actionsSelected.splice(idx, 1);
+            }
+            else {
+                $scope.actionsSelected.push(action);
+            }
+        };
     }]);

@@ -4,9 +4,12 @@
   <div class="row">
 
     <div class="col-md-8 col-md-offset-2">
-      <div class="panel panel-default">
+
+      <h3>Settings for <a ng-href="/courses/{{courseId}}/summary">Course {{courseId}}</a></h3>
+
+      <div class="panel panel-default" style="margin-top: 30px;">
         <div class="panel-heading">
-          <h3 class="panel-title">New course</h3>
+          <h3 class="panel-title">Configure settings</h3>
         </div>
         <div class="panel-body">
 
@@ -15,19 +18,19 @@
               <label for="coursename">Course name</label>
               <input type="text" class="form-control" id="coursename" ng-model="data.coursename" required>
             </div>
-
             <div class="form-group">
               <label for="description">Description</label>
               <textarea class="form-control" id="description" rows="3" ng-model="data.description"></textarea>
             </div>
 
             <div class="form-group">
-              <label for="contextId">Context ID (Moodle ID)</label>
-              <input type="text" class="form-control" id="contextId" ng-model="data.contextId" required>
+              <label for="description">Context ID (Moodle ID)</label>
+              <input type="text" class="form-control" id="contextId" ng-model="data.contextId">
             </div>
 
             <div class="form-group">
               <label>Course Options</label>
+
               <div class="form-group row">
                 <label class="col-sm-4 col-form-label" style="font-weight: normal">User Disabled Actions</label>
                 <div class="col-sm-8">
@@ -46,19 +49,52 @@
               </div>
             </div>
 
-            <button type="submit" id="projectNew_createButton" class="btn btn-success">Create</button>
-            <a type="button" class="btn btn-default" href="/">Cancel</a>
+            <div class="form-group">
+              <label for="description">Course Projects</label>
+              <p>Please separate project IDs with "|" as the delimiter. This list defines the referenced projects.</p>
+              <textarea class="form-control" id="projects" rows="3" ng-model="formatedProjectList"></textarea>
+            </div>
+
+            <div class="form-group row">
+              <div class="pt-4 col-sm-12">
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-default" ng-click="discardChanges()">Discard changes</button>
+                <button type="button" class="btn btn-danger pull-right" ng-click="openDeletionModal()">Delete course
+                </button>
+              </div>
+            </div>
+
           </form>
 
           <div ng-show="server.saveSuccess" class="alert alert-success" role="alert">
-            <strong>Project created!</strong> Redirecting to it's summary page.
+            <strong>Changes saved!</strong> Your changes have been saved successfully. {{server.info}}
           </div>
           <div ng-show="server.saveFailure" class="alert alert-danger" role="alert">
-            <strong>Project not created!</strong> Problem while saving your changes. Check your data and try again. {{server.error}}
+            <strong>Changes not saved!</strong> Problem while saving your changes. Check your data and try again. {{server.error}}
           </div>
 
         </div>
       </div>
     </div>
   </div>
+  <!-- the following is for the deletion modal -->
+  <div>
+    <script type="text/ng-template" id="DeletionModalContent.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Delete course</h3>
+      </div>
+      <div class="modal-body">
+        <p class="lead">
+          Do you really want to delete this course?<br>
+          Deletion can not be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" ng-click="ok()">Delete course</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+  </div>
 </div>
+
+
