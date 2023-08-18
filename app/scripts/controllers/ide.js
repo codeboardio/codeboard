@@ -579,6 +579,8 @@ app.controller('IdeCtrl',
             $scope.textAfterResult = "Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!";
             $scope.avatar = "../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg";
 
+            projectData.projectCompleted = true;
+
             // trigger successful submission event
             let req = IdeMsgService.msgSuccessfulSubmission();
             $rootScope.$broadcast(req.msg);
@@ -845,13 +847,13 @@ app.controller('IdeCtrl',
 
       /**
        * Settings for different UI elements, e.g. should buttons be visible
-       * todo maybe combine with isActionHidden?
+       * todo maybe combine with isActionHidden? Why separated from disabledActions and hiddenActions...
        */
       $scope.uiSettings = {
 
         // do we show the submit button?
         showSubmissionBtn: projectData.isSubmissionAllowed,
-        disableSubmissionBtn: projectData.projectCompleted
+        disableSubmissionBtn: false // projectData.projectCompleted // todo maybe add settings
 
       };
 
@@ -978,6 +980,11 @@ app.controller('IdeCtrl',
       /** Returns true if the current role is that of project 'ltiUser' */
       $scope.currentRoleIsLtiUser = function() {
         return $scope.isUsingLti;
+      };
+
+      /** Returns true if the current role is that of project 'owner' */
+      $scope.isProjectCompleted = function() {
+        return projectData.projectCompleted;
       };
 
       /**
@@ -1352,7 +1359,7 @@ app.controller('IdeCtrl',
        * Hide submission button after successful submission
        */
       $scope.$on(IdeMsgService.msgSuccessfulSubmission().msg, function () {
-        $scope.uiSettings.disableSubmissionBtn = true;
+        // $scope.uiSettings.disableSubmissionBtn = true;
       });
 
       /**

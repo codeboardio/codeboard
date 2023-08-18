@@ -18,10 +18,12 @@
 
                 <!-- todo col-xs-12 -->
                 <div class="col-md-2 visible-md visible-lg col-md-push-5 text-center">
-                  <div class="projectTitle {{getCurrentRole()}}">
+                  <div class="projectTitle {{getCurrentRole()}} {{isProjectCompleted() ? 'project-completed' : ''}}">
                       <span ng-show="currentRoleIsHelp()" class="glyphicon glyphicon-question-sign mr-2 fa-sm"></span>
                       <span ng-show="currentRoleIsSubmission()" class="glyphicon glyphicon-education mr-2 fa-sm"></span>
                       <span ng-show="currentRoleIsUserProject()" class="glyphicon glyphicon-user mr-2"></span>
+
+                      <span ng-show="isProjectCompleted()" class="glyphicon glyphicon-check mr-2"></span>
                     <span title="{{projectName}}">{{projectName}}</span>
                   </div>
                 </div>
@@ -94,8 +96,8 @@
                     <button id="ideToolButton" class="btn btn-default btn-sm" ng-if="!isActionHidden('tool')" ng-disabled="disabledActions.tool" ng-click="navBarClick('tool')" ng-show="isToolSupported()" title="Analyze this project">
                       <span class="glyphicon glyphicon-check"></span> <span class="hidden-xs">Analyze</span>
                     </button>
-                    <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" ng-click="navBarClick('submit')" title="Submit this project">
-                      <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="uiSettings.disableSubmissionBtn">Submit</span> <span class="hidden-xs" ng-show="uiSettings.disableSubmissionBtn">Aufgabe gelöst</span>
+                    <button ng-show="uiSettings.showSubmissionBtn" class="btn btn-primary btn-sm" ng-if="!isActionHidden('submit')" ng-disabled="disabledActions.submit || uiSettings.disableSubmissionBtn" ng-click="navBarClick('submit')" title="{{!isProjectCompleted() ? 'Deine Lösung submitten': 'Es zählt immer das beste Ergebnis'}}">
+                      <span  class="glyphicon glyphicon-send"></span> <span class="hidden-xs" ng-hide="isProjectCompleted()">Submit</span> <span class="hidden-xs" ng-show="isProjectCompleted()">Re-Submit</span>
                     </button>
 
                   </form>

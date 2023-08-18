@@ -32,6 +32,7 @@
           <th title="Date when the version was created/updated">Created</th>
           <th title="Project">Project</th>
           <th title="Status of the help request" ng-show="isType('helpRequest')">Status</th>
+          <th title="Status of the related submissions" ng-show="isType('helpRequest')">Best Submission</th>
 
           <th title="Result or grade that was given" ng-show="isType('submission')">Result</th>
           <th title="Number of test cases the submission passed" ng-show="isType('submission')">Tests passed</th>
@@ -44,6 +45,8 @@
           <td>{{version.updatedAt | date: 'medium'}}</td>
           <td>{{version.project.projectname}}</td>
           <td ng-show="isType('helprequest')"><span class="badge badge-{{version.status}}">{{version.status}}</span></td>
+          <td ng-show="isType('helprequest')"><a ng-href="/projects/{{version.projectId}}/submissions/{{version.bestSubmission.id}}"><span class="badge badge-default">{{version.bestSubmission.testResult}}</span> {{version.bestSubmission.updatedAt | date: 'medium'}}</a></td>
+
           <td ng-show="isType('submission')"><span class="badge badge-{{(version.testResult >= 0.99) ? 'answered' : 'default'}}">{{version.testResult === -1 ? '-' : version.testResult}} {{parseFloat(version.testResult)}}</span></td>
           <td ng-show="isType('submission')">{{version.numTestsPassed === -1 ? '-' : version.numTestsPassed}}</td>
           <td ng-show="isType('submission')">{{version.numTestsFailed === -1 ? '-' : version.numTestsFailed}}</td>

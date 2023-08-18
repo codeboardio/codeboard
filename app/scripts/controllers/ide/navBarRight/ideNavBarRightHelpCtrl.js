@@ -173,6 +173,7 @@ angular.module('codeboardApp')
             }
         };
 
+        var lastHelpRequest = null;
 
         /**
          * This method is called by a student requires help for a project.
@@ -193,6 +194,7 @@ angular.module('codeboardApp')
             // call ProjectFactory to store the request
             return ProjectFactory.createHelpRequest()
                 .then(function(helpRequest) {
+                    lastHelpRequest = helpRequest;
                     let reference = "/projects/" + helpRequest.projectId + "/helprequests/" + helpRequest.id;
                     return ChatSrv.addChatLineCard(noteStudent,"Hilfe angefragt", 'help', reference, helpRequest.id);
                 })

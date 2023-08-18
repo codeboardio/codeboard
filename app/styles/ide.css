@@ -155,6 +155,12 @@ body {
   font-size: 0.8em;
 }
 
+.ideHeader .projectTitle.project-completed {
+  background: #3da956 !important;
+  color: rgba(255, 255, 255, 0.8) !important
+}
+
+
 #ideNavBar {
   border-radius: 0;
   margin-bottom: 0;

@@ -1138,8 +1138,6 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
 
       var payload = getPayloadForCompilation(true);
 
-      console.log(payload);
-
       // the above payload contains the files in a form that's suited for Mantra compilation
       // however, we also want to store the files in the DB in format that we later load them
       // back into the IDE (e.g. when teacher inspects a submission); that's why we also send
@@ -1178,6 +1176,7 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
      * @returns a promise that resolves when a the request was completed
      * @author Janick Michot
      */
+    let prevHelpRequest = null;
     let createHelpRequest = function () {
 
       // create payload
@@ -1192,15 +1191,23 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       // create the promise that is returned
       let deferred = $q.defer();
 
-      // make call to the server
-      ProjectRequestHelpRes.save( { projectId: $routeParams.projectId }, payload,
-          function success(data, status, header, config) {
-            deferred.resolve(data); // resolve the promise
-          },
-          function error(response) {
-            deferred.reject(response); // reject the promise
-          }
-      );
+      // check if content has not changed
+      if(prevHelpRequest && JSON.stringify(getNodeArray(getProject().files)) === prevHelpRequest.userFilesDump) {
+        deferred.resolve(prevHelpRequest);
+      }
+
+      // else make call to the server
+      else {
+        ProjectRequestHelpRes.save( { projectId: $routeParams.projectId }, payload,
+            function success(data, status, header, config) {
+              prevHelpRequest = data;
+              deferred.resolve(data); // resolve the promise
+            },
+            function error(response) {
+              deferred.reject(response); // reject the promise
+            }
+        );
+      }
 
       // return the promise
       return deferred.promise;
@@ -1216,10 +1223,10 @@ services.factory('ProjectFactory', ['$http', '$routeParams', '$q', '$log', 'Proj
       let payload = {
         status: status,
         helpRequestId: helpRequestId,
-        courseId:  courseId ?? getCourseId()
+        courseId:  (courseId) ? courseId : getCourseId()
       };
 
-      projectId = projectId ?? $routeParams.projectId;
+      projectId = (projectId) ? projectId : $routeParams.projectId;
 
       // create the promise that is returned
       let deferred = $q.defer();
