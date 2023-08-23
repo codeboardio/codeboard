@@ -28,7 +28,7 @@ angular.module('codeboardApp')
 
       function getUserDisabledActions(courseOptions) {
         var actions = [];
-        var userDisabledAction = courseOptions.find(item => item.option === 'userDisabledAction');
+        var userDisabledAction = courseOptions.find(item => item.option === 'userDisabledActions');
         if(userDisabledAction) {
           actions = userDisabledAction.value.split('|');
         }
