@@ -22,8 +22,7 @@
 
     <!-- Add Message Form -->
     <div ng-show="sendRequestFormVisible">
-        <!-- currentRoleIsUser() -->
-        <form ng-show="!currentRoleIsUser()" id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
+        <form ng-show="currentRoleIsUser()" id="sendHelpRequest" class="form-inline" ng-submit="sendHelpRequest()">
             <p class="text-danger">{{sendHelpFormErrors}}</p>
             <div class="form-group w-100 mb-2">
                 <textarea class="topic w-100 border-box p-4" ng-model="noteStudent" name="noteStudent" placeholder="Dein Anliegen"></textarea>
