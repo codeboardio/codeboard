@@ -17,7 +17,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
         // Fetching data
         // fetch the json data from "explanations.json"
         service.getJsonData = function () {
-            return $http.get('../db_codingassistant/explanations.json').then(
+            return $http.get('../staticfiles/explanations.json').then(
                 function (response) {
                     return response.data;
                 },
@@ -29,7 +29,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
 
         // fetch the json data from "colors.json"
         service.getJsonColors = function () {
-            return $http.get('../db_codingassistant/colors.json').then(
+            return $http.get('../staticfiles/colors.json').then(
                 function (response) {
                     return response.data;
                 },
