@@ -17,7 +17,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
         // Fetching data
         // fetch the json data from "explanations.json"
         service.getJsonData = function () {
-            return $http.get('../staticfiles/explanations.json').then(
+            return $http.get('./staticfiles/explanations.json').then(
                 function (response) {
                     return response.data;
                 },
@@ -29,7 +29,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
 
         // fetch the json data from "colors.json"
         service.getJsonColors = function () {
-            return $http.get('../staticfiles/colors.json').then(
+            return $http.get('./staticfiles/colors.json').then(
                 function (response) {
                     return response.data;
                 },
@@ -976,17 +976,21 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Markers for variable names
             // get variableMarker.css
-            var styleCss = document.styleSheets[30];
-
+            var styleCss;
+            for (var i = 0; i < document.styleSheets.length; i++) {
+                if (document.styleSheets[i].title === "variableMarker") {
+                    styleCss = document.styleSheets[i];
+                }
+            }
             // delete styles from variable variableMarker.css
             for (let i = 0; i < styleCss.cssRules.length; i++) {
                 styleCss.deleteRule(i);
             }
-
             // loops over all variable and add marker style to variableMarker.css
             variableMap.forEach(function (value, key) {
                 styleCss.insertRule('.marker' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
             });
+            
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Return explanations and variableMap to use it in the codingAssistantMainCtrl

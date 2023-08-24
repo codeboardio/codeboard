@@ -17,8 +17,7 @@
     </div>
 
     <!-- User Actions -->
-    <!-- currentRoleIsUser() -->
-    <button ng-show="!currentRoleIsUser()" ng-disabled="requestTipDisabled" class="btn btn-success btn-100" ng-click="askForTip()"><span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern</button>
+    <button ng-show="currentRoleIsUser()" ng-disabled="requestTipDisabled" class="btn btn-success btn-100" ng-click="askForTip()"><span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern</button>
     <div id="targetinto" style="height: 1px; width: 100%"></div>
 </div>
 
