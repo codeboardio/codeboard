@@ -2156,8 +2156,9 @@ app.controller('RightBarCtrl', [
     '$uibModal',
     'ProjectFactory',
     'IdeMsgService',
+    'TabService',
     'CodingAssistantCodeMatchSrv',
-    function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService, CodingAssistantCodeMatchSrv) {
+    function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService, TabService, CodingAssistantCodeMatchSrv) {
         $scope.navBarRightContent = '';
         $scope.activeTab = '';
         $scope.rightBarTabs = {};
@@ -2278,12 +2279,18 @@ app.controller('RightBarCtrl', [
          * @param slug
          */
         $scope.rightBarTabClick = function (slug) {
+            if (slug === 'explanation') {
+                $rootScope.$broadcast("tabClicked");
+            }
+            
             if ($scope.activeTab !== slug) {
                 $scope.splitter.expand('#ideRighterPartOfMiddlePart');
                 $scope.activeTab = slug;
+                TabService.setSlug(slug);
             } else {
                 $scope.splitter.collapse('#ideRighterPartOfMiddlePart');
                 $scope.activeTab = '';
+                TabService.setSlug('');
             }
         };
 
@@ -2336,6 +2343,20 @@ app.controller('RightBarCtrl', [
         });
     },
 ]);
+
+// this service is used to make the clicked tab available in the codingAssistantMainCtrl
+app.service('TabService', function() {
+    var slug;
+    var service = this;
+
+    service.getSlug = function() {
+        return slug;
+    }
+
+    service. setSlug = function(newSlug) {
+        slug = newSlug;
+    }
+});
 
 app.controller('IdeFooterStatusBarCtrl', [
     '$scope',
