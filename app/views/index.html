@@ -42,10 +42,12 @@
     <link rel="stylesheet" href="styles/userSettings.css">
     <link rel="stylesheet" href="styles/docs.css">
     <link rel="stylesheet" href="styles/chat.css">
+    <link rel="stylesheet" href="styles/codeBlockMarker.css">
     <link rel="stylesheet" href="styles/bootstrapAdditions.css">
     <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
     <link rel="stylesheet" href="components/prism/prism.css">
     <!-- endbuild -->
+    <link rel="stylesheet" href="styles/variableMarker.css" title="variableMarker">
 
     <!-- todo auch irgendwie mit grunt verarbeiten? siehe cdn (Janick Michot).. oder weglassen -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
@@ -115,6 +117,7 @@
   <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
   <script src="bower_components/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
   <script src="bower_components/angular-ui-ace/ui-ace.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.js"></script>
 
   <script src="components/ngGrid/ngGridHeight.js"></script>
 
@@ -146,6 +149,8 @@
   <script src="scripts/controllers/ide/navBarRight/ideNavBarRightProjectDescriptionCtrl.js"></script>
   <script src="scripts/controllers/ide/navBarRight/ideNavBarRightSampleSolutionCtrl.js"></script>
   <script src="scripts/controllers/ide/navBarRight/ideNavBarRightHelpCtrl.js"></script>
+  <script src="scripts/controllers/ide/navBarRight/ideNavBarRightInfoCtrl.js"></script>
+  <script src="scripts/controllers/codingAssistantMainCtrl.js"></script>
   <script src="scripts/controllers/projectVersionsCtrl.js"></script>
   <script src="scripts/services/projectFactory.js"></script>
   <script src="scripts/controllers/userSettingsCtrl.js"></script>
@@ -155,10 +160,13 @@
   <script src="scripts/services/websocketSrv.js"></script>
   <script src="scripts/services/chatSrv.js"></script>
   <script src="scripts/services/statsSrv.js"></script>
+  <script src="scripts/services/codingAssistantCodeMatchSrv.js"></script>
+  <script src="scripts/services/aceEditorSrv.js"></script>
   <script src="scripts/directives/ngEnter.js"></script>
   <script src="scripts/directives/ngSelectOnFocus.js"></script>
   <script src="scripts/directives/prismSyntaxHighlighter.js"></script>
   <script src="scripts/directives/chatLine.js"></script>
+  <script src="scripts/directives/codingAssistantVarScope.js"></script>
   <script src="scripts/resources/projectRes.js"></script>
   <script src="scripts/resources/sessionRes.js"></script>
   <script src="scripts/resources/userRes.js"></script>

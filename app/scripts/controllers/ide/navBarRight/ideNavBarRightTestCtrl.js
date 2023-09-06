@@ -9,7 +9,7 @@
 angular.module('codeboardApp')
 
     /**
-     * Controller for Tips
+     * Controller for Tests in the "Test" tab
      */
     .controller('ideNavBarRightTestCtrl', ['$scope', '$rootScope', '$log', 'IdeMsgService', 'ProjectFactory', 'ChatSrv',
         function ($scope, $rootScope, $log, IdeMsgService, ProjectFactory, ChatSrv) {
@@ -101,7 +101,7 @@ angular.module('codeboardApp')
                 $scope.compilation.output = compilationResult.output;
                 $scope.compilation.compilationErrorId = compilationResult.compilationErrorId;
                 $scope.compilation.compErrorHelpMessage = compilationResult.compErrorHelpMessage;
-                $scope.compilation.status = compilationResult.compilationError ? 'fail' : 'sccuess';
+                $scope.compilation.status = compilationResult.compilationError ? 'fail' : 'success';
             };
 
             /**
@@ -198,21 +198,34 @@ angular.module('codeboardApp')
                         return compilationResult;
                     })
                     .then(function(compilationResult) {
-
                         $scope.state = (compilationResult.compilationError) ? $scope.states.compilationError : $scope.states.inProgress;
 
                         if (compilationResult.compilationError) {
+                            let reqOpenCompilerTab = IdeMsgService.msgNavBarRightOpenTab('compiler');
+                            $rootScope.$broadcast(reqOpenCompilerTab.msg, reqOpenCompilerTab.data);
 
+                            let chatLineCard = {
+                                cardHeader: 'Fehler beim Testen',
+                                cardBody: compilationResult.compErrorHelpMessage,
+                                cardType: 'compHelp',
+                                compilationOutput: compilationResult.output,
+                                compilationErrorId: compilationResult.compilationErrorId
+                            };
+
+                            let reqAddMsg = IdeMsgService.msgAddHelpMessage(chatLineCard, 'compilerTest', 'Roby', 'worried');
+                            $rootScope.$broadcast(reqAddMsg.msg, reqAddMsg.data);
+                            
+                            // broadcast event that code gets compiled and has a syntax-error
+                            $rootScope.$broadcast('compilerError');
                             $scope.state = $scope.states.compilationError;
 
                         } else {
-
                             $scope.state = $scope.states.inProgress;
 
                             ioTesting(compilationResult.id)
                                 .then(function(hasIoErrors) {
 
-                                    if(hasIoErrors) {
+                                    if (hasIoErrors) {
                                         $scope.state = $scope.states.ioError;
                                     } else {
                                         $scope.state = $scope.states.correctSolution;
@@ -226,6 +239,8 @@ angular.module('codeboardApp')
                                     // force update of scope (used for status)
                                     $scope.$apply();
                                 });
+                            // broadcast event that code gets compiled and has no syntax error (make sure with $timeout that the chatbox is available)
+                            $rootScope.$broadcast('noCompilerError');
                         }
                     })
                     .catch(function(error) {
@@ -255,19 +270,5 @@ angular.module('codeboardApp')
                     case 'ioTest':
                         return 'ideIoTestResult.html';
                 }
-            };
-
-            /**
-             * This method is bound to the chatLine rating directive.
-             * When the message is rated this method calls the chatService to
-             * send the rating to the api.
-             * @param messageId
-             * @param rating
-             */
-            $scope.onMessageRating = function (messageId, rating) {
-                ChatSrv.rateCompilationErrorMessage(messageId, rating)
-                    .then(function() {
-                        // console.log("Message rated");
-                    });
             };
         }]);

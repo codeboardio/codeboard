@@ -1,16 +1,19 @@
 <div class="chat-line {{alignment || 'left'}} w-100 {{type}}">
-
     <div class="chat-line-avatar pull-{{alignment || 'left'}}">
-        <img src="{{getAvatarUri(avatar)}}" width="55px" height="55px"  alt="Avatar"/>
+        <img src="{{getAvatarUri(avatar)}}" width="55px" height="55px" alt="Avatar" />
     </div>
 
     <div class="mt-3 chat-message pull-{{alignment || 'left'}}">
-
-        <div class="chat-line-posted-at text-{{alignment || 'left'}}">
-            <span class="small">&nbsp;
+        <div class="chat-line-posted-at text-{{alignment || 'left'}} {{type}}">
+            <span class="small"
+                >&nbsp;
                 <span>{{postedAt(createdAt)}}</span>
                 <span class="delimiter" ng-hide="!createdAt || !author">|</span>
-                <span>{{author}}</span>
+                <span ng-if="type !== 'info'">{{author}}</span>
+                <a ng-if="type === 'info'" ng-click="openHelpTab(tab)">{{author}}</a>
+                <a href="{{link}}" target="_blank" ng-if="type === 'explanation'"> | Docs</a>
+                <span ng-if="type === 'error'"> | Achtung Fehler</span>
+                <span ng-if="cardType === 'tip'"> | {{cardTitle}}</span>
             </span>
         </div>
 
@@ -18,4 +21,3 @@
     </div>
     <div class="clearfix"></div>
 </div>
-

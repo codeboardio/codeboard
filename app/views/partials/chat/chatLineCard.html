@@ -1,8 +1,7 @@
-<div class="chat-line-card w-100 {{cardType || 'help'}}">
+<div class="chat-line-card w-100 {{cardType || 'help'}}" ng-class="{'gray-out-compiler-chatbox': $parent.showCompilerInfoMessage && cardType === 'compHelp'}">
     <div class="card-header">
         <span ng-show="!cardReference">{{cardTitle}}</span>
         <a ng-hide="!cardReference" href="{{cardReference}}">{{cardTitle}}</a>
     </div>
-    <div class="card-body" ng-transclude>
-    </div>
+    <div class="card-body" ng-transclude></div>
 </div>

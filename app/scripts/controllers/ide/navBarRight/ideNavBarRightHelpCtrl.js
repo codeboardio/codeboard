@@ -1,6 +1,6 @@
 /**
- * This is the controller for the navBarTab "Help".
- * It makes use of the 'chatSrv' in order to request tips and help, as well as enabling the chat function.
+ * This is the controller for the navBarTab "Tipps", "Fragen" and "Compiler".
+ * It makes use of the 'chatSrv' in order to request tips as well as enabling the chat function in the "Tips" tab and provide the compiler-messages to the "Compiler" tab.
  *
  * @author Janick Michot
  * @date 19.12.2019
@@ -13,18 +13,27 @@ angular.module('codeboardApp')
     /**
      * Controller for Project Description
      */
-    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$timeout', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv',
-    function ($scope, $rootScope, $sce, $routeParams, $http, $timeout, IdeMsgService, ProjectFactory, ChatSrv, UserSrv) {
+    .controller('ideNavBarRightHelpCtrl', ['$scope', '$rootScope', '$sce', '$routeParams', '$http', '$log', '$timeout', '$uibModal', 'IdeMsgService', 'ProjectFactory', 'ChatSrv', 'UserSrv', 'AceEditorSrv',
+    function ($scope, $rootScope, $sce, $routeParams, $http, $log, $timeout, $uibModal, IdeMsgService, ProjectFactory, ChatSrv, UserSrv, AceEditorSrv) {
 
         let slug = 'help',
             avatarName = "Roby"; // todo dieser Benutzername ist eingetlich nicht statisch ...
+        let lastCompilerChatboxIndex = -1;
+        var aceEditor = $scope.ace.editor;
 
         // scope variables
         $scope.chatLines = [];
+        $scope.filteredCompilerChatLines = [];
+        $scope.filteredTipChatLines = [];
+        $scope.filteredHelpRequestChatLines = [];
         $scope.tips = [];
         $scope.sendRequestFormVisible = false;
         $scope.requestTipDisabled = true;
         $scope.noteStudent = $scope.noteTeacher = "";
+        $scope.showCompilerIntroMessage = true;
+        $scope.showCompilerInfoMessage = false;
+        $scope.showNoCompilationErrorMessage = false;
+        $scope.showCompilationErrorMessage = false;
 
         /**
          * Function to scroll to the bottom of the chat tab
@@ -44,7 +53,7 @@ angular.module('codeboardApp')
          */
         let getChatLineAvatar = function(chatLine) {
             if(chatLine.author.username === avatarName) {
-                return (chatLine.type === "card") ? 'idea' : 'neutral';
+                return (chatLine.type === "hint") ? 'idea' : 'neutral';
             } else {
                 return (chatLine.author.username === chatLine.user.username) ? 'student' : 'teacher';
             }
@@ -56,7 +65,7 @@ angular.module('codeboardApp')
          */
         let getNumTipsAlreadySent = function () {
             let chatLineTips = $scope.chatLines.filter(function(chatLine) {
-                return (chatLine.type === 'card' && chatLine.message.cardType === "tip");
+                return (chatLine.type === 'hint' && chatLine.message.cardType === "tip");
             });
             return chatLineTips.length;
         };
@@ -73,7 +82,7 @@ angular.module('codeboardApp')
 
             // if chatLine type card, parse the message
             // if current user role is 'user' remove the reference
-            if(chatLine.type === 'card') {
+            if(chatLine.type === 'hint' || chatLine.type === 'helpRequest') {
                 chatLine.message = JSON.parse(chatLine.message);
                 chatLine.message.cardReference = (ProjectFactory.getProject().userRole === 'user') ? null : chatLine.message.cardReference;
             }
@@ -94,18 +103,90 @@ angular.module('codeboardApp')
             $scope.noteTeacher = "";
         };
 
+        // filter chatLines for compiler chatlines
+        function filterCompilerChatLines() {
+            $scope.filteredCompilerChatLines = $scope.chatLines.filter(function(chatLine) {
+                return chatLine.type === 'compiler' || chatLine.type === 'compilerTest';
+            });
+        }
+
+        // filter chatLines for tip (hint) chatlines
+        function filterTipChatLines() {
+            $scope.filteredTipChatLines = $scope.chatLines.filter(function(chatLine) {
+                return chatLine.type === 'hint';
+            });
+        }
+
+        // filter chatLines for helpRequest chatlines
+        function filterHelpChatLines() {
+            $scope.filteredHelpRequestChatLines = $scope.chatLines.filter(function(chatLine) {
+                return chatLine.type === 'helpRequest' || chatLine.type === 'helpRequestAnswer';
+            });
+        }
+
+        // watches for changes in the chatLines array and call filter functions if there are changes
+        $scope.$watch('chatLines', function() {
+            filterCompilerChatLines();
+            filterTipChatLines();
+            filterHelpChatLines();
+        }, true);
+
+        // function gets called when there is a change in the aceEditor
+        AceEditorSrv.aceChangeListener($scope.ace.editor, function() {
+            $scope.showCompilerInfoMessage = true;
+            $scope.showNoCompilationErrorMessage = false;
+            $scope.showCompilationErrorMessage = false;
+            $scope.showCompilerIntroMessage = false;
+        })
+
+        // gets called when there is an error after the code gets compiled
+        $scope.$on('compilerError', function () {
+            $scope.showCompilerIntroMessage = false;
+            $scope.showCompilerInfoMessage = false;
+            $scope.showCompilationErrorMessage = true;
+            $timeout(() => {
+                // remove last compilation error chatbox
+                if (lastCompilerChatboxIndex !== -1) {
+                    $scope.chatLines.splice(lastCompilerChatboxIndex, 1);
+                }
+        
+                // find the new last compilation error chatbox index
+                $scope.chatLines.forEach((chatLine, index) => {
+                    if (chatLine.type === 'compiler' || chatLine.type === 'compilerTest') {
+                        $scope.showNoCompilationErrorMessage = false;
+                        lastCompilerChatboxIndex = index;
+                    }
+                });
+            });
+        });
+
+        // gets called when there is no error after the code gets compiled
+        $scope.$on('noCompilerError', function() {
+            $scope.showCompilerIntroMessage = false;
+            $scope.showCompilerInfoMessage = false;
+            $scope.showNoCompilationErrorMessage = true;
+            $scope.showCompilationErrorMessage = false;
+            // remove last compilation error chatbox
+            if (lastCompilerChatboxIndex !== -1) {
+                $scope.chatLines.splice(lastCompilerChatboxIndex, 1);
+                lastCompilerChatboxIndex = -1;
+            } else {
+                $log.debug('No Compiler message found!');
+            }
+        })
+        
 
         /**
          * init this tab by loading chat history and read tips
          */
         $scope.init = function() {
-
+            // $scope.currentRoleIsUser()
             $scope.sendRequestFormVisible = !$scope.currentRoleIsUser();
 
             // when user role help, make help default tab
             if(ProjectFactory.getProject().userRole === 'help') {
                 $timeout(function () {
-                    let req = IdeMsgService.msgNavBarRightOpenTab('help');
+                    let req = IdeMsgService.msgNavBarRightOpenTab('questions');
                     $rootScope.$broadcast(req.msg, req.data);
                 }, 500);
             }
@@ -121,10 +202,23 @@ angular.module('codeboardApp')
                 .then(function() {
                     // read all tips from codeboard.json
                     let config = ProjectFactory.getConfig();
-                    if(config && "Help" in config && "tips" in config.Help) {
-                        $scope.tips = config.Help.tips;
+                    if (config && "Help" in config && "tips" in config.Help) {
+                        // add property to tips that they do not get sent multiple times in runtime
+                        $scope.tips = config.Help.tips.map(tip => ({...tip, sent: false}));
                         $scope.helpIntro = config.Help.helpIntro;
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
+
+                        // update tips sent property based on chat history
+                        $scope.chatLines.forEach(function (chatLine) {
+                            if (chatLine.type === 'hint' && chatLine.message.cardType === 'tip' && chatLine.message.tipSent) {
+                                // get index of already sent tip
+                                let tipIndex = chatLine.message.tipIndex;
+                                // if the tip was already sent mark it as true
+                                if (tipIndex !== -1) {
+                                    $scope.tips[tipIndex].sent = true;
+                                }
+                            }
+                        });
                     }
                 })
                 .catch(function() {
@@ -160,16 +254,59 @@ angular.module('codeboardApp')
         });
 
         /**
-         * This functions adds a chatline with a tip.
+         * This functions adds a chatline with a relevant tip.
          */
         $scope.askForTip = function() {
-            let tip = $scope.tips[getNumTipsAlreadySent()];
-            if(typeof tip !== "undefined") {
-                ChatSrv.addChatLineCard(tip.note, tip.name, 'tip', null, null, avatarName)
+            let relevantTip;
+            // loop trough each tip in $scope.tips
+            for (let i = 0; i < $scope.tips.length; i++) {
+                // assign current tip to tip variable
+                let tip = $scope.tips[i];
+
+                if (tip.hasOwnProperty("mustMatch") && tip.hasOwnProperty("matching")) {
+                    // check if student code matches the "matching" regex pattern from current tip
+                    let codeMatched = aceEditor.getSession().getValue().match(tip.matching) !== null;
+                    
+                    // if student code matches "matching" regex and tip is not already sent assign current tip to relevant tip variable
+                    if (!tip.sent && ((tip.mustMatch && codeMatched) || (!tip.mustMatch && !codeMatched))) {
+                        relevantTip = tip;
+                        break;
+                    } 
+                } else {
+                    // tips which do not have "mustMatch" & "matching" property
+                    if (!tip.sent) {
+                        relevantTip = tip;
+                        break;
+                    } 
+                }
+            }
+                       
+            // if there is a relevant tip add it to chatLines array
+            if (relevantTip) {
+                // get index of the tip to store it in db
+                let tipIndex = $scope.tips.indexOf(relevantTip);
+                ChatSrv.addChatLineCard(relevantTip.note, relevantTip.name, 'tip', null, null, avatarName, true, tipIndex)
                     .then(function(aChatLine) {
                         addChatLine(aChatLine, true);
+                        relevantTip.sent = true;
                         $scope.requestTipDisabled = (getNumTipsAlreadySent() >= $scope.tips.length);
                     });
+            } else {
+                /** The controller for the modal */
+                var noRelevantTipModalInstanceCtrl = [
+                    '$scope',
+                    '$uibModalInstance',
+                    function ($scope, $uibModalInstance) {
+                        $scope.cancel = function () {
+                            $uibModalInstance.close();
+                        };
+                    },
+                ];
+
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'noRelevantTipModalContent.html',
+                    controller: noRelevantTipModalInstanceCtrl
+                });
             }
         };
 
@@ -232,7 +369,7 @@ angular.module('codeboardApp')
             }, Promise.resolve())
                 .then(function(helpRequest) {
                     let id = (helpRequest !== undefined) ? helpRequest.id : -1;
-                    return ChatSrv.addChatLine(noteTeacher, id, UserSrv.getUsername(), 'html');
+                    return ChatSrv.addChatLine(noteTeacher, id, UserSrv.getUsername(), 'helpRequestAnswer');
                 })
                 .then(function(chatLine) {
                     addChatLine(chatLine, true);
@@ -247,5 +384,19 @@ angular.module('codeboardApp')
          */
         $scope.showSendRequestForm = function() {
             $scope.sendRequestFormVisible = true;
+        };
+
+        /**
+         * This method is bound to the chatLine rating directive.
+         * When the message is rated this method calls the chatService to
+         * send the rating to the api.
+         * @param messageId
+         * @param rating
+         */
+        $scope.onMessageRating = function (messageId, rating) {
+            ChatSrv.rateCompilationErrorMessage(messageId, rating)
+                .then(function() {
+                    // console.log("Message rated");
+                });
         };
     }]);

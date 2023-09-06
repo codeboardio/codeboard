@@ -1,13 +1,9 @@
 <div class="row">
-
     <ul class="chat px-4">
-
         <ng-transclude ng-transclude-slot="beforeChat"></ng-transclude>
 
         <li class="clear chat-line my-4 clearfix text" ng-repeat="chatLine in chatLines">
-
             <div ng-switch="chatLine.type">
-
                 <div ng-switch-when="card">
                     <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="chatLine.avatar">
                         <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
@@ -16,10 +12,71 @@
                     </chat-line>
                 </div>
 
+                <div ng-switch-when="helpRequest">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="chatLine.avatar">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="compiler">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="compilerTest">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar">
+                        <chat-line-card card-title="{{chatLine.message.cardHeader}}" card-type="{{chatLine.message.cardType}}">
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                            <textarea class="mt-4 w-100" disabled>{{chatLine.message.compilationOutput}}</textarea>
+                            <chat-line-rating message-id="chatLine.message.compilationErrorId" on-rate-message="onMessageRating({messageId: messageId, rating: rating})" can-rate="false" />
+                        </chat-line-card>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="hint">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar" card-title="{{chatLine.message.cardHeader}}" card-reference="{{chatLine.message.cardReference}}" card-type="{{chatLine.message.cardType}}">
+                        <chat-line-simple>
+                            <div ng-bind-html="chatLine.message.cardBody"></div>
+                        </chat-line-simple>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="helpRequestAnswer">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="chatLine.avatar">
+                        <chat-line-simple>
+                            <div ng-bind-html="chatLine.message"></div>
+                        </chat-line-simple>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="error">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar" type="chatLine.type">
+                        <chat-line-error>{{chatLine.message}}</chat-line-error>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="explanation">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar" link="{{chatLine.link}}" type="chatLine.type">
+                        <chat-line-explanation>{{chatLine.message}}</chat-line-explanation>
+                    </chat-line>
+                </div>
+
+                <div ng-switch-when="info">
+                    <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" avatar="chatLine.avatar" type="chatLine.type" tab="chatLine.tab">
+                        <chat-line-simple><span ng-bind-html="chatLine.message"></span></chat-line-simple>
+                    </chat-line>
+                </div>
+
                 <div ng-switch-when="html">
                     <chat-line alignment="{{chatLine.alignment}}" author="{{chatLine.author}}" created-at="{{chatLine.createdAt}}" avatar="chatLine.avatar">
                         <chat-line-simple>
                             <div ng-bind-html="chatLine.message"></div>
+                        </chat-line-simple>
                     </chat-line>
                 </div>
 

@@ -1,0 +1,35 @@
+<div class="tab-body ide-tab-help ide-tab-chat" ng-controller="ideNavBarRightHelpCtrl" id="chat-wrapper">
+    <h1 class="modal-title">Hier findest du Hilfe zur Aufgabe</h1>
+
+    <div class="conversation">
+        <chat chat-lines="filteredTipChatLines" class="px-4">
+            <before-chat>
+                <li class="clear chat-line my-4 clearfix text">
+                    <chat-line author="Roby" avatar-size="" alignment="left">
+                        <chat-line-simple>
+                            <p class="mb-0">Nutze diesen Tab, wenn du Schwierigkeiten hast, diese Aufgabe zu lösen. Drücke auf den grünen Knopf und lass dir <b>Tipps</b> zu dieser Aufgabe anzeigen. Beachte, dass die Tipps abhängig vom Stand deiner Lösung angezeigt werden.</p>
+                        </chat-line-simple>
+                    </chat-line>
+                </li>
+                <hr class="chat-horizontal-line" />
+            </before-chat>
+        </chat>
+    </div>
+
+    <!-- User Actions -->
+    <button ng-show="currentRoleIsUser()" ng-disabled="requestTipDisabled" class="btn btn-success btn-100" ng-click="askForTip()"><span class="glyphicon glyphicon-info-sign"></span>Tipp anfordern</button>
+    <div id="targetinto" style="height: 1px; width: 100%"></div>
+</div>
+
+<!-- THe Modal Window, when there is no relevant tip -->
+<script type="text/ng-template" id="noRelevantTipModalContent.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Helpersystem - Tipps</h3>
+    </div>
+    <div class="modal-body">
+      <p class="">Es wurde kein relevanter Tipp für deine aktuelle Lösung gefunden!</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-info" ng-click="cancel()">Schliessen</button>
+    </div>
+</script>
