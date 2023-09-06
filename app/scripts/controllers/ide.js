@@ -1219,8 +1219,8 @@ app.controller('IdeCtrl', [
                     var jsbOpts = {
                         indent_size: 4,
                         brace_style: 'collapse, preserve-inline',
-                        max_preserve_newlines: "-1",
-                        preserve_newlines: false,
+                        max_preserve_newlines: "2",
+                        preserve_newlines: true,
                     };
                     function syncEditor() {
                         $scope.ace.editor.getSession().setValue(code);
