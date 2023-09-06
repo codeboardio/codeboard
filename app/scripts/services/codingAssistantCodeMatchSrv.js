@@ -973,23 +973,25 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 }
             });
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Markers for variable names
-            // get variableMarker.css
-            var styleCss;
-            for (var i = 0; i < document.styleSheets.length; i++) {
-                if (document.styleSheets[i].title === "variableMarker") {
-                    styleCss = document.styleSheets[i];
-                }
+            //////////////////////////////////////////////////// Markers for variable names ///////////////////////////////////////////////////////////////////////////////////////
+            // create a new style element
+            var markerElement = document.createElement('style');
+            markerElement.id = 'variableMarker';         
+            var cssRules = '';
+
+            // delete styles from variableMarker element
+            if (markerElement) {
+                markerElement.innerHTML = '';
             }
-            // delete styles from variable variableMarker.css
-            for (let i = 0; i < styleCss.cssRules.length; i++) {
-                styleCss.deleteRule(i);
-            }
-            // loops over all variable and add marker style to variableMarker.css
+
+            // loops over all variables and add marker style to variableMarker element
             variableMap.forEach(function (value, key) {
-                styleCss.insertRule('.marker' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0);
+                cssRules += '.marker' + key + '{ position:absolute; background-color: ' + value.color + '; z-index:20; opacity: 0.5;}', 0;
             });
+            markerElement.innerHTML = cssRules;
+
+            // append the style element to the document
+            document.head.appendChild(markerElement);
             
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
