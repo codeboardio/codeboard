@@ -399,7 +399,6 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                   // checks if explanationParts contains a cg1 to replace it with the correct cg
                   if (explanationParts.some((cg) => cg.match(/cg1/))) {
                     const currentMatch = conditionArr[i].match(currentExpression.regex);
-                    console.log(currentMatch);
                     // replace capturegroup 1 (cg1) with the captured content
                     explanationParts = explanationParts.map((cg) => cg.replaceAll('cg1', currentMatch[1]));
                     // checks if explanationParts contains a cg2 to replace it with the correct cg
