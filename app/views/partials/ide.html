@@ -76,7 +76,7 @@
                       </ul>
                     </div>
 
-                    <button ng-hide="!currentRoleIsOwner()" ng-if="!isActionHidden('reset')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
+                    <button ng-hide="currentRoleIsOwner()" ng-if="!isActionHidden('reset')" class="btn btn-default btn-sm nav-link" ng-click="navBarClick('reset')">
                       <span class="glyphicon glyphicon-repeat icon-flipped" title="Original wiederherstellen"></span>
                     </button>
 
