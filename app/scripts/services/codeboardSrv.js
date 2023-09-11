@@ -78,6 +78,10 @@ angular.module('codeboardApp').service('CodeboardSrv', [
         desc: 'Reset button (Original wiederherstellen)',
       },
       {
+        name: 'editor-settings',
+        desc: 'The settings of the ace editor',
+      },
+      {
         name: 'varScope',
         desc: 'Variable Scope button',
       },
@@ -88,10 +92,6 @@ angular.module('codeboardApp').service('CodeboardSrv', [
       {
         name: 'syntax-checker',
         desc: 'The sytax-checker which highlight errors on the left side of the editor',
-      },
-      {
-        name: 'editor-settings',
-        desc: 'The settings of the ace editor',
       },
       {
         name: 'info',
