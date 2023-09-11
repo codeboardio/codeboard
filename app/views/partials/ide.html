@@ -31,7 +31,7 @@
                 <div class="col-xs-7 col-md-5 col-md-pull-2">
                   <div class="navbar-form navbar-left pull-left px-0 mr-3">
 
-                    <a class="btn btn-default btn-sm" ng-click="navBarClick('home')" title="Zurück zur Übersicht">
+                    <a class="btn btn-default btn-sm" ng-if="!isActionHidden('home')" ng-click="navBarClick('home')" title="Zurück zur Übersicht">
                       <span class="glyphicon glyphicon-home"></span>
                     </a>
 
