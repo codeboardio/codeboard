@@ -386,6 +386,11 @@ app.controller('IdeCtrl', [
          * @author Janick Michot
          */
         let compileAndRunProject = function (runCleanCompile) {
+
+            // get disabled & enabled actions
+            let disabledActions = CodeboardSrv.getDisabledActions();
+            let enabledActions = CodeboardSrv.getEnabledActions();
+
             // make sure we save the current content before submitting
             saveCurrentlyDisplayedContent(true);
 
@@ -415,7 +420,7 @@ app.controller('IdeCtrl', [
 
                             $http.post('/api/' + $routeParams.projectId + '/help/compilation', payload).then(
                                 function (result) {
-                                    if (typeof result.data !== 'undefined') {
+                                    if (typeof result.data !== 'undefined' && (!disabledActions.includes('compiler') || enabledActions.includes('compiler'))) {
                                         let reqOpenCompilerTab = IdeMsgService.msgNavBarRightOpenTab('compiler');
                                         $rootScope.$broadcast(reqOpenCompilerTab.msg, reqOpenCompilerTab.data);
 
