@@ -14,11 +14,14 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
   'CodingAssistantCodeMatchSrv',
   'TabService',
   'AceEditorSrv',
-  function ($scope, $rootScope, $timeout, $document, CodingAssistantCodeMatchSrv, TabService, AceEditorSrv) {
+  'CodeboardSrv',
+  function ($scope, $rootScope, $timeout, $document, CodingAssistantCodeMatchSrv, TabService, AceEditorSrv, CodeboardSrv) {
     var aceEditor = $scope.ace.editor;
     var errorLine;
     var currentLine;
     var startCode = 0;
+    var disabledActions = CodeboardSrv.getDisabledActions();
+    var enabledActions = CodeboardSrv.getEnabledActions();
     $scope.cursorPosition = -1;
 
     // fetch db and colors data from CodingAssistantCodeMatchSrv
@@ -142,8 +145,10 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
 
           $scope.chatLines.push(chatline);
         }
-        // display all the annotations in the aceEditor
-        aceEditor.getSession().setAnnotations(annotations);
+        if (!disabledActions.includes('syntax-checker') || enabledActions.includes('syntax-checker')) {
+          // display all the annotations in the aceEditor
+          aceEditor.getSession().setAnnotations(annotations);
+        }
       });
 
       // Update showNoCodeMessage element based on combinedExplanations array length
