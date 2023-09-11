@@ -38,5 +38,85 @@ angular.module('codeboardApp').service('CodeboardSrv', [
 
       return enabledActions;
     };
+
+    // available disabled actions (can be set in "new course" / "course settings")
+    service.actions = [
+      {
+        name: 'home',
+        desc: 'The home button ("Zurück zur Übersicht")',
+      },
+      {
+        name: 'edit',
+        desc: 'Edit button',
+      },
+      {
+        name: 'compile',
+        desc: 'Compile button (Run)',
+      },
+      {
+        name: 'run',
+        desc: 'Run button',
+      },
+      {
+        name: 'save',
+        desc: 'Save project button',
+      },
+      {
+        name: 'full-screen',
+        desc: 'Full-screen button',
+      },
+      {
+        name: 'tree-view',
+        desc: 'Tree-view on the left side',
+      },
+      {
+        name: 'unredo',
+        desc: 'Unredo button',
+      },
+      {
+        name: 'reset',
+        desc: 'Reset button (Original wiederherstellen)',
+      },
+      {
+        name: 'varScope',
+        desc: 'Variable Scope button',
+      },
+      {
+        name: 'beautify',
+        desc: 'Beautify button',
+      },
+      {
+        name: 'syntax-checker',
+        desc: 'The sytax-checker which highlight errors on the left side of the editor',
+      },
+      {
+        name: 'editor-settings',
+        desc: 'The settings of the ace editor',
+      },
+      {
+        name: 'info',
+        desc: 'The info tab (Info)',
+      },
+      {
+        name: 'test',
+        desc: 'The test tab (Test)',
+      },
+      {
+        name: 'explanation',
+        desc: 'The explanation tab (Erklärungen)',
+      },
+      {
+        name: 'compiler',
+        desc: 'The compiler tab (Compiler)',
+      },
+      {
+        name: 'tips',
+        desc: 'The tips tab (Tipps)',
+      },
+      {
+        name: 'questions',
+        desc: 'The questions tab (Fragen)',
+      },
+    ];
   },
 ]);

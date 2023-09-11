@@ -5,8 +5,8 @@
  */
 
 angular.module('codeboardApp')
-  .controller('CourseSettingsCtrl', ['$scope', '$http', '$log', '$routeParams', '$location', '$timeout', '$uibModal', 'CourseRes', 'courseData',
-    function ($scope, $http, $log, $routeParams, $location, $timeout, $uibModal, CourseRes, courseData) {
+  .controller('CourseSettingsCtrl', ['$scope', '$http', '$log', '$routeParams', '$location', '$timeout', '$uibModal', 'CourseRes', 'courseData', 'CodeboardSrv',
+    function ($scope, $http, $log, $routeParams, $location, $timeout, $uibModal, CourseRes, courseData, CodeboardSrv) {
 
       // Object that holds the properties of a course and binds to the form
       $scope.data = {};
@@ -23,6 +23,9 @@ angular.module('codeboardApp')
         error: '',
         info: ''
       };
+
+      // array of disabled actions
+      $scope.actions = CodeboardSrv.actions;
 
       $scope.formatedProjectList = '';
 

@@ -33,12 +33,13 @@
                 <div class="col-sm-8">
                   <div class="panel panel-default">
                     <div class="panel-body">
-                        <span ng-repeat="action in ['edit', 'compile', 'run', 'save', 'full-screen', 'tree-view', 'unredo', 'reset', 'varScope', 'beautify', 'editor-settings', 'info', 'test', 'explanation', 'compiler', 'tips', 'questions', 'home']"
+                        <span ng-repeat="e in actions"
                               class="label label-default"
-                              ng-class="{'label-danger': actionsSelected.indexOf(action) > -1}"
+                              title="{{e.desc}}"
+                              ng-class="{'label-danger': actionsSelected.indexOf(e.name) > -1}"
                               style="margin: 3px ; font-size: 12px; font-weight: 400; display: inline-block"
-                              ng-click="toggleSelection(action)">
-                          {{action}}
+                              ng-click="toggleSelection(e.name)">
+                          {{e.name}}
                         </span>
                     </div>
                   </div>
