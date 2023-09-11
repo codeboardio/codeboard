@@ -18,6 +18,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     var aceEditor = $scope.ace.editor;
     var errorLine;
     var currentLine;
+    var startCode = 0;
     $scope.cursorPosition = -1;
 
     // fetch db and colors data from CodingAssistantCodeMatchSrv
@@ -39,7 +40,26 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
 
       // call updateExplanations when the user open the explanations tab
       $rootScope.$on('tabClicked', function () {
+        var doc = aceEditor.getSession().getDocument();
+        var lineCount = doc.getLength();
+
+        // find first line with some code
+        for (var i = 0; i < lineCount; i++) {
+          var line = doc.getLine(i);
+          if (line.trim() !== '') {
+            startCode = i + 1;
+            break;
+          }
+        }
+        $scope.cursorPosition = startCode;
+        // move cursor to startCode line
+        aceEditor.gotoLine(startCode, 0);
+
         updateExplanations(db, colors);
+
+        $timeout(() => {
+          highlightChatbox(startCode);
+        });
       });
 
       // Call updateExplanations() with a slight delay to ensure the initial code is loaded
@@ -133,9 +153,13 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     // call mouseclick listener in ace service
     AceEditorSrv.mouseDownListener(aceEditor, function (e) {
       $scope.cursorPosition = e.getDocumentPosition().row + 1;
+      highlightChatbox($scope.cursorPosition);
       $scope.$apply();
+    });
 
-      var chatBoxId = 'chatLine-' + $scope.cursorPosition;
+    // function which highlights the corresponding chatbox when clicking into line / opening explanation tab
+    function highlightChatbox(cursorPosition) {
+      var chatBoxId = 'chatLine-' + cursorPosition;
       // get corresponding chatbox
       var chatBox = $document[0].getElementById(chatBoxId);
       // check if the chat line with the corresponding line level exists
@@ -143,7 +167,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
         // scroll the chatbox to the associated line in the codeEditor
         chatBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-    });
+    }
 
     // call enterKey listener in ace service
     AceEditorSrv.enterKeyListener(aceEditor, function (e) {
