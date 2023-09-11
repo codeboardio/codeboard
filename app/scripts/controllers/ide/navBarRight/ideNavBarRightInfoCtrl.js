@@ -8,25 +8,14 @@
 'use strict';
 angular.module('codeboardApp').controller('ideNavBarRightInfoCtrl', [
   '$scope',
+  'CodeboardSrv',
+  'UserSrv',
   'ProjectFactory',
-  function ($scope, ProjectFactory) {
+  function ($scope, CodeboardSrv, UserSrv, ProjectFactory) {
     $scope.chatLines = [];
-    $scope.disabledActions = [];
 
-    // check for disabled action in the context of a course
-    let courseData = ProjectFactory.getProject().courseData;
-    if (typeof courseData !== 'undefined' && courseData.hasOwnProperty('courseOptions')) {
-      let courseUserDisabledActions = courseData.courseOptions.find((o) => o.option === 'userDisabledActions');
-      if (typeof courseUserDisabledActions !== 'undefined') {
-        $scope.disabledActions = $scope.disabledActions.concat(courseUserDisabledActions.value.split('|'));
-      }
-    }
-
-    // check for disabled actions in the context of a project
-    if (ProjectFactory.hasConfig('userDisabledActions')) {
-      $scope.disabledActions = $scope.disabledActions.concat(ProjectFactory.getConfig().userDisabledActions);
-      console.log( $scope.disabledActions);
-    }
+    var disabledActions = CodeboardSrv.getDisabledActions();
+    var enabledActions = CodeboardSrv.getEnabledActions();
 
     let infoChatLines = [
       {
@@ -68,9 +57,18 @@ angular.module('codeboardApp').controller('ideNavBarRightInfoCtrl', [
 
     // only add info chatLines which are not in disabledActions
     infoChatLines.forEach((chatLine) => {
-      if (!$scope.disabledActions.includes(chatLine.tab)) {
+      if (!disabledActions.includes(chatLine.tab) || enabledActions.includes(chatLine.tab)) {
         $scope.chatLines.push(chatLine);
       }
     });
+
+    $scope.isActionHidden = function (action) {
+      // if the current user is admin return false
+      if (UserSrv.isAuthenticated() && ProjectFactory.getProject().userRole !== 'user') {
+        return false;
+      }
+
+      return disabledActions.includes(action) && !enabledActions.includes(action);
+    };
   },
 ]);

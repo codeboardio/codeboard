@@ -21,7 +21,8 @@ app.controller('IdeCtrl', [
     'WebsocketSrv',
     'ChatSrv',
     'CodingAssistantCodeMatchSrv',
-    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, CodingAssistantCodeMatchSrv) {
+    'CodeboardSrv',
+    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, CodingAssistantCodeMatchSrv, CodeboardSrv) {
         // First we handle all data that was injected as part of the app.js resolve.
         // set the ProjectFactory to contain the project loaded from the server
         ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
@@ -1004,23 +1005,13 @@ app.controller('IdeCtrl', [
 
             // array that hols the config
             let disabledActions = [];
+            let enabledActions = [];
 
-            // check for disabled action in the context of a course
-            let courseData = ProjectFactory.getProject().courseData;
-            if (typeof courseData !== 'undefined' && courseData.hasOwnProperty('courseOptions')) {
-                let courseUserDisabledActions = courseData.courseOptions.find((o) => o.option === 'userDisabledActions');
-                if (typeof courseUserDisabledActions !== 'undefined') {
-                    disabledActions = disabledActions.concat(courseUserDisabledActions.value.split('|'));
-                }
-            }
+            disabledActions = CodeboardSrv.getDisabledActions();
+            enabledActions = CodeboardSrv.getEnabledActions();
 
-            // check for disabled actions in the context of a project
-            if (ProjectFactory.hasConfig('userDisabledActions')) {
-                disabledActions = disabledActions.concat(ProjectFactory.getConfig().userDisabledActions);
-            }
-
-            // check if disabled actions contains the action
-            return disabledActions.includes(action);
+            // check if disabled actions contains the action and there is no enabledAction in the project
+            return disabledActions.includes(action) && !enabledActions.includes(action);
         };
 
         /**

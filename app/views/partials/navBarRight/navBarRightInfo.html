@@ -7,12 +7,12 @@
         <chat chat-lines="chatLines"></chat>
     </div>
     <hr class="chat-horizontal-line">
-    <h2 class="info-heading">Buttons</h2>
-    <div class="button-row">
+    <h2 class="info-heading" ng-if="!isActionHidden('beautify') || !isActionHidden('varScope')">Buttons</h2>
+    <div class="button-row" ng-if="!isActionHidden('beautify')">
         <button id="codeBeautifyButton" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-flash"></span></button>
         <span class="button-description">Nutze diesen Button, wenn du deinen Code formatieren willst</span>
     </div>
-    <div class="button-row">
+    <div class="button-row" ng-if="!isActionHidden('varScope')">
         <button id="varScopeButton" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-resize-vertical"></span></button>
         <span class="button-description">Nutze diesen Button, wenn du den Gültigkeitsbereich von Variablen in deinem Code anzeigen willst</span>
     </div>
