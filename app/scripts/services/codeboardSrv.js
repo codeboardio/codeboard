@@ -10,6 +10,7 @@ angular.module('codeboardApp').service('CodeboardSrv', [
     var service = this;
     var disabledActions = [];
     var enabledActions = [];
+    var variableMap = {};
 
     // this function gets all current disabledActions
     service.getDisabledActions = () => {
@@ -37,6 +38,16 @@ angular.module('codeboardApp').service('CodeboardSrv', [
       }
 
       return enabledActions;
+    };
+
+    // function which returns the variableMap needed for the IdeCtrl
+    service.getVariableMap = function () {
+      return variableMap;
+    };
+
+    // function which sets the variableMap based on the result of the CodingAssistantMainCtrl
+    service.setVariableMap = function (newVariableMap) {
+      variableMap = newVariableMap;
     };
 
     // available disabled actions (can be set in "new course" / "course settings")

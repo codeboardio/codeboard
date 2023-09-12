@@ -105,7 +105,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
       var result = CodingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCode, aceEditor, colors);
 
       // convert variableMap into an object
-      $rootScope.variableMap = Object.fromEntries(result.variableMap);
+      CodeboardSrv.setVariableMap(Object.fromEntries(result.variableMap));
 
       // Iterate through the explanations array to generate the chatboxes
       result.explanations.forEach((explanation) => {

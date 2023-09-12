@@ -1232,6 +1232,7 @@ app.controller('IdeCtrl', [
                     break;
                 case 'show_var_scope':
                     CodingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor, false);
+                    $scope.variableMap = CodeboardSrv.getVariableMap();
                     $scope.toggleVarScope();
                     break;
             }
