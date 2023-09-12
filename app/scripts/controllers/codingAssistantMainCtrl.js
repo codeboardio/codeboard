@@ -148,12 +148,46 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
         }
       });
 
-      // checks if array "chatBoxes" contains a chatbox which is not in $scope.chatLines array --> if so, add the chatbox to the array
-      chatBoxes.forEach((c) => {
-        if (!$scope.chatLines.some((chatline) => chatline.lineLevel === c.lineLevel)) {
-          $scope.chatLines.push(c);
+      const newChatLines = [];
+      for (let i = 0; i < chatBoxes.length; i++) {
+        const newChatBox = chatBoxes[i];
+        // check if the newChatbox is already inside the $scope.chatLines array
+        const existChatBoxIndex = $scope.chatLines.findIndex((chatline) => chatline.lineLevel === newChatBox.lineLevel);
+
+        // if the chatbox does not exist add it to newChatLines array
+        if (existChatBoxIndex === -1) {
+          newChatLines.push(newChatBox);
+        } else {
+          // if the chatbox exist and is of type error do further checks
+          if ($scope.chatLines[existChatBoxIndex].type === 'error' && newChatBox.lineLevel === $scope.chatLines[existChatBoxIndex].lineLevel) {
+            const oldErrorChatLine = $scope.chatLines[existChatBoxIndex].message;
+            const newErrorChatLine = newChatBox.message;
+
+            // check if new chatbox has not the same message as the existing error chatbox --> if so update the chatboxes
+            if (oldErrorChatLine !== newErrorChatLine) {
+              newChatLines.push(newChatBox);
+            } else {
+              // keep the existing error chatbox
+              newChatLines.push($scope.chatLines[existChatBoxIndex]);
+            }
+          } 
+          // if the chatbox exist and is of type exlanation do further checks
+          else if ($scope.chatLines[existChatBoxIndex].type === 'explanation' && newChatBox.lineLevel === $scope.chatLines[existChatBoxIndex].lineLevel) {
+            const oldExplanationChatLine = $scope.chatLines[existChatBoxIndex].message;
+            const newExplanationChatLine = newChatBox.message;
+
+            // check if new chatbox has not the same message as the existing explanation chatbox --> if so update the chatboxes
+            if (oldExplanationChatLine !== newExplanationChatLine) {
+              newChatLines.push(newChatBox);
+            } else {
+              // keep the existing explanaiton chatbox
+              newChatLines.push($scope.chatLines[existChatBoxIndex]);
+            }
+          }
         }
-      });
+      }
+
+      $scope.chatLines = newChatLines;
 
       // checks if every chatBox in $scope.chatLines array is in chatBoxes array --> if not, correct chatbox gets removed from $scope.chatLines array
       for (let i = $scope.chatLines.length - 1; i >= 0; i--) {
