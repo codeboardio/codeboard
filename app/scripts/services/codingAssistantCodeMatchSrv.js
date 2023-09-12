@@ -320,6 +320,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
               link: dbline.link,
               lineLevel: linelevel,
               isError: false,
+              code: line
             });
 
             // Store the index of the last explanation for the current line (is needed e.g. for explaining a condition)
@@ -512,6 +513,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
               link: dbline.link,
               lineLevel: linelevel,
               isError: false,
+              code: line
             });
 
             // reset the explanationParts array for the next line
@@ -680,6 +682,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                   link: dbline.link,
                   lineLevel: linelevel,
                   isError: false,
+                  code: line
                 });
 
                 // reset the explanationParts array for the next line
@@ -912,6 +915,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 link: dbline.link,
                 lineLevel: linelevel,
                 isError: false,
+                code: line
               });
 
               // reset the explanationParts array for the next line
@@ -932,18 +936,21 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 answer: 'Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!',
                 lineLevel: linelevel,
                 isError: true,
+                code:line
               });
             } else if (declareVarErr) {
               explanations.push({
                 answer: 'Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration!',
                 lineLevel: linelevel,
                 isError: true,
+                code: line
               });
             } else {
               explanations.push({
                 answer: 'In dieser Zeile hat sich ein Fehler eingeschlichen. Bitte korrigiere den Code, damit ich ihn erklären kann!',
                 lineLevel: linelevel,
                 isError: true,
+                code: line
               });
             }
           }
@@ -971,7 +978,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
       document.head.appendChild(markerElement);
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // Return explanations and variableMap to use it in the codingAssistantMainCtrl
+      // Return explanations and variableMap to use it in the CodingAssistantMainCtrl
       return {
         explanations: explanations,
         variableMap: variableMap,

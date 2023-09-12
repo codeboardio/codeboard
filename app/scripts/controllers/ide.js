@@ -2368,7 +2368,7 @@ app.controller('RightBarCtrl', [
     },
 ]);
 
-// this service is used to make the clicked tab available in the codingAssistantMainCtrl
+// this service is used to make the clicked tab available in the CodingAssistantMainCtrl
 app.service('TabService', function() {
     var slug;
     var service = this;

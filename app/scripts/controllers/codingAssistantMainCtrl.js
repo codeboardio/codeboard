@@ -6,20 +6,21 @@
  * @date 20.03.2023
  */
 'use strict';
-angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
+angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
   '$scope',
   '$rootScope',
   '$timeout',
   '$document',
   'CodingAssistantCodeMatchSrv',
-  'TabService',
   'AceEditorSrv',
   'CodeboardSrv',
-  function ($scope, $rootScope, $timeout, $document, CodingAssistantCodeMatchSrv, TabService, AceEditorSrv, CodeboardSrv) {
+  function ($scope, $rootScope, $timeout, $document, CodingAssistantCodeMatchSrv, AceEditorSrv, CodeboardSrv) {
     var aceEditor = $scope.ace.editor;
     var errorLine;
     var currentLine;
     var startCode = 0;
+    var chatBoxes = [];
+    $scope.chatLines = [];
     var disabledActions = CodeboardSrv.getDisabledActions();
     var enabledActions = CodeboardSrv.getEnabledActions();
     $scope.cursorPosition = -1;
@@ -68,9 +69,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
       // Call updateExplanations() with a slight delay to ensure the initial code is loaded
       $scope.$on('fileOpenend', function () {
         $timeout(() => {
-          if (TabService.getSlug() === 'explanation') {
-            updateExplanations(db, colors);
-          }
+          updateExplanations(db, colors);
         });
       });
 
@@ -78,9 +77,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
       AceEditorSrv.aceChangeListener(aceEditor, function () {
         // automatically call $apply if necessarry to prevent '$apply already in progress' error
         $timeout(() => {
-          if (TabService.getSlug() === 'explanation') {
-            updateExplanations(db, colors);
-          }
+          updateExplanations(db, colors);
         });
         // add markers dynamically
         // CodingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
@@ -92,7 +89,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
     // Automatic function executed one time at the beginning / when a file is openend and then every time the code in the editor changes
     function updateExplanations(db, colors) {
       var annotations = [];
-      $scope.chatLines = [];
+      chatBoxes = [];
 
       // get current code from aceEditor
       var inputCode = aceEditor
@@ -131,7 +128,7 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
               text: chatline.message,
               type: 'error',
             });
-            $scope.chatLines.push(chatline);
+            chatBoxes.push(chatline);
           }
         } else {
           let chatline = {
@@ -143,13 +140,28 @@ angular.module('codeboardApp').controller('codingAssistantMainCtrl', [
             avatar: 'idea',
           };
 
-          $scope.chatLines.push(chatline);
+          chatBoxes.push(chatline);
         }
         if (!disabledActions.includes('syntax-checker') || enabledActions.includes('syntax-checker')) {
           // display all the annotations in the aceEditor
           aceEditor.getSession().setAnnotations(annotations);
         }
       });
+
+      // checks if array "chatBoxes" contains a chatbox which is not in $scope.chatLines array --> if so, add the chatbox to the array
+      chatBoxes.forEach((c) => {
+        if (!$scope.chatLines.some((chatline) => chatline.lineLevel === c.lineLevel)) {
+          $scope.chatLines.push(c);
+        }
+      });
+
+      // checks if every chatBox in $scope.chatLines array is in chatBoxes array --> if not, correct chatbox gets removed from $scope.chatLines array
+      for (let i = $scope.chatLines.length - 1; i >= 0; i--) {
+        const chatline = $scope.chatLines[i];
+        if (!chatBoxes.some((c) => c.lineLevel === chatline.lineLevel)) {
+          $scope.chatLines.splice(i, 1);
+        }
+      }
 
       // Update showNoCodeMessage element based on combinedExplanations array length
       $scope.showNoCodeMessage = result.explanations.length === 0;
