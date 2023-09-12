@@ -153,9 +153,8 @@ body {
 
 .ideHeader .projectTitle.project-completed {
   background: #3da956 !important;
-  color: rgba(255, 255, 255, 0.8) !important
+  color: rgba(255, 255, 255, 0.8) !important;
 }
-
 
 #ideNavBar {
   border-radius: 0;
@@ -204,7 +203,6 @@ body {
 
 #ideRightestPartOfMiddlePart {
   background-color: #4a80a5;
-  padding-top: 5px;
 }
 
 .ideSplitterOverflowVisible {
@@ -473,23 +471,45 @@ body {
 }
 
 /** - - - Additional Tabs - - - */
-.ideAdditionalTabs .tab {
+
+.ideAdditionalTabs {
   writing-mode: vertical-rl;
+  white-space: nowrap; 
+  overflow-y: auto; 
+}
+
+.tab {
   text-orientation: mixed;
   padding-bottom: 10px;
-  margin-bottom: 5px;
   color: #eee;
   display: inline-block;
   width: 26px;
   line-height: 26px;
-  font-weight: 300;
+  font-weight: 500;
   cursor: pointer;
   font-size: 0.9em;
   border-bottom: 4px solid #d0d0d0;
 }
 
-.ideAdditionalTabs .tab .glyphicon {
+.tab-description {
+  border-top: 4px solid #d0d0d0;
+}
+
+.tab .glyphicon {
+  margin-top: 5px;
   margin-bottom: 8px;
+}
+
+.tab:hover {
+  text-decoration: none;
+  color: #355b7f;
+  background-color: #ffffff;
+  filter: brightness(95%);
+}
+
+.tabClicked {
+  color: #355b7f;
+  background-color: #ffffff;
 }
 
 /** todo nachfolgenden css-Angaben in separates File **/

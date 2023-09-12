@@ -2288,6 +2288,8 @@ app.controller('RightBarCtrl', [
          * @param slug
          */
         $scope.rightBarTabClick = function (slug) {
+            var tablinks = document.getElementsByClassName("tab");
+
             if (slug === 'explanation') {
                 $rootScope.$broadcast("tabClicked");
             }
@@ -2296,10 +2298,22 @@ app.controller('RightBarCtrl', [
                 $scope.splitter.expand('#ideRighterPartOfMiddlePart');
                 $scope.activeTab = slug;
                 TabService.setSlug(slug);
+                
+                // remove 'tabClicked' class from all tabs on right side
+                for (var i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("tabClicked");
+                }
+                
+                // add 'tabClicked' class to the clicked tab on the right side
+                document.getElementById("rightBarTabs" + $scope.activeTab).classList.add("tabClicked");
             } else {
                 $scope.splitter.collapse('#ideRighterPartOfMiddlePart');
                 $scope.activeTab = '';
                 TabService.setSlug('');
+                // remove 'tabClicked' class from all tabs on right side
+                for (var i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("tabClicked");
+                }
             }
         };
 
