@@ -22,7 +22,8 @@ app.controller('IdeCtrl', [
     'ChatSrv',
     'CodingAssistantCodeMatchSrv',
     'CodeboardSrv',
-    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, CodingAssistantCodeMatchSrv, CodeboardSrv) {
+    'AceEditorSrv',
+    function ($scope, $rootScope, $log, $sce, $location, $routeParams, $window, $http, $timeout, $uibModal, ProjectFactory, projectData, ltiData, IdeMsgService, UserSrv, WebsocketSrv, ChatSrv, CodingAssistantCodeMatchSrv, CodeboardSrv, AceEditorSrv) {
         // First we handle all data that was injected as part of the app.js resolve.
         // set the ProjectFactory to contain the project loaded from the server
         ProjectFactory.setProjectFromJSONdata(projectData, ltiData);
@@ -1746,6 +1747,68 @@ app.controller('IdeCtrl', [
 
         // invoke function to init the project
         initProject();
+
+        /////////////////////////////////////////////// syntax-checker and variable scope functionality (part of coding-assistant) ///////////////////////////////////////////////
+        var disabledActions = CodeboardSrv.getDisabledActions();
+        var enabledActions = CodeboardSrv.getEnabledActions();
+        var errorLine;
+        var currentLine;
+
+        // fetch db data from CodingAssistantCodeMatchSrv
+        function fetchData() {
+            return CodingAssistantCodeMatchSrv.getJsonData()
+            .then((db) => {
+                return { db };
+            })
+            .catch((error) => {
+                console.error('An error occurred while fetching data:', error);
+            });
+        }
+
+        fetchData().then(({ db }) => {
+            AceEditorSrv.aceChangeListener($scope.ace.editor, function () {
+                // automatically call $apply if necessarry to prevent '$apply already in progress' error
+                $timeout(() => {
+                  updateExplanations(db);
+                });
+                
+                // add markers dynamically
+                // CodingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
+
+                // broadcast that varScope window gets closed when there was a change in the code...    
+                $scope.$broadcast('codeChanged');
+            });
+        });
+
+        function updateExplanations(db) {
+            var annotations = [];
+            var inputCode = AceEditorSrv.getInputCode($scope.ace.editor);
+            var result = CodingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCode, $scope.ace.editor);
+            // convert variableMap into an object
+            CodeboardSrv.setVariableMap(Object.fromEntries(result.variableMap));
+
+            result.explanations.forEach((explanation) => {
+                if (explanation.isError) {
+                    // lineLevel of error chatbox
+                    errorLine = explanation.lineLevel;
+                    // current lineLevel of cursor
+                    currentLine = $scope.ace.editor.getSelectionRange().start.row + 1;
+                    if (currentLine !== errorLine) {
+                        // store a new annotation with the error lineLevel in the annotations array
+                        annotations.push({
+                          row: explanation.lineLevel - 1,
+                          column: 0,
+                          text: explanation.answer,
+                          type: 'error',
+                        });
+                      }
+                }
+                if (!disabledActions.includes('syntax-checker') || enabledActions.includes('syntax-checker')) {
+                    // display all the annotations in the aceEditor
+                    $scope.ace.editor.getSession().setAnnotations(annotations);
+                }                
+            })
+        }
     },
 ]);
 

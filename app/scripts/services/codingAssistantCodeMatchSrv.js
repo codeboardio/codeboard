@@ -27,17 +27,70 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
       );
     };
 
-    // fetch the json data from "colors.json"
-    service.getJsonColors = function () {
-      return $http.get('./staticfiles/colors.json').then(
-        function (response) {
-          return response.data;
-        },
-        function (error) {
-          console.error('Error fetching JSON data:', error);
-        }
-      );
-    };
+    // colors for variable scope
+    var colors = [
+      '#FFE15D',
+      '#9A86A4',
+      '#C47AFF',
+      '#3A8891',
+      '#FFA8A8',
+      '#40DFEF',
+      '#DC3535',
+      '#CCFF00',
+      '#00FFFF',
+      '#A50A50',
+      '#13678A',
+      '#F4722B',
+      '#EC4EC4',
+      '#7FBBB3',
+      '#D1C492',
+      '#c0f5a9',
+      '#f5bc0c',
+      '#cfe2f3',
+      '#f4cccc',
+      '#ead1dc',
+      '#d385e4',
+      '#51b9d4',
+      '#8b788b',
+      '#54f8c2',
+      '#ac337b',
+      '#8a132e',
+      '#e529a9',
+      '#5e72bf',
+      '#5f91c5',
+      '#5f985a',
+      '#F08080',
+      '#FA8072',
+      '#E9967A',
+      '#FFC0CB',
+      '#FFA8A8',
+      '#FFB6C1',
+      '#FF7F50',
+      '#FFFFE0',
+      '#FFFACD',
+      '#FAFAD2',
+      '#FFEFD5',
+      '#FFE4B5',
+      '#FFDAB9',
+      '#EEE8AA',
+      '#F0E68C',
+      '#BDB76B',
+      '#E6E6FA',
+      '#D8BFD8',
+      '#DDA0DD',
+      '#E0FFFF',
+      '#AFEEEE',
+      '#B0C4DE',
+      '#B0E0E6',
+      '#ADD8E6',
+      '#87CEEB',
+      '#FFF8DC',
+      '#FFEBCD',
+      '#FFE4C4',
+      '#FFDEAD',
+      '#F5DEB3',
+      '#DEB887',
+    ];
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Everything related to toggle markers - code implemented with help form stack overflow (https://stackoverflow.com/questions/65677814/how-to-remove-all-the-existing-highlight-markers-in-ace-editor-using-react) and Chat-GPT
@@ -114,23 +167,14 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
      * @param {Array} data the content from the explanations.json
      * @param {Array} inputCodeArray the current code in the Code-Editor
      * @param {} aceEditor the aceEditor
-     * @param {Array} col the colors from the colors.json
      */
-    service.getMatchedExplanations = function (data, inputCodeArray, aceEditor, col) {
+    service.getMatchedExplanations = function (data, inputCodeArray, aceEditor) {
       // Regexes needed for further check
       const beforeRegex = /^(public|private|protected)/;
       const staticRegex = /.* static/;
       const paraRegex = /(int|String|boolean|long|double|char)[\[\]]*\s*(\w+[\[\]]*)+/;
       const newVarComparisationRegex = /^\s*((?:boolean))\s*(\w+)\s*\=\s*([A-z0-9$_()+\-*\/%\s]+)\s+([<=!>]+)\s+([A-z0-9$_()\-+*\/%\s]+);\s*$/;
       const redeclareVarComparisationRegex = /^\s*(\w+)\s+\=\s+([A-z0-9$_.()*\-+/%\s*]+)\s+([<=!>]+)\s+([A-z0-9$_.()*\-+/%\s*]+);\s*$/;
-
-      // store colors from colors.json --> markers and variable scope block styles
-      var colors = [];
-
-      // store the colors in array
-      col.colors.forEach((element) => {
-        colors.push(element);
-      });
 
       // check line height from codeEditor
       var editorLineHeight;
@@ -320,7 +364,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
               link: dbline.link,
               lineLevel: linelevel,
               isError: false,
-              code: line
+              code: line,
             });
 
             // Store the index of the last explanation for the current line (is needed e.g. for explaining a condition)
@@ -357,7 +401,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                   var margin = '' + (linelevel - 1) * editorLineHeight;
                   margin += 'px';
                   // create object with linelevel at the start, linelevel at the end, blocklevel, margin, color, keyoutput, height
-                  var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount].hexacode };
+                  var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount] };
                   var startwertMatch = newCondition[0].match(/(int|double)\s(\w+)\s?\=\s?[0-9]+/);
                   variableMap.set(startwertMatch[2], variableObject);
 
@@ -513,7 +557,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
               link: dbline.link,
               lineLevel: linelevel,
               isError: false,
-              code: line
+              code: line,
             });
 
             // reset the explanationParts array for the next line
@@ -572,7 +616,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 // add pixel
                 margin += 'px';
                 // create object with linelevel at the start, linelevel at the end, blocklevel, margin, color, keyoutput, height
-                var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount].hexacode };
+                var variableObject = { lineLevelStart: linelevel, blockLevel: level, lineLevelEnd: 0, height: '', margin: margin, color: colors[variableCount] };
                 // add object to variable map with variable name as key
                 variableMap.set(currentMatch[2], variableObject);
 
@@ -682,7 +726,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                   link: dbline.link,
                   lineLevel: linelevel,
                   isError: false,
-                  code: line
+                  code: line,
                 });
 
                 // reset the explanationParts array for the next line
@@ -915,7 +959,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 link: dbline.link,
                 lineLevel: linelevel,
                 isError: false,
-                code: line
+                code: line,
               });
 
               // reset the explanationParts array for the next line
@@ -936,21 +980,21 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 answer: 'Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet.',
                 lineLevel: linelevel,
                 isError: true,
-                code:line
+                code: line,
               });
             } else if (declareVarErr) {
               explanations.push({
                 answer: 'Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration.',
                 lineLevel: linelevel,
                 isError: true,
-                code: line
+                code: line,
               });
             } else {
               explanations.push({
                 answer: 'In dieser Zeile könnte es einen Fehler haben. Prüfe, ob alles korrekt ist.',
                 lineLevel: linelevel,
                 isError: true,
-                code: line
+                code: line,
               });
             }
           }

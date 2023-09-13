@@ -1,5 +1,5 @@
 /**
- * This is the main controller for the navBarTab "Explanation" and the variable scope (Coding-Assistant).
+ * This is the main controller for the navBarTab "Explanation"
  *
  *
  * @author Samuel Truniger
@@ -21,26 +21,22 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
     var startCode = 0;
     var chatBoxes = [];
     $scope.chatLines = [];
-    var disabledActions = CodeboardSrv.getDisabledActions();
-    var enabledActions = CodeboardSrv.getEnabledActions();
     $scope.cursorPosition = -1;
 
-    // fetch db and colors data from CodingAssistantCodeMatchSrv
+    // fetch db data from CodingAssistantCodeMatchSrv
     function fetchData() {
       return CodingAssistantCodeMatchSrv.getJsonData()
         .then((db) => {
-          return CodingAssistantCodeMatchSrv.getJsonColors().then((colors) => {
-            return { db, colors };
-          });
+            return { db };
         })
         .catch((error) => {
           console.error('An error occurred while fetching data:', error);
         });
     }
 
-    fetchData().then(({ db, colors }) => {
-      // call updateExplanations() to show message, when no file is opened
-      updateExplanations(db, colors);
+    fetchData().then(({ db }) => {
+      // call updateExplanations() once to show message, when no file is opened
+      updateExplanations(db);
 
       // call updateExplanations when the user open the explanations tab
       $rootScope.$on('tabClicked', function () {
@@ -59,7 +55,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
         // move cursor to startCode line
         aceEditor.gotoLine(startCode, 0);
 
-        updateExplanations(db, colors);
+        updateExplanations(db);
 
         $timeout(() => {
           highlightChatbox(startCode);
@@ -69,7 +65,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
       // Call updateExplanations() with a slight delay to ensure the initial code is loaded
       $scope.$on('fileOpenend', function () {
         $timeout(() => {
-          updateExplanations(db, colors);
+          updateExplanations(db);
         });
       });
 
@@ -77,35 +73,22 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
       AceEditorSrv.aceChangeListener(aceEditor, function () {
         // automatically call $apply if necessarry to prevent '$apply already in progress' error
         $timeout(() => {
-          updateExplanations(db, colors);
+          updateExplanations(db);
         });
-        // add markers dynamically
-        // CodingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
-
-        $rootScope.$broadcast('codeChanged');
       });
     });
 
     // Automatic function executed one time at the beginning / when a file is openend and then every time the code in the editor changes
-    function updateExplanations(db, colors) {
-      var annotations = [];
+    function updateExplanations(db) {
       chatBoxes = [];
 
       // get current code from aceEditor
-      var inputCode = aceEditor
-        .getSession()
-        .getValue()
-        .replace(/ +/g, ' ')
-        .replace(/\s*\;\s*$/g, ';')
-        .split('\n');
+      var inputCode = AceEditorSrv.getInputCode(aceEditor);
 
-      var result = CodingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCode, aceEditor, colors);
-
-      // convert variableMap into an object
-      CodeboardSrv.setVariableMap(Object.fromEntries(result.variableMap));
+      var explanations = CodingAssistantCodeMatchSrv.getMatchedExplanations(db, inputCode, aceEditor).explanations;
 
       // Iterate through the explanations array to generate the chatboxes
-      result.explanations.forEach((explanation) => {
+      explanations.forEach((explanation) => {
         if (explanation.isError) {
           // lineLevel of error chatbox
           errorLine = explanation.lineLevel;
@@ -121,13 +104,6 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
           };
           // show checkbox when line changed
           if (currentLine !== errorLine) {
-            // store a new annotation with the error lineLevel in the annotations array
-            annotations.push({
-              row: explanation.lineLevel - 1,
-              column: 0,
-              text: explanation.answer,
-              type: 'error',
-            });
             chatBoxes.push(chatline);
           }
         } else {
@@ -139,12 +115,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
             author: 'Roby erklärt Zeile ' + explanation.lineLevel,
             avatar: 'idea',
           };
-
           chatBoxes.push(chatline);
-        }
-        if (!disabledActions.includes('syntax-checker') || enabledActions.includes('syntax-checker')) {
-          // display all the annotations in the aceEditor
-          aceEditor.getSession().setAnnotations(annotations);
         }
       });
 
@@ -198,7 +169,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
       }
 
       // Update showNoCodeMessage element based on combinedExplanations array length
-      $scope.showNoCodeMessage = result.explanations.length === 0;
+      $scope.showNoCodeMessage = explanations.length === 0;
     }
 
     // call mouseclick listener in ace service
