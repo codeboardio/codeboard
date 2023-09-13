@@ -2174,6 +2174,7 @@ app.controller('RightBarCtrl', [
         $scope.rightBarTabs = {};
         $scope.showRightBarTabs = true;
         $scope.isCollapsed = true;
+        var tablinks = document.getElementsByClassName("tab");
 
         // In the following all tabs are defined, which are displayed in the right bar. The definition consists of a title,
         // an icon and the ContentUrl. The ContentUrl specifies which template is to be loaded. These templates can in turn
@@ -2289,8 +2290,7 @@ app.controller('RightBarCtrl', [
          * @param slug
          */
         $scope.rightBarTabClick = function (slug) {
-            var tablinks = document.getElementsByClassName("tab");
-
+            
             if (slug === 'explanation') {
                 $rootScope.$broadcast("tabClicked");
             }
@@ -2364,6 +2364,10 @@ app.controller('RightBarCtrl', [
         $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
             $scope.splitter.expand('#ideRighterPartOfMiddlePart');
             $scope.activeTab = data.tab;
+            for (var i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("tabClicked");
+            }
+            document.getElementById("rightBarTabs" + $scope.activeTab).classList.add("tabClicked");
         });
     },
 ]);
