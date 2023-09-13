@@ -11,10 +11,11 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
   '$rootScope',
   '$timeout',
   '$document',
+  'ProjectFactory',
   'CodingAssistantCodeMatchSrv',
   'AceEditorSrv',
   'CodeboardSrv',
-  function ($scope, $rootScope, $timeout, $document, CodingAssistantCodeMatchSrv, AceEditorSrv, CodeboardSrv) {
+  function ($scope, $rootScope, $timeout, $document, ProjectFactory, CodingAssistantCodeMatchSrv, AceEditorSrv, CodeboardSrv) {
     var aceEditor = $scope.ace.editor;
     var errorLine;
     var currentLine;
@@ -27,7 +28,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
     function fetchData() {
       return CodingAssistantCodeMatchSrv.getJsonData()
         .then((db) => {
-            return { db };
+          return { db };
         })
         .catch((error) => {
           console.error('An error occurred while fetching data:', error);
@@ -35,35 +36,38 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
     }
 
     fetchData().then(({ db }) => {
-      // call updateExplanations() once to show message, when no file is opened
+      // call updateExplanations() once to show message, when no file is opened / load initial code
       updateExplanations(db);
 
       // call updateExplanations when the user open the explanations tab
       $rootScope.$on('tabClicked', function () {
-        var doc = aceEditor.getSession().getDocument();
-        var lineCount = doc.getLength();
+        var lSelectedNode = CodeboardSrv.getFile() ||'.java';
+        if (lSelectedNode.match(/.java/)) {
+          var doc = aceEditor.getSession().getDocument();
+          var lineCount = doc.getLength();
 
-        // find first line with some code
-        for (var i = 0; i < lineCount; i++) {
-          var line = doc.getLine(i);
-          if (line.trim() !== '') {
-            startCode = i + 1;
-            break;
+          // find first line with some code
+          for (var i = 0; i < lineCount; i++) {
+            var line = doc.getLine(i);
+            if (line.trim() !== '') {
+              startCode = i + 1;
+              break;
+            }
           }
+          $scope.cursorPosition = startCode;
+          // move cursor to startCode line
+          aceEditor.gotoLine(startCode, 0);
+
+          updateExplanations(db);
+
+          $timeout(() => {
+            highlightChatbox(startCode);
+          });
         }
-        $scope.cursorPosition = startCode;
-        // move cursor to startCode line
-        aceEditor.gotoLine(startCode, 0);
-
-        updateExplanations(db);
-
-        $timeout(() => {
-          highlightChatbox(startCode);
-        });
       });
 
       // Call updateExplanations() with a slight delay to ensure the initial code is loaded
-      $scope.$on('fileOpenend', function () {
+      $scope.$on('fileOpened', function () {
         $timeout(() => {
           updateExplanations(db);
         });
@@ -71,10 +75,13 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
 
       // call change listener in ace service
       AceEditorSrv.aceChangeListener(aceEditor, function () {
-        // automatically call $apply if necessarry to prevent '$apply already in progress' error
-        $timeout(() => {
-          updateExplanations(db);
-        });
+        var lSelectedNode = CodeboardSrv.getFile() ||'.java'; 
+        if (lSelectedNode.match(/.java/)) {
+          // automatically call $apply if necessarry to prevent '$apply already in progress' error
+          $timeout(() => {
+            updateExplanations(db);
+          });
+        }
       });
     });
 
@@ -141,7 +148,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
               // keep the existing error chatbox
               newChatLines.push($scope.chatLines[existChatBoxIndex]);
             }
-          } 
+          }
           // if the chatbox exist and is of type exlanation do further checks
           else if ($scope.chatLines[existChatBoxIndex].type === 'explanation' && newChatBox.lineLevel === $scope.chatLines[existChatBoxIndex].lineLevel) {
             const oldExplanationChatLine = $scope.chatLines[existChatBoxIndex].message;

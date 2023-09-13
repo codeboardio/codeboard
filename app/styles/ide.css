@@ -121,7 +121,6 @@ body {
 /** - - - - - - - IDE Header - - - - - - - */
 .ideHeader {
   width: 100%;
-  position: sticky;
   /* height: 54px; /* set the header to the same height as the navbar */
   /*border: 1px solid #a9a9a9;*/
 }

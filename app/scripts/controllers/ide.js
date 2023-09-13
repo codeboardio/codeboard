@@ -1767,16 +1767,18 @@ app.controller('IdeCtrl', [
 
         fetchData().then(({ db }) => {
             AceEditorSrv.aceChangeListener($scope.ace.editor, function () {
-                // automatically call $apply if necessarry to prevent '$apply already in progress' error
-                $timeout(() => {
-                  updateExplanations(db);
-                });
-                
-                // add markers dynamically
-                // CodingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor);
-
+                var lSelectedNode = CodeboardSrv.getFile() ||'.java';
+                if (lSelectedNode.match(/.java/)) {
+                    // automatically call $apply if necessarry to prevent '$apply already in progress' error
+                    $timeout(() => {
+                        updateExplanations(db);
+                    });
                 // broadcast that varScope window gets closed when there was a change in the code...    
                 $scope.$broadcast('codeChanged');
+                }
+                
+                // add markers dynamically
+                // CodingAssistantCodeMatchSrv.addDynamicMarkers(aceEditor););
             });
         });
 
@@ -1818,7 +1820,8 @@ app.controller('TreeCtrl', [
     '$log',
     'ProjectFactory',
     'IdeMsgService',
-    function ($scope, $rootScope, $log, ProjectFactory, IdeMsgService) {
+    'CodeboardSrv',
+    function ($scope, $rootScope, $log, ProjectFactory, IdeMsgService, CodeboardSrv) {
         $scope.projectNodes = ProjectFactory.getProject().files;
 
         /**
@@ -1842,8 +1845,12 @@ app.controller('TreeCtrl', [
          */
         $scope.nodeClick = function () {
             // broadcast an event when a file is openend
-            $rootScope.$broadcast('fileOpenend');
             var lSelectedNode = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId);
+            CodeboardSrv.setFile(lSelectedNode.filename);
+            // only broadcast an event for the syntax-checker when a java file is opened
+            if (lSelectedNode.filename.match(/.java/)) {
+                $rootScope.$broadcast('fileOpened');
+            } 
 
             // ignore the click if the selected node is a folder
             if (lSelectedNode !== null && !lSelectedNode.isFolder) {

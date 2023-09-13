@@ -11,6 +11,7 @@ angular.module('codeboardApp').service('CodeboardSrv', [
     var disabledActions = [];
     var enabledActions = [];
     var variableMap = {};
+    var currentFile;
 
     // this function gets all current disabledActions
     service.getDisabledActions = () => {
@@ -48,6 +49,16 @@ angular.module('codeboardApp').service('CodeboardSrv', [
     // function which sets the variableMap based on the result of the CodingAssistantMainCtrl
     service.setVariableMap = function (newVariableMap) {
       variableMap = newVariableMap;
+    };
+
+    // function which returns the current opened file
+    service.getFile = function () {
+      return currentFile;
+    };
+
+    // function which sets the current opened file
+    service.setFile = function (file) {
+      currentFile = file;
     };
 
     // available disabled actions (can be set in "new course" / "course settings")
