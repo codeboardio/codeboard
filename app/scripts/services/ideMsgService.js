@@ -444,10 +444,12 @@ angular.module('codeboardApp')
      * @param tabId
      * @returns {{msg: string, data: {tabId: *}}}
      */
-    this.msgNavBarRightOpenTab = function (tab) {
+    this.msgNavBarRightOpenTab = function (tab, doIoTest) {
+      // this is only relevant for the test-tab.. if the test-tab gets opened from the info-tab the test should not start automatically.. therefore we pass doIoTest as false in that broadcast call... default is doIoTest=true
+      if (typeof doIoTest === 'undefined') { doIoTest = true; }
       return {
         msg: 'ide.navBarRightOpenTab',
-        data: { "tab": tab }
+        data: { "tab": tab, "doIoTest": doIoTest },
       };
     };
 

@@ -254,7 +254,7 @@ angular.module('codeboardApp')
              * listen to test project events
              */
             $scope.$on(IdeMsgService.msgNavBarRightOpenTab().msg, function (event, data) {
-                if(data.tab === 'test') {
+                if(data.tab === 'test' && data.doIoTest) {
                     $scope.doTheIoTesting();
                 }
             });

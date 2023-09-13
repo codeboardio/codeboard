@@ -99,7 +99,7 @@ angular.module('codeboardApp').directive('chatLine', function () {
                     switch (type) {
                         case 'test':
                             // open test tab
-                            req = IdeMsgService.msgNavBarRightOpenTab('test');
+                            req = IdeMsgService.msgNavBarRightOpenTab('test', false);
                             $rootScope.$broadcast(req.msg, req.data);
                             break;
                         case 'explanation':
@@ -117,7 +117,7 @@ angular.module('codeboardApp').directive('chatLine', function () {
                             req = IdeMsgService.msgNavBarRightOpenTab('compiler');
                             $rootScope.$broadcast(req.msg, req.data);
                             break;
-                        case 'question':
+                        case 'questions':
                             // open questions tab
                             req = IdeMsgService.msgNavBarRightOpenTab('questions');
                             $rootScope.$broadcast(req.msg, req.data);
