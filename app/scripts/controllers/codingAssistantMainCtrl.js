@@ -123,9 +123,9 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
           if (currentLine !== errorLine) {
             // store a new annotation with the error lineLevel in the annotations array
             annotations.push({
-              row: chatline.lineLevel - 1,
+              row: explanation.lineLevel - 1,
               column: 0,
-              text: chatline.message,
+              text: explanation.answer,
               type: 'error',
             });
             chatBoxes.push(chatline);

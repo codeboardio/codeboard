@@ -933,21 +933,21 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
           if (line.match(/^(?!^\s*}\s*$)(?!^\s*\t\s*$)(?!^\s*$).+$/gm)) {
             if (redeclareVarErr) {
               explanations.push({
-                answer: 'Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet!',
+                answer: 'Du probierst auf eine Variable zuzugreifen, welche nocht nicht deklariert wurde, oder sich ausserhalb des Scopes befindet.',
                 lineLevel: linelevel,
                 isError: true,
                 code:line
               });
             } else if (declareVarErr) {
               explanations.push({
-                answer: 'Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration!',
+                answer: 'Diese Variable wurde bereits deklariert! Bitte verwende einen anderen Namen für die Deklaration.',
                 lineLevel: linelevel,
                 isError: true,
                 code: line
               });
             } else {
               explanations.push({
-                answer: 'In dieser Zeile hat sich ein Fehler eingeschlichen. Bitte korrigiere den Code, damit ich ihn erklären kann!',
+                answer: 'In dieser Zeile könnte es einen Fehler haben. Prüfe, ob alles korrekt ist.',
                 lineLevel: linelevel,
                 isError: true,
                 code: line
