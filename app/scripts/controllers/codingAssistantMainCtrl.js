@@ -21,6 +21,8 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
     var currentLine;
     var startCode = 0;
     var chatBoxes = [];
+    var disabledActions = CodeboardSrv.getDisabledActions();
+    var enabledActions = CodeboardSrv.getEnabledActions();
     $scope.chatLines = [];
     $scope.cursorPosition = -1;
 
@@ -41,7 +43,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
 
       // call updateExplanations when the user open the explanations tab
       $rootScope.$on('tabClicked', function () {
-        var lSelectedNode = CodeboardSrv.getFile() ||'.java';
+        var lSelectedNode = CodeboardSrv.getFile() || '.java';
         if (lSelectedNode.match(/.java/)) {
           var doc = aceEditor.getSession().getDocument();
           var lineCount = doc.getLength();
@@ -66,7 +68,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
         }
       });
 
-      // Call updateExplanations() with a slight delay to ensure the initial code is loaded
+      // call updateExplanations() with a slight delay to ensure the initial code is loaded - click file in tree-view case
       $scope.$on('fileOpened', function () {
         $timeout(() => {
           updateExplanations(db);
@@ -75,7 +77,7 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
 
       // call change listener in ace service
       AceEditorSrv.aceChangeListener(aceEditor, function () {
-        var lSelectedNode = CodeboardSrv.getFile() ||'.java'; 
+        var lSelectedNode = CodeboardSrv.getFile() || '.java';
         if (lSelectedNode.match(/.java/)) {
           // automatically call $apply if necessarry to prevent '$apply already in progress' error
           $timeout(() => {
@@ -111,7 +113,9 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
           };
           // show checkbox when line changed
           if (currentLine !== errorLine) {
-            chatBoxes.push(chatline);
+            if (!disabledActions.includes('error-chatbox') || enabledActions.includes('error-chatbox')) {
+              chatBoxes.push(chatline);
+            }
           }
         } else {
           let chatline = {
