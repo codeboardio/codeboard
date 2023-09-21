@@ -120,7 +120,6 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
         // if storedMarkers is empty, try adding from storedMarkersBackup (this case gets executed when the code in the editor does not change and the variable scope window gets toggled on/off)
         if (service.storedMarkers.length === 0 && service.storedMarkersBackup) {
           service.storedMarkersBackup.forEach((item) => {
-            console.log(item);
             if (item.clazz.includes('marker')) {
               aceEditor.getSession().addMarker(item.range, item.clazz, item.type);
             }
