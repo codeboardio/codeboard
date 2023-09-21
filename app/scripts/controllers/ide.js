@@ -2436,6 +2436,8 @@ app.controller('RightBarCtrl', [
          * function which gets called when user clicks on a new tab above the editor to remove the markers and close the window
          */
         $scope.$on('javaClassClicked', function () {
+            // reset storedMarkersBackup every time a new tab is clicked to not set the previous markers from the other tab in the new tab.. 
+            CodingAssistantCodeMatchSrv.storedMarkersBackup = [];
             CodingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor, true, true);
             if (!$scope.isCollapsed) {
                 $scope.innerSplitter.collapse('#ideVarScopePartOfMiddlePart');

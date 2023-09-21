@@ -96,7 +96,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
     // Everything related to toggle markers - code implemented with help form stack overflow (https://stackoverflow.com/questions/65677814/how-to-remove-all-the-existing-highlight-markers-in-ace-editor-using-react) and Chat-GPT
     // Indicates if markers are toggled on or off
     var toggled = false;
-    var storedMarkersBackup = [];
+    service.storedMarkersBackup = [];
     // does line match
     var markerMatch;
     var dataType;
@@ -118,22 +118,25 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
       }
       if (toggled && !changed) {
         // if storedMarkers is empty, try adding from storedMarkersBackup (this case gets executed when the code in the editor does not change and the variable scope window gets toggled on/off)
-        if (service.storedMarkers.length === 0 && storedMarkersBackup) {
-          storedMarkersBackup.forEach((item) => {
+        if (service.storedMarkers.length === 0 && service.storedMarkersBackup) {
+          service.storedMarkersBackup.forEach((item) => {
+            console.log(item);
             if (item.clazz.includes('marker')) {
-              aceEditor.session.addMarker(item.range, item.clazz, item.type);
+              aceEditor.getSession().addMarker(item.range, item.clazz, item.type);
             }
           });
-        } else {
+        } 
+        // this condition gets executed when the markers get showed the first time.. if there are now changes in the code the markers get showed from the storedMarkersBackup array
+        else {
           // show the stored markers in the code-editor
           service.storedMarkers.forEach((item) => {
             if (item.clazz.includes('marker')) {
               // store marker id for later removal
-              item.markerId = aceEditor.session.addMarker(item.range, item.clazz, item.type);
+              item.markerId = aceEditor.getSession().addMarker(item.range, item.clazz, item.type);
             }
           });
           // update storedMarkersBackup when storedMarkers are shown
-          storedMarkersBackup = [...service.storedMarkers];
+          service.storedMarkersBackup = [...service.storedMarkers];
           service.storedMarkers = [];
         }
       } else if ((!toggled && !changed) || changed || newTabOpened) {
@@ -141,11 +144,11 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
           toggled = false;
         }
         // remove existing markers in the ace Editor
-        var existMarkers = aceEditor.session.getMarkers();
+        var existMarkers = aceEditor.getSession().getMarkers();
         if (existMarkers) {
           var prevMarkersArr = Object.keys(existMarkers);
           prevMarkersArr.forEach((item) => {
-            aceEditor.session.removeMarker(existMarkers[item].id);
+            aceEditor.getSession().removeMarker(existMarkers[item].id);
           });
         }
       }
