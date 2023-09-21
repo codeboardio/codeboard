@@ -264,7 +264,8 @@ app.controller('IdeCtrl', [
             var onWSCloseCallback = function () {
                 // if no message was added via WS, we set a message that the action completed
                 if (numOfMessages === 0) {
-                    addToOutput('--Session ended without output.--', false);
+                    // todo addToOutput('--Session ended without output.--', false);
+                    console.log('--Session ended without output.--')
                 }
 
                 // set focus back to the editor
