@@ -725,7 +725,7 @@
         },
         {
             "name": "newArrayDeclarationRegex",
-            "regex": "^\\s*(int|String|boolean|long|double|char)\\[\\]\\s*(\\w+)\\s*;\\s*$",
+            "regex": "^\\s*(int|String|boolean|long|double|char)\\s*\\[\\]\\s*(\\w+)\\s*;\\s*$",
             "answer": "Es wird ein Array vom Datentyp '1' mit dem Namen \"'2'\" deklariert.",
             "link": "https://www.w3schools.com/java/java_arrays.asp",
             "block": "false",
@@ -741,7 +741,7 @@
         },
         {
             "name": "newArrayRegex",
-            "regex": "^\\s*(int|String|boolean|long|double|char)\\[\\]\\s*(\\w+)\\s*=?\\s*\\{(.*)\\}\\s*;\\s*$",
+            "regex": "^\\s*(int|String|boolean|long|double|char)\\s*\\[\\]\\s*(\\w+)\\s*=?\\s*\\{(.*)\\}\\s*;\\s*$",
             "answer": "Array \"'2'\" vom Datentyp '1' wird mit dem Inhalt \"'3'\" deklariert",
             "link": "https://www.w3schools.com/java/java_arrays.asp",
             "block": "false",
@@ -757,7 +757,7 @@
         },
         {
             "name": "newArrayDeclarationAndInitializationRegex",
-            "regex": "^\\s*(int|String|boolean|long|double|char)\\[\\]\\s*(\\w+)\\s?=?\\s*new\\s+(int|String|boolean|long|double|char)\\[([0-9])\\]\\s*;\\s*$",
+            "regex": "^\\s*(int|String|boolean|long|double|char)\\s*\\[\\]\\s*(\\w+)\\s?=?\\s*new\\s+(int|String|boolean|long|double|char)\\[([0-9])\\]\\s*;\\s*$",
             "answer": "Array vom Datentyp '1' wird mit dem Namen \"'2'\" deklariert, um '4' '3'-Werte zu speichern.",
             "link": "https://www.w3schools.com/java/java_arrays.asp",
             "block": "false",
@@ -999,7 +999,7 @@
         },
         {
             "name": "additionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\+\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\+\\=\\s*([a-zA-Z0-9_.\\[\\]]*)\\s*\\;\\s*$",
             "answer": "Das Ergebnis von '1' + '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' + '2')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",

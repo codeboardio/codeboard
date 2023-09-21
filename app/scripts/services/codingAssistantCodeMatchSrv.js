@@ -106,7 +106,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
     var variableLength;
     var wholeLineTxt;
     // regex to calculate marker position
-    const markerDeclarationRegex = /(?<=\s|^)((?:\w+)(?:\[\])+|\w+)(\s+)(\w+)/;
+    const markerDeclarationRegex = /(?<=\s|^)((?:\w+)(?:\s*\[\])+|\w+)(\s+)(\w+)/;
     const markerRedeclarationRegex = /(?<=\s|^)(\w+)(?=\s*[+\-*\/]?=|\+\+;|--;|\[\d+\])/;
     const markerLoopRegex = /(?:for|while)\s*\(([^()]*?)(\w+)\s+([^()]*?)(\w+)/;
 
@@ -1031,7 +1031,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
       document.head.appendChild(markerElement);
 
       // filter the storedMarkers array that there are no duplicates because the function gets called multiple times within the application
-      service.storedMarkers = service.storedMarkers.filter((value, index, self) => index === self.findIndex((t) => t.clazz === value.clazz));
+      // service.storedMarkers = service.storedMarkers.filter((value, index, self) => index === self.findIndex((t) => t.clazz === value.clazz));
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // return explanations and variableMap to use it in the CodingAssistantMainCtrl & IdeCtrl
