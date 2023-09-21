@@ -1,5 +1,5 @@
 /**
- * This is the main controller for the navBarTab "Explanation"
+ * This is the main controller for the navBarTab "explanation" - the controller will generate the explanation/error chatboxes (functionality for variable Scope and syntax-checker is in ide.js)
  *
  *
  * @author Samuel Truniger
@@ -70,6 +70,13 @@ angular.module('codeboardApp').controller('CodingAssistantMainCtrl', [
 
       // call updateExplanations() with a slight delay to ensure the initial code is loaded - click file in tree-view case
       $scope.$on('fileOpened', function () {
+        $timeout(() => {
+          updateExplanations(db);
+        });
+      });
+
+      // Call updateExplanations() with a slight delay to ensure the initial code is loaded (click tab above editor case)
+      $scope.$on('javaClassClicked', function () {
         $timeout(() => {
           updateExplanations(db);
         });

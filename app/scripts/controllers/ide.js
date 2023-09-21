@@ -1767,6 +1767,23 @@ app.controller('IdeCtrl', [
         }
 
         fetchData().then(({ db }) => {
+            // call updateExplanations once to ensure that initial code is loaded
+            updateExplanations(db);
+
+            // call updateExplanations() with a slight delay to ensure the initial code is loaded (click file in tree-view case)
+            $scope.$on('fileOpened', function () {
+                $timeout(() => {
+                    updateExplanations(db);
+                });
+            });
+
+            // call updateExplanations() with a slight delay to ensure the initial code is loaded (click tab above editor case)
+            $scope.$on('javaClassClicked', function () {
+                $timeout(() => {
+                    updateExplanations(db);
+                });
+            });
+
             AceEditorSrv.aceChangeListener($scope.ace.editor, function () {
                 var lSelectedNode = CodeboardSrv.getFile() ||'.java';
                 if (lSelectedNode.match(/.java/)) {
@@ -1848,7 +1865,7 @@ app.controller('TreeCtrl', [
             // broadcast an event when a file is openend
             var lSelectedNode = ProjectFactory.getNode($scope.mytree.currentNode.uniqueId);
             CodeboardSrv.setFile(lSelectedNode.filename);
-            // only broadcast an event for the syntax-checker when a java file is opened
+            // only broadcast an event when a java file is opened (click file in tree-view case)
             if (lSelectedNode.filename.match(/.java/)) {
                 $rootScope.$broadcast('fileOpened');
             } 
@@ -2016,7 +2033,8 @@ app.controller('TabCtrl', [
     '$uibModal',
     'ProjectFactory',
     'IdeMsgService',
-    function ($scope, $rootScope, $log, $uibModal, ProjectFactory, IdeMsgService) {
+    'CodeboardSrv',
+    function ($scope, $rootScope, $log, $uibModal, ProjectFactory, IdeMsgService, CodeboardSrv) {
         $scope.tabs = [];
 
         /**
@@ -2050,6 +2068,12 @@ app.controller('TabCtrl', [
         $scope.selectClick = function (aArrayIndex) {
             var req = IdeMsgService.msgDisplayFileRequest($scope.tabs[aArrayIndex].nodeIndex);
             $rootScope.$broadcast(req.msg, req.data);
+
+            CodeboardSrv.setFile($scope.tabs[aArrayIndex].name);
+            if ($scope.tabs[aArrayIndex].name.match(/.java/)) {
+                // broadcast an event when a new tab gets clicked (above the editor) and only when it is a .java file
+                $rootScope.$broadcast('javaClassClicked');
+            }
         };
 
         /**
@@ -2239,7 +2263,8 @@ app.controller('RightBarCtrl', [
     'IdeMsgService',
     'TabService',
     'CodingAssistantCodeMatchSrv',
-    function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService, TabService, CodingAssistantCodeMatchSrv) {
+    'CodeboardSrv',
+    function ($scope, $rootScope, $http, $uibModal, ProjectFactory, IdeMsgService, TabService, CodingAssistantCodeMatchSrv, CodeboardSrv) {
         $scope.navBarRightContent = '';
         $scope.activeTab = '';
         $scope.rightBarTabs = {};
@@ -2402,6 +2427,30 @@ app.controller('RightBarCtrl', [
                 $scope.ideTabsStyle = { 'margin-left': 'calc(10% + 47px)' };
             }
         };
+        
+        /**
+         * function which gets called when user clicks on a new tab above the editor to remove the markers and close the window
+         */
+        $scope.$on('javaClassClicked', function () {
+            CodingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor, true, true);
+            if (!$scope.isCollapsed) {
+                $scope.innerSplitter.collapse('#ideVarScopePartOfMiddlePart');
+                $scope.ideTabsStyle = { 'margin-left': '47px' };
+                $scope.isCollapsed = true;
+            }
+        });
+
+        /**
+         * function which gets called when user clicks on a new file in the tree-view to remove the markers and close the window - can be enabled in a case where the tree-view should be visible for the students
+         */
+        // $scope.$on('fileOpened', function () {
+        //     CodingAssistantCodeMatchSrv.toggleMarkers($scope.ace.editor, true, true);
+        //     if (!$scope.isCollapsed) {
+        //         $scope.innerSplitter.collapse('#ideVarScopePartOfMiddlePart');
+        //         $scope.ideTabsStyle = { 'margin-left': '47px' };
+        //         $scope.isCollapsed = true;
+        //     }
+        // });
 
         /**
          * function which gets called when code in ace editor changed to close the variable scope div

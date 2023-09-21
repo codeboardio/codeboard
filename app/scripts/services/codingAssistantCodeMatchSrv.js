@@ -96,8 +96,6 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
     // Everything related to toggle markers - code implemented with help form stack overflow (https://stackoverflow.com/questions/65677814/how-to-remove-all-the-existing-highlight-markers-in-ace-editor-using-react) and Chat-GPT
     // Indicates if markers are toggled on or off
     var toggled = false;
-    // store the markers
-    var storedMarkers = [];
     var storedMarkersBackup = [];
     // does line match
     var markerMatch;
@@ -113,11 +111,14 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
     const markerLoopRegex = /(?:for|while)\s*\(([^()]*?)(\w+)\s+([^()]*?)(\w+)/;
 
     // toggles the markers on and off in the code-editor
-    service.toggleMarkers = function (aceEditor, changed) {
+    service.toggleMarkers = function (aceEditor, changed, newTabOpened) {
       toggled = !toggled;
+      if (newTabOpened === undefined) {
+        newTabOpened = false;
+      }
       if (toggled && !changed) {
         // if storedMarkers is empty, try adding from storedMarkersBackup (this case gets executed when the code in the editor does not change and the variable scope window gets toggled on/off)
-        if (storedMarkers.length === 0 && storedMarkersBackup) {
+        if (service.storedMarkers.length === 0 && storedMarkersBackup) {
           storedMarkersBackup.forEach((item) => {
             if (item.clazz.includes('marker')) {
               aceEditor.session.addMarker(item.range, item.clazz, item.type);
@@ -125,16 +126,20 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
           });
         } else {
           // show the stored markers in the code-editor
-          storedMarkers.forEach((item) => {
+          service.storedMarkers.forEach((item) => {
             if (item.clazz.includes('marker')) {
               // store marker id for later removal
               item.markerId = aceEditor.session.addMarker(item.range, item.clazz, item.type);
             }
           });
           // update storedMarkersBackup when storedMarkers are shown
-          storedMarkersBackup = [...storedMarkers];
+          storedMarkersBackup = [...service.storedMarkers];
+          service.storedMarkers = [];
         }
-      } else if ((!toggled && !changed) || changed) {
+      } else if ((!toggled && !changed) || changed || newTabOpened) {
+        if (newTabOpened) {
+          toggled = false;
+        }
         // remove existing markers in the ace Editor
         var existMarkers = aceEditor.session.getMarkers();
         if (existMarkers) {
@@ -142,7 +147,6 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
           prevMarkersArr.forEach((item) => {
             aceEditor.session.removeMarker(existMarkers[item].id);
           });
-          storedMarkers = [];
         }
       }
     };
@@ -175,6 +179,9 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
       const paraRegex = /(int|String|boolean|long|double|char)[\[\]]*\s*(\w+[\[\]]*)+/;
       const newVarComparisationRegex = /^\s*((?:boolean))\s*(\w+)\s*\=\s*([A-z0-9$_()+\-*\/%\s]+)\s+([<=!>]+)\s+([A-z0-9$_()\-+*\/%\s]+);\s*$/;
       const redeclareVarComparisationRegex = /^\s*(\w+)\s+\=\s+([A-z0-9$_.()*\-+/%\s*]+)\s+([<=!>]+)\s+([A-z0-9$_.()*\-+/%\s*]+);\s*$/;
+
+      // store the markers - reset array after every function call
+      service.storedMarkers = [];
 
       // check line height from codeEditor
       var editorLineHeight;
@@ -415,7 +422,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                     startIndex = markerMatch.index + markerMatch[0].length - dataType.length - variableName.length;
                     variableLength = variableName.length;
 
-                    storedMarkers.push({
+                    service.storedMarkers.push({
                       range: new Range(linelevel - 1, startIndex, linelevel - 1, startIndex + variableLength),
                       clazz: 'marker' + variableName,
                       type: 'text',
@@ -631,7 +638,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                   startIndex = markerMatch.index + dataType.length + numWhitespaces;
                   variableLength = variableName.length;
 
-                  storedMarkers.push({
+                  service.storedMarkers.push({
                     range: new Range(linelevel - 1, startIndex, linelevel - 1, startIndex + variableLength),
                     clazz: 'marker' + variableName,
                     type: 'text',
@@ -870,7 +877,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                 startIndex = markerMatch.index;
                 variableLength = variableName.length;
 
-                storedMarkers.push({
+                service.storedMarkers.push({
                   range: new Range(linelevel - 1, startIndex, linelevel - 1, startIndex + variableLength),
                   clazz: 'marker' + variableName,
                   type: 'text',
@@ -1021,8 +1028,11 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
       // append the style element to the document
       document.head.appendChild(markerElement);
 
+      // filter the storedMarkers array that there are no duplicates because the function gets called multiple times within the application
+      service.storedMarkers = service.storedMarkers.filter((value, index, self) => index === self.findIndex((t) => t.clazz === value.clazz));
+
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // Return explanations and variableMap to use it in the CodingAssistantMainCtrl
+      // return explanations and variableMap to use it in the CodingAssistantMainCtrl & IdeCtrl
       return {
         explanations: explanations,
         variableMap: variableMap,
