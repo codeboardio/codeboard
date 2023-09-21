@@ -551,7 +551,7 @@ app.controller('IdeCtrl', [
 
                     // default texts
                     $scope.title = 'Deine Lösung wird überprüft';
-                    $scope.textAfterResult = 'Damit du im Kurs fortfahren kannst, musst du deinen Code weiter verbessern und alle Tests bestehen. Wenn du Probleme bei dieser Aufgabe hast, nutze die einzelnen Hilfestellungen, welche über die rechte Navigationsleiste aufgerufen werden können. Weiterhin viel Erfolg!';
+                    $scope.textAfterResult = 'Vor der Abgabe teste ich ein letztes Mal dein Programm. Für jeden bestandenen Test gibt es Punkte. Ich bin gleich so weit.';
                     $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_neutral_2020.svg';
 
                     /**
@@ -560,7 +560,9 @@ app.controller('IdeCtrl', [
                      * todo Differentiate texts depending on whether they are dynamic or not
                      */
                     let noTestsPassed = function () {
-                        $scope.textBeforeResult = 'Sehr wahrscheinlich hat deine Lösung einen Kompilier-Fehler. Versuche diesen zu beheben, damit du deine Lösung erfolgreich abgeben kannst.';
+                        $scope.title = 'Die Überprüfung ist abgeschlossen';
+                        $scope.textBeforeResult = 'Leider funktioniert dein Programm noch nicht wie gewünscht. Bei keinem meiner Tests hat dein Programm die richtige Ausgabe erzeugt. ';
+                        $scope.textAfterResult = 'Versuche dein Programm weiter zu verbessern.';
                         $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg';
                     };
 
@@ -568,7 +570,9 @@ app.controller('IdeCtrl', [
                      * Defines what to do when no tests passed
                      */
                     let notEnoughTestsPassed = function (numTests) {
-                        $scope.textBeforeResult = 'Gut gemacht! Deine Lösung erfüllt bereits ' + $scope.numTestsPassed + ' von ' + $scope.numTests + ' Tests.';
+                        $scope.title = 'Die Überprüfung ist abgeschlossen';
+                        $scope.textBeforeResult = 'Gut gemacht! Dein Programm erfüllt bereits ' + $scope.numTestsPassed + ' von ' + $scope.numTests + ' Tests.';
+                        $scope.textAfterResult = 'Versuche dein Programm weiter zu verbessern.';
                         $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_worried_2020.svg';
                     };
 
@@ -577,9 +581,9 @@ app.controller('IdeCtrl', [
                      * When the passRates is reached we trigger the msgSuccessfulSubmission event
                      */
                     let enoughTestsPassed = function () {
-                        $scope.title = 'Deine Lösung wurde erfolgreich übermittelt';
-                        $scope.textBeforeResult = 'Gratulation! Deine Lösung erfüllt alle Tests und wurde erfolgreich abgegeben!';
-                        $scope.textAfterResult = 'Du kannst nun im Kurs fortfahren und mit der nächsten Aufgabe beginnen. Ich wünsche dir weiterhin viel Spass im Kurs!';
+                        $scope.title = 'Super gemacht!';
+                        $scope.textBeforeResult = 'Gratulation! Dein Programm hat alle Tests bestanden und du hast die maximale Punktzahl erhalten.';
+                        $scope.textAfterResult = 'Du kannst dir nun die Musterlösung anzeigen lassen.';
                         $scope.avatar = '../../../images/avatars/Avatar_RobyCoder_RZ_thumb-up_2020.svg';
 
                         projectData.projectCompleted = true;
