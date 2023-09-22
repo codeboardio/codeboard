@@ -444,33 +444,9 @@
             "type": "operator"
         },
         {
-            "name": "additionAllocationPrint",
-            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\+\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
-            "answer": "Das Ergebnis von '1' (entspricht '2' = '2' + '3') wird ",
-            "type": "operator"
-        },
-        {
-            "name": "multiplicationAllocationPrint",
-            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\*\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
-            "answer": "Das Ergebnis von '1' (entspricht '2' = '2' * '3') wird ",
-            "type": "operator"
-        },
-        {
-            "name": "divisionAllocationPrint",
-            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s+\\/\\=\\s+([a-zA-Z0-9_\\[\\]]+))",
-            "answer": "Das Ergebnis von '1' (entspricht '2' = '2' / '3') wird ",
-            "type": "operator"
-        },
-        {
-            "name": "subtractionAllocationPrint",
-            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\-\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
-            "answer": "Das Ergebnis von '1' (entspricht '2' = '2' - '3') wird ",
-            "type": "operator"
-        },
-        {
-            "name": "moduloAllocationPrint",
-            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*\\%\\=\\s*([a-zA-Z0-9_\\[\\]]+))",
-            "answer": "Das Ergebnis von '1' (entspricht '2' = '2' % '3') wird ",
+            "name": "allocationPrint",
+            "regex": "(([a-zA-Z0-9_\\[\\]]+)\\s*(\\+|\\-|\\/|\\*|\\%)\\=\\s*([a-zA-Z0-9_\\[\\].]+))",
+            "answer": "Das Ergebnis von '1' (entspricht '2' = '2' '3' '4') wird ",
             "type": "operator"
         },
         {
@@ -589,8 +565,8 @@
         },
         {
             "name": "newVariableDivisionRegex",
-            "regex": "^\\s*(int|double)\\s(\\w+)\\s?\\=\\s?([A-z0-9.]+\\s*\\/+\\s*[A-z0-9.]*)\\s*;\\s*$",
-            "answer": "1' \"'2'\" wird als '3' (Datentyp int = Resultat ohne Nachkommastelle) deklariert",
+            "regex": "^\\s*(int|double)\\s(\\w+)\\s?\\=\\s?([A-z0-9.()+*-\/\\s]+\\s*\/+\\s*[A-z0-9.()+*-\/\\s]*)\\s*;\\s*$",
+            "answer": "1' \"'2'\" wird als '3' deklariert (Bei Datentyp 'int' --> keine Nachkommastelle)",
             "link": "https://www.w3schools.com/java/java_variables.asp",
             "block": "false",
             "type": "operator"
@@ -669,8 +645,8 @@
         },
         {
             "name": "newVariableModuloRegex",
-            "regex": "^\\s*(int|double)\\s(\\w+)\\s?\\=\\s?([A-z0-9.]+\\s*\\%\\s*[A-z0-9.]*)\\s*;\\s*$",
-            "answer": "1' \"'2'\" wird als '3' deklariert ('3' gibt den Rest der Division zurück)",
+            "regex": "^\\s*(int|double)\\s(\\w+)\\s?\\=\\s?([A-z0-9.()+*-\/\\s]+\\s*\\%\\s*[A-z0-9.()+*-\/\\s]*)\\s*;\\s*$",
+            "answer": "1' \"'2'\" wird als '3' deklariert (\"%\" gibt den Rest der Division zurück)",
             "link": "https://codegree.de/java-modulo-die-division-mit-rest-in-java/",
             "block": "false",
             "type": "operator"
@@ -855,8 +831,8 @@
         },
         {
             "name": "redeclareVariableModuloRegex",
-            "regex": "^\\s*(\\w+)\\s?\\=\\s?([A-z0-9.]+\\s*\\%+\\s*[A-z0-9.]*)\\s*;\\s*$",
-            "answer": "2' (gibt den Rest der Division zurück) wird der Variable '1' zugewiesen",
+            "regex": "^\\s*(\\w+)\\s?\\=\\s?([A-z0-9.()+*-\/\\s]+\\s*\\%+\\s*[A-z0-9.()+*-\/\\s]*)\\s*;\\s*$",
+            "answer": "2' wird der Variable '1' zugewiesen (\"%\" gibt den Rest der Division zurück)",
             "link": "https://codegree.de/java-modulo-die-division-mit-rest-in-java/",
             "block": "false",
             "type": "operator"
@@ -998,41 +974,9 @@
             "type": "operator"
         },
         {
-            "name": "additionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\+\\=\\s*([a-zA-Z0-9_.\\[\\]]*)\\s*\\;\\s*$",
-            "answer": "Das Ergebnis von '1' + '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' + '2')",
-            "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
-            "block": "false",
-            "type": "operator"
-        },
-        {
-            "name": "divisionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\/\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
-            "answer": "Das Ergebnis von '1' / '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' / '2')",
-            "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
-            "block": "false",
-            "type": "operator"
-        },
-        {
-            "name": "subtractionAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\-\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
-            "answer": "Das Ergebnis von '1' - '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' - '2')",
-            "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
-            "block": "false",
-            "type": "operator"
-        },
-        {
-            "name": "multiplicationAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\*\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
-            "answer": "Das Ergebnis von '1' * '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' * '2')",
-            "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
-            "block": "false",
-            "type": "operator"
-        },
-        {
-            "name": "moduloAllocation",
-            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\%\\=\\s*([a-zA-Z0-9_\\[\\]]*)\\s*\\;\\s*$",
-            "answer": "Das Ergebnis von '1' % '2' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' % '2')",
+            "name": "allocation",
+            "regex": "^\\s*([a-zA-Z0-9_\\[\\]]*)\\s*(\\+|\\-|\\/|\\*|\\%)\\=\\s*([a-zA-Z0-9_.\\[\\].]*)\\s*\\;\\s*$",
+            "answer": "Das Ergebnis von '1' '2' '3' wird der Variable \"'1'\" zugewiesen (entspricht '1' = '1' '2' '3')",
             "link": "https://www.w3schools.com/jsref/jsref_operators.asp",
             "block": "false",
             "type": "operator"

@@ -533,7 +533,7 @@ angular.module('codeboardApp').service('CodingAssistantCodeMatchSrv', [
                     // go trough all the splitted answers and check where the cg is needed
                     if (printExpressionAnswerArray[j].match(/^[0-9]*$/)) {
                       const currentNumber = printExpressionAnswerArray[j].match(/^[0-9]*$/);
-                      printExpressionAnswerArray[j] = '"' + checkPrintStatement[currentNumber] + '"';
+                      printExpressionAnswerArray[j] = checkPrintStatement[currentNumber];
                     }
                   }
                   if (currentExpression.name === 'callMethodInputRegex') {
